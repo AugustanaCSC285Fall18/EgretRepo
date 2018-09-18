@@ -36,8 +36,16 @@ public class Chick {
 	/**
 	 * @return the current Center Point of the chick
 	 */
-	public Point getCenterPoint() {
+	public Point getCurrentCenterPoint() {
 		return centerPoint;
+	}
+	
+	/**
+	 * @param time - the time to get the center of the chick
+	 * @return the center point of the chick at a given time
+	 */
+	public Point getCenterPointAtTime(int time) {
+		return locations.get(time);
 	}
 	
 	/**
@@ -60,8 +68,9 @@ public class Chick {
 	 * Takes in a new point and sets the center location of the chick and 
 	 * adds the new center location to the list of previous locations. 
 	 * @param newCenterPoint - the new center point of the chick
+	 * @param time - the time stamp of the center point
 	 */
-	public void setLocation(Point newCenterPoint) {
+	public void addLocation(Point newCenterPoint, int time) {
 		centerPoint = newCenterPoint;
 		locations.add(newCenterPoint);
 	}
