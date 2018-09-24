@@ -2,6 +2,8 @@ package edu.augustana.csc285.Egret;
 
 import  edu.augustana.csc285.Egret.Utils;
 import java.io.File;
+import java.io.FileNotFoundException;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 
 public class Video {
 	
+	
+	//you want these
 	@FXML
 	private ImageView currentFrameImage;
 	@FXML
@@ -31,24 +35,12 @@ public class Video {
 	@FXML
 	private TextField jumpToFrameArea;
 	
-	private double frameRate;
-	private double widthPixels;
-	private double heightPixels;	
-
-	private double xPixelsPerCm;
-	private double yPixelsPerCm;	
-	private double startFrameNum;
-	private double endFrameNum;
 	
-	private int videoLength;
-	private int currentTimeStamp;
-	private String formatType;
-	//Integer because the time steps are in seconds most likely else we could maybe do them in milliseconds or something
-	private ArrayList<Integer> flagMarkers;
-	private int timeInterval;
-	private int numTracks;
 	
-
+	
+	
+	
+	
 	// a timer for acquiring the video stream
 	// private ScheduledExecutorService timer;
 	private VideoCapture capture = new VideoCapture();
@@ -56,12 +48,98 @@ public class Video {
 	private int curFrameNum;
 	public double numFrame;
 
-	public Video() { //what parameters might we need?
-		//insert constructor stuff here
+	
+	
+		
+//Delete these:
+//	private double frameRate;
+//	private double widthPixels;
+//	private double heightPixels;
+//	private String formatType;	
+//	private int numTracks;
+//	public double numFrame;
+//	private int curFrameNum;
 		
 		
 		
-	}
+		
+
+		
+		
+		
+//	private double xPixelsPerCm;
+//	private double yPixelsPerCm;	
+//	private Integer startFrameNum;
+//	//private Integer curFrameNum;
+//	private Integer endFrameNum;
+//	private Integer totalFrames;
+//	
+//	private double videoLength;
+//	private int currentTimeStamp; //CHANGE: to frame
+//
+//	private ArrayList<Integer> flagMarkers;
+//	private double timeInterval;
+//	private VideoCapture vidCap = new VideoCapture();
+//
+//	private String fileName;
+//
+//
+////	public Video(String fileName) throws FileNotFoundException { 
+////		this.fileName = fileName;
+////		this.vidCap = new VideoCapture(fileName);
+////		if(!vidCap.isOpened()) {
+////			throw new FileNotFoundException("Unable to open video file: " + fileName);
+////		}
+////		
+////	}
+//	
+//	public double getFrameRate() {
+//		return this.vidCap.get(Videoio.CV_CAP_PROP_FPS);
+//	}
+//
+//	public double getwidthPixels() {
+//		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
+//	}
+//
+//	public double getheightPixels() {
+//		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);	
+//	}
+//
+//	public void setStartFrameNum(double startFrame) {
+//		startFrameNum = (int) startFrame;
+//	}
+//	
+//	public Integer getStartFrameNum() {
+//		return startFrameNum;
+//	}
+//
+//	public void setEndFrameNum(double endFrame) {
+//		endFrameNum = (int) endFrame;
+//	}
+//	
+//	public Integer getEndFrameNum() {
+//		return endFrameNum;
+//	}
+//
+//	public void setCurFrameNum(double curFrameNum) {
+//		this.curFrameNum = (int) curFrameNum;
+//	}
+//	
+//	public Integer getCurFrameNum() {
+//		return curFrameNum;
+//	}
+//
+//	public double getVideoLength() {
+//		return videoLength;
+//	}
+//
+//	public int getCurrentTimeStamp() {
+//		return currentTimeStamp;
+//	}
+//	
+//	public int getTotalNumberofFrames() {
+//		return endFrameNum - startFrameNum;
+//	}
 	
 	@FXML
 	public void initialize() {
@@ -69,7 +147,7 @@ public class Video {
 		jumpToFrameArea.setDisable(true);
 
 	}
-
+	
 	@FXML
 	public void handleBrowse() {
 		FileChooser fileChooser = new FileChooser();
@@ -79,7 +157,6 @@ public class Video {
 
 		if (chosenFile != null) {
 			fileName = chosenFile.toURI().toString();
-			captureInfo();
 			startVideo();
 		}
 		;
@@ -87,22 +164,11 @@ public class Video {
 		runJumpTo();
 	}
 
-	protected void captureInfo() {
-		this.capture.open(fileName);
-		widthPixels = this.capture.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
-		heightPixels = this.capture.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);		
-		frameRate = this.capture.get(Videoio.CV_CAP_PROP_FPS); 
-		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		startFrameNum = 0;
-		endFrameNum = numFrame; 
-		
-
-	}
-	
 	protected void startVideo() {
 
 		// start the video capture
 		this.capture.open(fileName);
+		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 		totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n");
 		sliderSeekBar.setDisable(false);
 		jumpToFrameArea.setDisable(false);
@@ -126,6 +192,12 @@ public class Video {
 			try {
 				// read the current frame
 				this.capture.read(frame);
+
+				// if the frame is not empty, process it to black and white color
+				/*
+				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
+				 * }
+				 */
 
 			} catch (Exception e) {
 				// log the error
@@ -183,33 +255,7 @@ public class Video {
 
 	}
 
-	public double getFrameRate() {
-		return frameRate;
-	}
-
-	public double getxPixelsPerCm() {
-		return xPixelsPerCm;
-	}
-
-	public double getyPixelsPerCm() {
-		return yPixelsPerCm;
-	}
-
-	public double getStartFrameNum() {
-		return startFrameNum;
-	}
-
-	public double getEndFrameNum() {
-		return endFrameNum;
-	}
-
-	public int getVideoLength() {
-		return videoLength;
-	}
-
-	public int getCurrentTimeStamp() {
-		return currentTimeStamp;
-	}
+}
 
 	
-}
+	

@@ -3,23 +3,23 @@ package edu.augustana.csc285.Egret;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 public class AnimalTrack {
 	
 	private Point centerPoint;
-	private Map<Double, Point> locations;
+	private Map<Integer, Point> locations;
 	private String name;
 	
 	public AnimalTrack(String name, Point centerPoint, Color colorId) {
 		this.name = name;
 		this.centerPoint = centerPoint;
-		locations = new HashMap<Double, Point>();
-		locations.put(0.0, this.centerPoint);
+		locations = new TreeMap<Integer, Point>();
+		locations.put(0, this.centerPoint);
 	}
 
-	public void setLocations(Map<Double, Point> locations) {
+	public void setLocations(Map<Integer, Point> locations) {
 		this.locations = locations;
 	}
 
@@ -55,7 +55,7 @@ public class AnimalTrack {
 	/**
 	 * @return the current list of all center locations of the animal
 	 */
-	public Map<Double, Point> getLocations() {
+	public Map<Integer, Point> getLocations() {
 		return locations;
 	}
 	
@@ -74,7 +74,7 @@ public class AnimalTrack {
 	 * @param newCenterPoint - the new center point of the animal
 	 * @param time - the time stamp of the center point
 	 */
-	public void addLocation(Point newCenterPoint, double time) {
+	public void addLocation(Point newCenterPoint, Integer time) {
 		centerPoint = newCenterPoint;
 		locations.put(time, newCenterPoint);
 	}
