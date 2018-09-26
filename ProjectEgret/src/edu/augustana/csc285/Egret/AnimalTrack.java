@@ -3,23 +3,23 @@ package edu.augustana.csc285.Egret;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.TreeMap;
+
+import datamodel.TimePoint;
 
 public class AnimalTrack {
 	
 	private Point centerPoint;
-	private Map<Integer, Point> locations;
-	private String name;
+	private ArrayList<TimePoint> locations;
+	private String animalId;
 	
 	public AnimalTrack(String name, Point centerPoint, Color colorId) {
-		this.name = name;
+		this.animalId = name;
 		this.centerPoint = centerPoint;
-		locations = new TreeMap<Integer, Point>();
-		locations.put(0, this.centerPoint);
+		locations = new ArrayList<TimePoint>();
+		locations.add(new TimePoint(centerPoint, 0));
 	}
 
-	public void setLocations(Map<Integer, Point> locations) {
+	public void setLocations(ArrayList<TimePoint> locations) {
 		this.locations = locations;
 	}
 
@@ -27,14 +27,14 @@ public class AnimalTrack {
 	 * @param name - the name that is set for the animal track
 	 */
 	public void setName(String name) {
-		this.name = name;
+		this.animalId = name;
 	}
 
 	/**
 	 * @return the name of the animal
 	 */
 	public String getName() {
-		return name;
+		return animalId;
 	}
 	
 	/**
@@ -48,14 +48,14 @@ public class AnimalTrack {
 	 * @param time - the time to get the center of the animal
 	 * @return the center point of the animal at a given time
 	 */
-	public Point getCenterPointAtTime(double time) {
-		return locations.get(time);
+	public TimePoint getCenterPointAtTime(double time) {
+		return locations.get(0);
 	}
 	
 	/**
 	 * @return the current list of all center locations of the animal
 	 */
-	public Map<Integer, Point> getLocations() {
+	public ArrayList<TimePoint> getLocations() {
 		return locations;
 	}
 	
@@ -63,9 +63,7 @@ public class AnimalTrack {
 	 * @return the String representation of the AnimalTrack object
 	 */
 	public String toString() {
-		String str = "";
-		//I'm not sure if we need this or how we would want this to look
-		return str;
+		return "Chick ID: " + animalId + ": Locations: " + locations;
 	}
 	
 	/**
@@ -76,7 +74,7 @@ public class AnimalTrack {
 	 */
 	public void addLocation(Point newCenterPoint, Integer time) {
 		centerPoint = newCenterPoint;
-		locations.put(time, newCenterPoint);
+		locations.add(new TimePoint(newCenterPoint, time));
 	}
 	
 	

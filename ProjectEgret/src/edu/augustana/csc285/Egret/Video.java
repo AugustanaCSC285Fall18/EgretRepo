@@ -67,79 +67,77 @@ public class Video {
 		
 		
 		
-//	private double xPixelsPerCm;
-//	private double yPixelsPerCm;	
-//	private Integer startFrameNum;
-//	//private Integer curFrameNum;
-//	private Integer endFrameNum;
-//	private Integer totalFrames;
-//	
-//	private double videoLength;
-//	private int currentTimeStamp; //CHANGE: to frame
-//
-//	private ArrayList<Integer> flagMarkers;
-//	private double timeInterval;
-//	private VideoCapture vidCap = new VideoCapture();
-//
-//	private String fileName;
-//
-//
-////	public Video(String fileName) throws FileNotFoundException { 
-////		this.fileName = fileName;
-////		this.vidCap = new VideoCapture(fileName);
-////		if(!vidCap.isOpened()) {
-////			throw new FileNotFoundException("Unable to open video file: " + fileName);
-////		}
-////		
-////	}
-//	
-//	public double getFrameRate() {
-//		return this.vidCap.get(Videoio.CV_CAP_PROP_FPS);
+	private double xPixelsPerCm;
+	private double yPixelsPerCm;	
+	private Integer startFrameNum;
+	//private Integer curFrameNum;
+	private Integer endFrameNum;
+	private Integer totalFrames;
+	
+	private double videoLength;
+	private int currentTimeStamp; //CHANGE: to frame
+
+	private ArrayList<Integer> flagMarkers;
+	private double timeInterval;
+	private VideoCapture vidCap = new VideoCapture();
+
+
+//	public Video(String fileName) throws FileNotFoundException { 
+//		this.fileName = fileName;
+//		this.vidCap = new VideoCapture(fileName);
+//		if(!vidCap.isOpened()) {
+//			throw new FileNotFoundException("Unable to open video file: " + fileName);
+//		}
+//		
 //	}
-//
-//	public double getwidthPixels() {
-//		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
-//	}
-//
-//	public double getheightPixels() {
-//		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);	
-//	}
-//
-//	public void setStartFrameNum(double startFrame) {
-//		startFrameNum = (int) startFrame;
-//	}
-//	
-//	public Integer getStartFrameNum() {
-//		return startFrameNum;
-//	}
-//
-//	public void setEndFrameNum(double endFrame) {
-//		endFrameNum = (int) endFrame;
-//	}
-//	
-//	public Integer getEndFrameNum() {
-//		return endFrameNum;
-//	}
-//
-//	public void setCurFrameNum(double curFrameNum) {
-//		this.curFrameNum = (int) curFrameNum;
-//	}
-//	
-//	public Integer getCurFrameNum() {
-//		return curFrameNum;
-//	}
-//
-//	public double getVideoLength() {
-//		return videoLength;
-//	}
-//
-//	public int getCurrentTimeStamp() {
-//		return currentTimeStamp;
-//	}
-//	
-//	public int getTotalNumberofFrames() {
-//		return endFrameNum - startFrameNum;
-//	}
+	
+	public double getFrameRate() {
+		return this.vidCap.get(Videoio.CV_CAP_PROP_FPS);
+	}
+
+	public double getwidthPixels() {
+		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_WIDTH);
+	}
+
+	public double getheightPixels() {
+		return this.vidCap.get(Videoio.CV_CAP_PROP_FRAME_HEIGHT);	
+	}
+
+	public void setStartFrameNum(double startFrame) {
+		startFrameNum = (int) startFrame;
+	}
+	
+	public Integer getStartFrameNum() {
+		return startFrameNum;
+	}
+
+	public void setEndFrameNum(double endFrame) {
+		endFrameNum = (int) endFrame;
+	}
+	
+	public Integer getEndFrameNum() {
+		return endFrameNum;
+	}
+
+	public void setCurFrameNum(double curFrameNum) {
+		this.curFrameNum = (int) curFrameNum;
+	}
+	
+	public Integer getCurFrameNum() {
+		return curFrameNum;
+	}
+
+	public double getVideoLength() {
+		return videoLength;
+	}
+
+	public int getCurrentTimeStamp() {
+		return currentTimeStamp;
+	}
+	
+	public int getTotalNumberofFrames() {
+		return endFrameNum - startFrameNum;
+	}
 	
 	@FXML
 	public void initialize() {
@@ -223,6 +221,7 @@ public class Video {
 
 		});
 	}
+	
 
 	private void runJumpTo() {
 		
