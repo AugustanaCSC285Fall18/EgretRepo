@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LoadVideoWindowController">
+   <children>
+      <MenuBar layoutY="1.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="1.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem fx:id="closeOption" mnemonicParsing="false" onAction="#exitWindow" text="Close" />
+                  <MenuItem fx:id="returnOption" mnemonicParsing="false" onAction="#returnToMainWindow" text="Return Home" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <StackPane layoutY="201.0" prefHeight="54.0" prefWidth="586.0" AnchorPane.bottomAnchor="146.0" AnchorPane.leftAnchor="450.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="200.0">
+         <children>
+            <Button fx:id="browseBtn" mnemonicParsing="false" onMouseClicked="#findFile" text="Browse">
+               <font>
+                  <Font size="16.0" />
+               </font>
+               <padding>
+                  <Insets bottom="5.0" left="20.0" right="20.0" top="5.0" />
+               </padding>
+            </Button>
+         </children>
+      </StackPane>
+      <StackPane layoutX="78.0" layoutY="175.0" prefHeight="106.0" prefWidth="342.0" AnchorPane.bottomAnchor="119.0" AnchorPane.leftAnchor="78.0" AnchorPane.rightAnchor="180.0" AnchorPane.topAnchor="175.0">
+         <children>
+            <TextField fx:id="filePathField" onInputMethodTextChanged="#updateFilePath" prefHeight="26.0" prefWidth="263.0" />
+         </children>
+      </StackPane>
+      <StackPane prefHeight="81.0" prefWidth="600.0" AnchorPane.bottomAnchor="219.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="100.0">
+         <children>
+            <Label text="Load Video">
+               <font>
+                  <Font size="32.0" />
+               </font>
+            </Label>
+         </children>
+      </StackPane>
+      <StackPane layoutX="256.0" layoutY="289.0" prefHeight="81.0" prefWidth="600.0" AnchorPane.bottomAnchor="30.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="289.0">
+         <children>
+            <Button fx:id="continueBtn" mnemonicParsing="false" onMouseClicked="#openPreviewWindow" text="Continue">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Button>
+         </children>
+      </StackPane>
+   </children>
+</AnchorPane>

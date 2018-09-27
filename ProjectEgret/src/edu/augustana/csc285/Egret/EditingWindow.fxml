@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
+   <top>
+      <MenuBar BorderPane.alignment="CENTER">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem fx:id="closeOption" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
+                  <MenuItem fx:id="saveOption" mnemonicParsing="false" onAction="#saveProject" text="Save" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem fx:id="undoOption" mnemonicParsing="false" onAction="#undoEdit" text="Undo" />
+                  <MenuItem fx:id="redoOption" mnemonicParsing="false" onAction="#redoEdit" text="Redo" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <right>
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <ToggleButton fx:id="modifyToggleBtn" mnemonicParsing="false" onMouseClicked="#toggleManualEdit" prefHeight="150.0" prefWidth="300.0" text="Modify" />
+            <Button fx:id="undoBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#undoEdit" prefHeight="150.0" prefWidth="300.0" text="Undo" />
+            <Button fx:id="redoBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#redoEdit" prefHeight="150.0" prefWidth="300.0" text="Redo" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="10.0" right="10.0" top="10.0" />
+         </BorderPane.margin>
+      </VBox>
+   </right>
+   <bottom>
+      <HBox prefHeight="63.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <children>
+            <Button fx:id="previousFrameBtn" mnemonicParsing="false" onMouseClicked="#frameStepBack" prefHeight="150.0" prefWidth="500.0" text="Previous" />
+            <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="500.0" text="Next" />
+            <Button fx:id="finishEditingBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#openPopUp" prefHeight="150.0" prefWidth="500.0" text="Finish" />
+         </children>
+         <BorderPane.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" />
+         </BorderPane.margin>
+      </HBox>
+   </bottom>
+   <center>
+      <AnchorPane prefHeight="256.0" prefWidth="490.0" BorderPane.alignment="CENTER">
+         <children>
+            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
+            <Slider fx:id="sliderSeekBar" layoutX="64.0" layoutY="266.0" prefHeight="14.0" prefWidth="362.0" />
+         </children>
+      </AnchorPane>
+   </center>
+</BorderPane>
