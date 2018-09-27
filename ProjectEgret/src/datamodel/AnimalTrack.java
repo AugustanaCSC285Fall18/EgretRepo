@@ -1,10 +1,9 @@
-package edu.augustana.csc285.Egret;
+package datamodel;
 
 import java.awt.Color;
-import java.awt.Point;
 import java.util.ArrayList;
 
-import datamodel.TimePoint;
+import org.opencv.core.Point;
 
 public class AnimalTrack {
 	
@@ -12,11 +11,11 @@ public class AnimalTrack {
 	private ArrayList<TimePoint> locations;
 	private String animalId;
 	
-	public AnimalTrack(String name, Point centerPoint, Color colorId) {
+	public AnimalTrack(String name, Point point) {
 		this.animalId = name;
-		this.centerPoint = centerPoint;
+		this.centerPoint = point;
 		locations = new ArrayList<TimePoint>();
-		locations.add(new TimePoint(centerPoint, 0));
+		locations.add(new TimePoint(point, 0));
 	}
 
 	public void setLocations(ArrayList<TimePoint> locations) {

@@ -1,6 +1,6 @@
 package datamodel;
 
-import java.awt.Point;
+import org.opencv.core.Point;
 
 public class TimePoint implements Comparable<TimePoint> {
 	private double x;     // location
@@ -15,7 +15,7 @@ public class TimePoint implements Comparable<TimePoint> {
 	}
 	
 	public TimePoint(Point pt, int frameNum) {
-		this(pt.getX(), pt.getY(), frameNum);
+		this(pt.x, pt.y, frameNum);
 	}	
 	
 
