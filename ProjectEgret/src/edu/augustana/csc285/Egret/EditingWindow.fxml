@@ -48,7 +48,7 @@
       <HBox prefHeight="63.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="previousFrameBtn" mnemonicParsing="false" onMouseClicked="#frameStepBack" prefHeight="150.0" prefWidth="500.0" text="Previous" />
-            <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="500.0" text="Next" />
+            <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#frameStepForward" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="500.0" text="Next" />
             <Button fx:id="finishEditingBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#openPopUp" prefHeight="150.0" prefWidth="500.0" text="Finish" />
          </children>
          <BorderPane.margin>

@@ -90,6 +90,8 @@ public class EditingWindowController {
 	private double xCord;
 	private double yCord;
 	private int animals = 3;
+	ProjectData data = new ProjectData();
+	private int animalCounter = 0;
     
     
 
@@ -105,7 +107,8 @@ public class EditingWindowController {
 
     @FXML
     void frameStepForward(MouseEvent event) {
-
+    	animalCounter = 0;
+    	
     }
 
     @FXML
@@ -127,9 +130,12 @@ public class EditingWindowController {
     void toggleManualEdit(MouseEvent event) {
 
     	currentFrameImage.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-    		xCord = e.getSceneX();
-    		yCord = e.getSceneY();
+    		xCord = e.getX();
+    		yCord = e.getY();
     		Point centerPoint = new Point(xCord,yCord);
+    		data.getAnimalTracksList().get(animalCounter).addLocation(centerPoint, curFrameNum);
+    		animalCounter++;
+    		System.out.println(data.getAnimalTracksList());
     	 });
     }
 
@@ -140,7 +146,6 @@ public class EditingWindowController {
     
 	@FXML
 	public void initialize() {
-		ProjectData data = new ProjectData();
 		sliderSeekBar.setDisable(true);
 		File newFile = new File("S:\\CLASS\\CS\\285\\sample_videos\\sample1.mp4");
 		File chosenFile = newFile;
@@ -262,18 +267,4 @@ public class EditingWindowController {
 		});
 
 	}
-    
-   
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-
 }
-
