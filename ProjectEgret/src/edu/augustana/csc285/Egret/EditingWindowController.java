@@ -1,6 +1,7 @@
 package edu.augustana.csc285.Egret;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 import org.opencv.core.Mat;
@@ -92,6 +93,7 @@ public class EditingWindowController {
 	private int animals = 3;
 	ProjectData data = new ProjectData();
 	private int animalCounter = 0;
+	private Video videoObject;
     
     
 
@@ -108,7 +110,11 @@ public class EditingWindowController {
     @FXML
     void frameStepForward(MouseEvent event) {
     	animalCounter = 0;
-    	
+    	//change hard coded number into what the user wants to measure
+		curFrameNum += videoObject.getFrameRate()*3;
+		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		updateFrameView();
+		
     }
 
     @FXML
@@ -128,17 +134,28 @@ public class EditingWindowController {
 
     @FXML
     void toggleManualEdit(MouseEvent event) {
+//    	if(toggleActive) {
+//    		toggleActive=false;
+//    		
+//    	}else {
+//    		toggleActive=true;
+//    	}
+    }
 
-    	currentFrameImage.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-    		xCord = e.getX();
-    		yCord = e.getY();
+    @FXML 
+    void addDataPoint(MouseEvent event) {
+//    	if(toggleActive) {
+//    		
+//    	}else {
+//    		
+//    	}
+    		xCord = event.getX();
+    		yCord = event.getY();
     		Point centerPoint = new Point(xCord,yCord);
     		data.getAnimalTracksList().get(animalCounter).addLocation(centerPoint, curFrameNum);
     		animalCounter++;
     		System.out.println(data.getAnimalTracksList());
-    	 });
     }
-
     @FXML
     void undoEdit(MouseEvent event) {
 
@@ -152,13 +169,15 @@ public class EditingWindowController {
 	}
 	
 	@FXML
-	public void handleBrowse() {
+	public void handleBrowse() throws FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Image File");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
 			fileName = chosenFile.toURI().toString();
+			videoObject = new Video(fileName);
+			capture = videoObject.getVidCap();
 			startVideo();
 		};
 		runSliderSeekBar();
@@ -168,7 +187,6 @@ public class EditingWindowController {
 	protected void startVideo() {
 
 		// start the video capture
-		this.capture.open(fileName);
 		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
 		sliderSeekBar.setDisable(false);

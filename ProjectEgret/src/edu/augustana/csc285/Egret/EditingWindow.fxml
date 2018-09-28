@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -48,7 +48,7 @@
       <HBox prefHeight="63.0" prefWidth="600.0" BorderPane.alignment="CENTER">
          <children>
             <Button fx:id="previousFrameBtn" mnemonicParsing="false" onMouseClicked="#frameStepBack" prefHeight="150.0" prefWidth="500.0" text="Previous" />
-            <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#frameStepForward" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="500.0" text="Next" />
+            <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="500.0" text="Next" />
             <Button fx:id="finishEditingBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#openPopUp" prefHeight="150.0" prefWidth="500.0" text="Finish" />
          </children>
          <BorderPane.margin>
@@ -59,7 +59,7 @@
    <center>
       <AnchorPane prefHeight="256.0" prefWidth="490.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="25.0" onMouseClicked="#addDataPoint" pickOnBounds="true" preserveRatio="true" />
             <Slider fx:id="sliderSeekBar" layoutX="64.0" layoutY="266.0" prefHeight="14.0" prefWidth="362.0" />
             <Button fx:id="browseBtn" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleBrowse" text="Browse" />
          </children>
