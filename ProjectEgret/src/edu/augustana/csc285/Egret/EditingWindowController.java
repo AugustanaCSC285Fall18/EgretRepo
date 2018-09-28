@@ -147,14 +147,7 @@ public class EditingWindowController {
 	@FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
-		File newFile = new File("S:\\CLASS\\CS\\285\\sample_videos\\sample1.mp4");
-		File chosenFile = newFile;
-		if (chosenFile != null) {
-			fileName = chosenFile.toURI().toString();
-			startVideo();
-		};
 		runSliderSeekBar();
-		//jumpToFrameArea.setDisable(true);
 		
 	}
 	
@@ -164,14 +157,10 @@ public class EditingWindowController {
 		fileChooser.setTitle("Open Image File");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-// These two lines load a specific video file, was used when browse button was not implemented yet
-//		File newFile = new File("S:\\CLASS\\CS\\285\\sample_videos\\sample1.mp4");
-//		File chosenFile = newFile;
 		if (chosenFile != null) {
 			fileName = chosenFile.toURI().toString();
 			startVideo();
-		}
-		;
+		};
 		runSliderSeekBar();
 		//runJumpTo(); //prints out which frame you are at
 	}
