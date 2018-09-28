@@ -155,19 +155,20 @@ public class EditingWindowController {
 	
 	@FXML
 	public void handleBrowse() {
-//		FileChooser fileChooser = new FileChooser();
-//		fileChooser.setTitle("Open Image File");
-//		Window mainWindow = currentFrameImage.getScene().getWindow();
-//		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-		File newFile = new File("S:\\CLASS\\CS\\285\\sample_videos\\sample1.mp4");
-		File chosenFile = newFile;
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Image File");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showOpenDialog(mainWindow);
+// These two lines load a specific video file, was used when browse button was not implemented yet
+//		File newFile = new File("S:\\CLASS\\CS\\285\\sample_videos\\sample1.mp4");
+//		File chosenFile = newFile;
 		if (chosenFile != null) {
 			fileName = chosenFile.toURI().toString();
 			startVideo();
 		}
 		;
 		runSliderSeekBar();
-		//runJumpTo();
+		//runJumpTo(); //prints out which frame you are at
 	}
 
 	protected void startVideo() {
@@ -175,9 +176,10 @@ public class EditingWindowController {
 		// start the video capture
 		this.capture.open(fileName);
 		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n");
+		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
 		sliderSeekBar.setDisable(false);
-		//jumpToFrameArea.setDisable(false);
+		//this can be repurposed to allow the client to jump to specific time stamp
+		//jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
 		updateFrameView();
 		sliderSeekBar.setMax((int) numFrame -1);
 		sliderSeekBar.setMaxWidth((int) numFrame -1);

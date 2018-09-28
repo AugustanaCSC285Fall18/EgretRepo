@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -57,10 +57,11 @@
       </HBox>
    </bottom>
    <center>
-      <AnchorPane fx:id="anchorPane" prefHeight="256.0" prefWidth="490.0" BorderPane.alignment="CENTER">
+      <AnchorPane prefHeight="256.0" prefWidth="490.0" BorderPane.alignment="CENTER">
          <children>
-            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
+            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" />
             <Slider fx:id="sliderSeekBar" layoutX="64.0" layoutY="266.0" prefHeight="14.0" prefWidth="362.0" />
+            <Button fx:id="browseBtn" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onAction="#handleBrowse" text="Browse" />
          </children>
       </AnchorPane>
    </center>
