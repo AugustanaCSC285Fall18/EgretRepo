@@ -15,6 +15,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -23,6 +25,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -63,6 +67,9 @@ public class EditingWindowController {
 
     @FXML
     private ImageView currentFrameImage;
+    
+    @FXML
+    private Canvas canvas;
 
     @FXML
     private Slider sliderSeekBar;
@@ -94,6 +101,8 @@ public class EditingWindowController {
 	ProjectData data = new ProjectData();
 	private int animalCounter = 0;
 	private Video videoObject;
+	private GraphicsContext gc;
+	private boolean toggleActive = false;
     
     
 
@@ -109,6 +118,7 @@ public class EditingWindowController {
 
     @FXML
     void frameStepForward(MouseEvent event) {
+    	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	animalCounter = 0;
     	//change hard coded number into what the user wants to measure
 		curFrameNum += videoObject.getFrameRate()*3;
@@ -134,38 +144,40 @@ public class EditingWindowController {
 
     @FXML
     void toggleManualEdit(MouseEvent event) {
-//    	if(toggleActive) {
-//    		toggleActive=false;
-//    		
-//    	}else {
-//    		toggleActive=true;
-//    	}
+    	toggleActive = !toggleActive;
     }
 
-    @FXML 
-    void addDataPoint(MouseEvent event) {
-//    	if(toggleActive) {
-//    		
-//    	}else {
-//    		
-//    	}
-    		xCord = event.getX();
-    		yCord = event.getY();
-    		Point centerPoint = new Point(xCord,yCord);
+    @FXML //TODO: figure out mechanism for how to modify animal data
+    void addOrModifyDataPoint(MouseEvent event) {
+		xCord = event.getX();
+		yCord = event.getY();
+		Point centerPoint = new Point(xCord,yCord);
+    	if(toggleActive) {
+    		
+    	}else {
+    		gc.fillOval(xCord, yCord,5,5);
     		data.getAnimalTracksList().get(animalCounter).addLocation(centerPoint, curFrameNum);
     		animalCounter++;
     		System.out.println(data.getAnimalTracksList());
+    	}
     }
+    
     @FXML
     void undoEdit(MouseEvent event) {
-
+    	if(animalCounter>0) {
+    		animalCounter--;
+    		gc.clearRect(0, 0, 5, 5);
+    		data.getAnimalTracksList().get(animalCounter).removeLocation();
+    		System.out.println(data.getAnimalTracksList());
+    	}
     }
+    
     
 	@FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
+		gc = canvas.getGraphicsContext2D();
 		runSliderSeekBar();
-		
 	}
 	
 	@FXML
@@ -183,7 +195,7 @@ public class EditingWindowController {
 		runSliderSeekBar();
 		//runJumpTo(); //prints out which frame you are at
 	}
-
+	
 	protected void startVideo() {
 
 		// start the video capture

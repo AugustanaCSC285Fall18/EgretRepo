@@ -8,18 +8,18 @@ import org.opencv.core.Point;
 public class AnimalTrack {
 	
 	private Point centerPoint;
-	private ArrayList<TimePoint> locations;
+	private ArrayList<TimePoint> positions;
 	private String animalId;
 	
 	public AnimalTrack(String name, Point point) {
 		this.animalId = name;
 		this.centerPoint = point;
-		locations = new ArrayList<TimePoint>();
-		locations.add(new TimePoint(point, 0));
+		positions = new ArrayList<TimePoint>();
+		positions.add(new TimePoint(point, 0));
 	}
 
 	public void setLocations(ArrayList<TimePoint> locations) {
-		this.locations = locations;
+		this.positions = locations;
 	}
 
 	/**
@@ -48,21 +48,21 @@ public class AnimalTrack {
 	 * @return the center point of the animal at a given time
 	 */
 	public TimePoint getCenterPointAtTime(double time) {
-		return locations.get(0);
+		return positions.get(0);
 	}
 	
 	/**
 	 * @return the current list of all center locations of the animal
 	 */
 	public ArrayList<TimePoint> getLocations() {
-		return locations;
+		return positions;
 	}
 	
 	/**
 	 * @return the String representation of the AnimalTrack object
 	 */
 	public String toString() {
-		return "Chick ID: " + animalId + ": Locations: " + locations;
+		return "Chick ID: " + animalId + ": Locations: " + positions;
 	}
 	
 	/**
@@ -73,7 +73,24 @@ public class AnimalTrack {
 	 */
 	public void addLocation(Point newCenterPoint, Integer time) {
 		centerPoint = newCenterPoint;
-		locations.add(new TimePoint(newCenterPoint, time));
+		positions.add(new TimePoint(newCenterPoint, time));
+	}
+	
+	public void removeLocation() {
+		if(positions.size()>0) {
+			positions.remove(positions.size()-1);
+		}
+	}
+	
+	public TimePoint getTimePointAtTime(int frameNum) {
+		//TODO: This method's implementation is inefficient [linear search is O(N)]
+		//      Replace this with binary search (O(log n)] or use a Map for fast access
+		for (TimePoint pt : positions) {
+			if (pt.getFrameNum() == frameNum) {
+				return pt;
+			}
+		}
+		return null;
 	}
 	
 	
