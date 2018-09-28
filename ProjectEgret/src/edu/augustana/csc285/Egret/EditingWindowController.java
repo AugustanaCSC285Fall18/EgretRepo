@@ -166,7 +166,8 @@ public class EditingWindowController {
     void undoEdit(MouseEvent event) {
     	if(animalCounter>0) {
     		animalCounter--;
-    		gc.clearRect(0, 0, 5, 5);
+    		//TODO: when undo, have to remove drawing
+    		//gc.clearRect(0, 0, 5, 5);
     		data.getAnimalTracksList().get(animalCounter).removeLocation();
     		System.out.println(data.getAnimalTracksList());
     	}
