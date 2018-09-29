@@ -9,7 +9,9 @@ import org.opencv.core.Point;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
+import datamodel.AnimalTrack;
 import datamodel.ProjectData;
+import datamodel.TimePoint;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -113,7 +115,12 @@ public class EditingWindowController {
 
     @FXML
     void frameStepBack(MouseEvent event) {
-
+    	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+    	animalCounter = 0;
+    	curFrameNum -= videoObject.getFrameRate()*3;
+		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		updateFrameView();
+		frameAdjustHelper();
     }
 
     @FXML
@@ -124,7 +131,18 @@ public class EditingWindowController {
 		curFrameNum += videoObject.getFrameRate()*3;
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
-		
+		frameAdjustHelper();
+    }
+    
+    protected void frameAdjustHelper() {
+    	AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+    	toggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
+    	System.out.println(toggleActive);
+    	if(toggleActive) {
+    		for(int i = 0; i < data.getAnimalTracksList().size(); i++) {
+    			gc.fillOval(data.getAnimalTracksList().get(i).getX(),data.getAnimalTracksList().get(i).getY(), 5,5);
+    		}
+    	}
     }
 
     @FXML
@@ -145,30 +163,36 @@ public class EditingWindowController {
     @FXML
     void toggleManualEdit(MouseEvent event) {
     	toggleActive = !toggleActive;
+    	animalCounter = 0;
     }
 
     @FXML //TODO: figure out mechanism for how to modify animal data
     void addOrModifyDataPoint(MouseEvent event) {
-		xCord = event.getX();
+    	xCord = event.getX();
 		yCord = event.getY();
 		Point centerPoint = new Point(xCord,yCord);
+		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+		
     	if(toggleActive) {
-    		
+    		TimePoint oldPoint = currentAnimal.getTimePointAtTime(curFrameNum);
+    		gc.clearRect(oldPoint.getX(), oldPoint.getY(), 10, 10);
+    		currentAnimal.setTimePointAtTime(centerPoint, curFrameNum);
     	}else {
-    		gc.fillOval(xCord, yCord,5,5);
-    		data.getAnimalTracksList().get(animalCounter).addLocation(centerPoint, curFrameNum);
-    		animalCounter++;
-    		System.out.println(data.getAnimalTracksList());
+    		currentAnimal.addLocation(centerPoint, curFrameNum);
     	}
+    	
+    	animalCounter++;
+    	System.out.println(data.getAnimalTracksList());
+    	gc.fillOval(xCord, yCord,5,5);
     }
     
     @FXML
     void undoEdit(MouseEvent event) {
     	if(animalCounter>0) {
     		animalCounter--;
-    		//TODO: when undo, have to remove drawing
-    		//gc.clearRect(0, 0, 5, 5);
-    		data.getAnimalTracksList().get(animalCounter).removeLocation();
+    		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+    		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), 5, 5);
+    		currentAnimal.removeLocation();
     		System.out.println(data.getAnimalTracksList());
     	}
     }

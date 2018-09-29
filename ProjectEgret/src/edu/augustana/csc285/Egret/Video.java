@@ -46,7 +46,7 @@ public class Video {
 	private VideoCapture capture = new VideoCapture();
 	private String fileName = null;
 	private int curFrameNum;
-	public double numFrame;
+	public int numFrame;
 
 	
 	
@@ -69,10 +69,10 @@ public class Video {
 		
 	private double xPixelsPerCm;
 	private double yPixelsPerCm;	
-	private Integer startFrameNum;
+	private int startFrameNum;
 	//private Integer curFrameNum;
-	private Integer endFrameNum;
-	private Integer totalFrames;
+	private int endFrameNum;
+	private int totalFrames;
 	
 	private double videoLength;
 	private int currentTimeStamp; //CHANGE: to frame
@@ -91,8 +91,8 @@ public class Video {
 		
 	}
 	
-	public double getFrameRate() {
-		return this.vidCap.get(Videoio.CV_CAP_PROP_FPS);
+	public int getFrameRate() {
+		return (int) this.vidCap.get(Videoio.CV_CAP_PROP_FPS);
 	}
 
 	public double getwidthPixels() {
@@ -107,7 +107,7 @@ public class Video {
 		startFrameNum = (int) startFrame;
 	}
 	
-	public Integer getStartFrameNum() {
+	public int getStartFrameNum() {
 		return startFrameNum;
 	}
 
@@ -115,7 +115,7 @@ public class Video {
 		endFrameNum = (int) endFrame;
 	}
 	
-	public Integer getEndFrameNum() {
+	public int getEndFrameNum() {
 		return endFrameNum;
 	}
 
@@ -123,7 +123,7 @@ public class Video {
 		this.curFrameNum = (int) curFrameNum;
 	}
 	
-	public Integer getCurFrameNum() {
+	public int getCurFrameNum() {
 		return curFrameNum;
 	}
 
@@ -260,6 +260,3 @@ public class Video {
 //	}
 
 }
-
-	
-	

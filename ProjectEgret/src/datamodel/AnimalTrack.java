@@ -18,8 +18,8 @@ public class AnimalTrack {
 		positions.add(new TimePoint(point, 0));
 	}
 
-	public void setLocations(ArrayList<TimePoint> locations) {
-		this.positions = locations;
+	public void setLocations(ArrayList<TimePoint> position) {
+		this.positions = position;
 	}
 
 	/**
@@ -93,5 +93,27 @@ public class AnimalTrack {
 		return null;
 	}
 	
+	public boolean isTimePointAtTime(int frameNum) {
+		//TODO: This method's implementation is inefficient [linear search is O(N)]
+		//      Replace this with binary search (O(log n)] or use a Map for fast access
+		System.out.println("frame: " + frameNum);
+		System.out.println("positions: " + positions);
+		
+		return getTimePointAtTime(frameNum) != null;
+	}
+	
+	public void setTimePointAtTime(Point curPoint, int frameNum) {
+		TimePoint currentTimePoint = getTimePointAtTime(frameNum);
+		currentTimePoint.setX(curPoint.x);
+		currentTimePoint.setY(curPoint.y);
+	}
+	
+	public double getX() {
+		return centerPoint.x;
+	}
+	
+	public double getY() {
+		return centerPoint.y;
+	}
 	
 }
