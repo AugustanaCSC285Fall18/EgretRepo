@@ -2,7 +2,6 @@ package edu.augustana.csc285.Egret;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -27,8 +26,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -83,23 +80,8 @@ public class EditingWindowController {
 	private int curFrameNum;
 	public double numFrame;
 	
-	private double xPixelsPerCm;
-	private double yPixelsPerCm;	
-	private Integer startFrameNum;
-	//private Integer curFrameNum;
-	private Integer endFrameNum;
-	private Integer totalFrames;
-	
-	private double videoLength;
-	private int currentTimeStamp; //CHANGE: to frame
-
-	private ArrayList<Integer> flagMarkers;
-	private double timeInterval;
-	private VideoCapture vidCap = new VideoCapture();
-	
 	private double xCord;
 	private double yCord;
-	private int animals = 3;
 	ProjectData data = new ProjectData();
 	private int animalCounter = 0;
 	private Video videoObject;

@@ -74,8 +74,8 @@ public class MainWindowController {
 	
 	private void startVideo() {
 		vidCap.open(fileName);
-		video.numFrame = (int) vidCap.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		totalFrameArea.appendText("Total Frames: " + (int) video.numFrame + "\n");
+		video.setNumFrame((int) vidCap.get(Videoio.CV_CAP_PROP_FRAME_COUNT));
+		totalFrameArea.appendText("Total Frames: " + (int) video.getNumFrame()+ "\n");
 		slider.setDisable(false);
 		jumpToFrameArea.setDisable(false);
 		
