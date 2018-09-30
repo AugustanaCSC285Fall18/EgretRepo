@@ -2,17 +2,16 @@ package datamodel;
 
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Point;
 
-import edu.augustana.csc285.Egret.Video;
-
 public class ProjectData {
-	private List<AnimalTrack> animalTracksList;
 	private Video video;
-	private List<AnimalTrack> untrackedTacks;
+	private List<AnimalTrack> tracks;
+	private List<AnimalTrack> unassignedSegments;
 	
 	public void exportCSVFile(File outFile) {
 		
@@ -22,24 +21,30 @@ public class ProjectData {
 		
 	}
 	
+	public ProjectData(String videoFilePath) throws FileNotFoundException {
+		video = new Video(videoFilePath);
+		tracks = new ArrayList<>();
+		unassignedSegments = new ArrayList<>();
+	}
+	
 	public ProjectData() {
-		AnimalTrack animal1 = new AnimalTrack("Chick1", new Point(0.0,0.0));
-		AnimalTrack animal2 = new AnimalTrack("Chick2", new Point(0.0,0.0));
-		AnimalTrack animal3 = new AnimalTrack("Chick3", new Point(0.0,0.0));
-		animalTracksList = new ArrayList<AnimalTrack>();
-		animalTracksList.add(animal1);
-		animalTracksList.add(animal2);
-		animalTracksList.add(animal3);
+		AnimalTrack animal1 = new AnimalTrack("Chick1");
+		AnimalTrack animal2 = new AnimalTrack("Chick2");
+		AnimalTrack animal3 = new AnimalTrack("Chick3");
+		tracks = new ArrayList<AnimalTrack>();
+		tracks.add(animal1);
+		tracks.add(animal2);
+		tracks.add(animal3);
 		
 		
 	}
 
 	public List<AnimalTrack> getAnimalTracksList() {
-		return animalTracksList;
+		return tracks;
 	}
 
 	public void setAnimalTracksList(List<AnimalTrack> animalTracks) {
-		this.animalTracksList = animalTracks;
+		this.tracks = animalTracks;
 	}
 
 	public Video getVideo() {
@@ -50,11 +55,11 @@ public class ProjectData {
 		this.video = video;
 	}
 
-	public List<AnimalTrack> getUntrackedTacks() {
-		return untrackedTacks;
+	public List<AnimalTrack> getUnassignedSegments() {
+		return unassignedSegments;
 	}
 
-	public void setUntrackedTacks(List<AnimalTrack> untrackedTacks) {
-		this.untrackedTacks = untrackedTacks;
+	public void setUnassignedSegments(List<AnimalTrack> untrackedTacks) {
+		this.unassignedSegments = untrackedTacks;
 	}
 }

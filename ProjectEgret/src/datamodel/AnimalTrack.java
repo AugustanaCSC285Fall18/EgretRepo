@@ -8,14 +8,11 @@ import org.opencv.core.Point;
 public class AnimalTrack {
 	
 	private Point centerPoint;
-	private ArrayList<TimePoint> positions;
+	private ArrayList<TimePoint> positions = new ArrayList<TimePoint>();
 	private String animalId;
 	
-	public AnimalTrack(String name, Point point) {
+	public AnimalTrack(String name) {
 		this.animalId = name;
-		this.centerPoint = point;
-		positions = new ArrayList<TimePoint>();
-		positions.add(new TimePoint(point, 0));
 	}
 
 	public void setLocations(ArrayList<TimePoint> position) {
@@ -44,14 +41,6 @@ public class AnimalTrack {
 	}
 	
 	/**
-	 * @param time - the time to get the center of the animal
-	 * @return the center point of the animal at a given time
-	 */
-	public TimePoint getCenterPointAtTime(double time) {
-		return positions.get(0);
-	}
-	
-	/**
 	 * @return the current list of all center locations of the animal
 	 */
 	public ArrayList<TimePoint> getLocations() {
@@ -76,6 +65,10 @@ public class AnimalTrack {
 		positions.add(new TimePoint(newCenterPoint, time));
 	}
 	
+	public void add(TimePoint pt) {
+		positions.add(pt);
+	}
+	
 	public void removeLocation() {
 		if(positions.size()>0) {
 			positions.remove(positions.size()-1);
@@ -93,7 +86,7 @@ public class AnimalTrack {
 		return null;
 	}
 	
-	public boolean isTimePointAtTime(int frameNum) {
+	public boolean hasTimePointAtTime(int frameNum) {
 		//TODO: This method's implementation is inefficient [linear search is O(N)]
 		//      Replace this with binary search (O(log n)] or use a Map for fast access
 		System.out.println("frame: " + frameNum);
@@ -106,6 +99,10 @@ public class AnimalTrack {
 		TimePoint currentTimePoint = getTimePointAtTime(frameNum);
 		currentTimePoint.setX(curPoint.x);
 		currentTimePoint.setY(curPoint.y);
+	}
+	
+	public TimePoint getFinalTimePoint() {
+		return positions.get(positions.size()-1);
 	}
 	
 	public double getX() {

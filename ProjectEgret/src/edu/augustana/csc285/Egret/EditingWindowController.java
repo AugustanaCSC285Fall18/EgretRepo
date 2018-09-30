@@ -11,6 +11,7 @@ import org.opencv.videoio.Videoio;
 import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.TimePoint;
+import datamodel.Video;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -26,6 +27,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
@@ -86,7 +88,9 @@ public class EditingWindowController {
 	private int animalCounter = 0;
 	private Video videoObject;
 	private GraphicsContext gc;
-	private boolean toggleActive = false;
+	private boolean modifyToggleActive = false;
+	private int drawX = 5;
+	private int drawY = 5;
     
     
 
@@ -99,7 +103,7 @@ public class EditingWindowController {
     void frameStepBack(MouseEvent event) {
     	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	animalCounter = 0;
-    	curFrameNum -= videoObject.getFrameRate()*3;
+    	curFrameNum -= Math.floor(videoObject.getFrameRate()*3);
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
@@ -110,7 +114,7 @@ public class EditingWindowController {
     	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     	animalCounter = 0;
     	//change hard coded number into what the user wants to measure
-		curFrameNum += videoObject.getFrameRate()*3;
+		curFrameNum += Math.floor(videoObject.getFrameRate()*3);
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
@@ -118,11 +122,12 @@ public class EditingWindowController {
     
     protected void frameAdjustHelper() {
     	AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    	toggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
-    	System.out.println(toggleActive);
-    	if(toggleActive) {
+    	//modifyToggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
+    	//System.out.println(modifyToggleActive);
+    	if(currentAnimal.hasTimePointAtTime(curFrameNum)) {
     		for(int i = 0; i < data.getAnimalTracksList().size(); i++) {
-    			gc.fillOval(data.getAnimalTracksList().get(i).getX(),data.getAnimalTracksList().get(i).getY(), 5,5);
+    			TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
+    			gc.fillOval(curAnimalPoint.getX(),curAnimalPoint.getY(), drawX,drawY);
     		}
     	}
     }
@@ -144,7 +149,7 @@ public class EditingWindowController {
 
     @FXML
     void toggleManualEdit(MouseEvent event) {
-    	toggleActive = !toggleActive;
+    	modifyToggleActive = !modifyToggleActive;
     	animalCounter = 0;
     }
 
@@ -155,17 +160,20 @@ public class EditingWindowController {
 		Point centerPoint = new Point(xCord,yCord);
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 		
-    	if(toggleActive) {
+    	if(modifyToggleActive) {
     		TimePoint oldPoint = currentAnimal.getTimePointAtTime(curFrameNum);
-    		gc.clearRect(oldPoint.getX(), oldPoint.getY(), 10, 10);
+    		System.out.println("Old point: " + oldPoint);
+    		gc.clearRect(oldPoint.getX(), oldPoint.getY(), drawX, drawY);
     		currentAnimal.setTimePointAtTime(centerPoint, curFrameNum);
+    		System.out.println("New Point: " + centerPoint);
     	}else {
     		currentAnimal.addLocation(centerPoint, curFrameNum);
     	}
     	
     	animalCounter++;
     	System.out.println(data.getAnimalTracksList());
-    	gc.fillOval(xCord, yCord,5,5);
+    	gc.setFill(Color.BLACK);
+    	gc.fillOval(xCord, yCord,drawX,drawY);
     }
     
     @FXML
@@ -173,7 +181,8 @@ public class EditingWindowController {
     	if(animalCounter>0) {
     		animalCounter--;
     		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), 5, 5);
+    		gc.setFill(Color.BLUE);
+    		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
     		currentAnimal.removeLocation();
     		System.out.println(data.getAnimalTracksList());
     	}
