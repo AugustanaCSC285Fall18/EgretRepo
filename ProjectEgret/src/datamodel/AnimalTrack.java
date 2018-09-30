@@ -51,18 +51,18 @@ public class AnimalTrack {
 	 * @return the String representation of the AnimalTrack object
 	 */
 	public String toString() {
-		return "Chick ID: " + animalId + ": Locations: " + positions;
+		return animalId + ": Locations: " + positions;
 	}
 	
 	/**
 	 * Takes in a new point and sets the center location of the animal and 
 	 * adds the new center location to the list of previous locations. 
 	 * @param newCenterPoint - the new center point of the animal
-	 * @param time - the time stamp of the center point
+	 * @param frameNum - the time stamp of the center point
 	 */
-	public void addLocation(Point newCenterPoint, Integer time) {
+	public void addLocation(Point newCenterPoint, int frameNum) {
 		centerPoint = newCenterPoint;
-		positions.add(new TimePoint(newCenterPoint, time));
+		positions.add(new TimePoint(newCenterPoint, frameNum));
 	}
 	
 	public void add(TimePoint pt) {

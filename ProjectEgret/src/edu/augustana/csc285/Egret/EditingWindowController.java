@@ -29,6 +29,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Window;
 
 public class EditingWindowController {
@@ -91,6 +92,8 @@ public class EditingWindowController {
 	private boolean modifyToggleActive = false;
 	private int drawX = 5;
 	private int drawY = 5;
+	
+	private TimePoint previousPoint;
     
     
 
@@ -161,30 +164,42 @@ public class EditingWindowController {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 		
     	if(modifyToggleActive) {
-    		TimePoint oldPoint = currentAnimal.getTimePointAtTime(curFrameNum);
-    		System.out.println("Old point: " + oldPoint);
-    		gc.clearRect(oldPoint.getX(), oldPoint.getY(), drawX, drawY);
-    		currentAnimal.setTimePointAtTime(centerPoint, curFrameNum);
-    		System.out.println("New Point: " + centerPoint);
+    		modifyDataPointHelper(currentAnimal, centerPoint);
     	}else {
-    		currentAnimal.addLocation(centerPoint, curFrameNum);
+    		addDataPointHelper(currentAnimal, centerPoint);
     	}
-    	
     	animalCounter++;
     	System.out.println(data.getAnimalTracksList());
-    	gc.setFill(Color.BLACK);
     	gc.fillOval(xCord, yCord,drawX,drawY);
+    }
+    
+    void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+    	previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
+    	System.out.println("Old point: " + previousPoint);
+    	gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
+    	currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
+    	System.out.println("New Point: " + newPoint);
+    }
+    
+    void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+    	currentAnimal.addLocation(newPoint, curFrameNum);
     }
     
     @FXML
     void undoEdit(MouseEvent event) {
     	if(animalCounter>0) {
     		animalCounter--;
+    		if (modifyToggleActive) {
     		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    		gc.setFill(Color.BLUE);
+    		
     		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
     		currentAnimal.removeLocation();
     		System.out.println(data.getAnimalTracksList());
+    		}
+    	} else {
+    		Popup popup = new Popup();
+    		//TODO: make a popup that says nothing to undo instead of nothing happening.  
+    		
     	}
     }
     

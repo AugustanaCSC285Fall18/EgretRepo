@@ -49,7 +49,7 @@ public class TimePoint implements Comparable<TimePoint> {
 	
 	@Override
 	public String toString() {
-		return "(" + x + ", " + y + ")" + " " + frameNum;
+		return "(" + x + ", " + y + ")" + " @ " + frameNum;
 	}
 
 	public double getDistanceTo(TimePoint other) {
