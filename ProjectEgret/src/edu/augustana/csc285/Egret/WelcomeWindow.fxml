@@ -19,7 +19,7 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Button fx:id="openProjectBtn" layoutX="350.0" layoutY="210.0" mnemonicParsing="false" onAction="#openProject" text="Open Existing Project">
+      <Button fx:id="openProjectBtn" disable="true" layoutX="350.0" layoutY="210.0" mnemonicParsing="false" onAction="#openProject" text="Open Existing Project">
          <font>
             <Font size="16.0" />
          </font>
