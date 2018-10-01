@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
@@ -188,12 +189,12 @@ public class EditingWindowController {
     void undoEdit(MouseEvent event) {
     	if(animalCounter>0) {
     		animalCounter--;
-    		if (modifyToggleActive) {
     		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
     		
     		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
     		currentAnimal.removeLocation();
-    		System.out.println(data.getAnimalTracksList());
+    		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+    			System.out.println(data.getAnimalTracksList().get(i));
     		}
     	} else {
     		Popup popup = new Popup();
