@@ -15,7 +15,9 @@ public class ProjectData {
 	private List<AnimalTrack> untrackedTacks;
 	
 	public void exportCSVFile(File outFile) {
-		
+		for (int i = 0; i < animalTracksList.size(); i++) {
+			System.out.println(animalTracksList.get(i));
+		}
 	}
 	
 	public void saveProject(File projectFile) {
