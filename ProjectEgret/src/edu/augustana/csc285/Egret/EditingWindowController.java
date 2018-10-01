@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 
 import org.opencv.core.Mat;
+import org.opencv.core.Point;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
@@ -32,46 +33,33 @@ import javafx.stage.Popup;
 import javafx.stage.Window;
 
 public class EditingWindowController {
-
-	@FXML
-	private AnchorPane anchorPane;
 	
 	@FXML
+	private AnchorPane anchorPane;
+	@FXML
     private MenuItem closeOption;
-
     @FXML
     private MenuItem saveOption;
-
     @FXML
     private MenuItem undoOption;
-
     @FXML
     private MenuItem redoOption;
-
     @FXML
     private ToggleButton modifyToggleBtn;
-
     @FXML
     private Button undoBtn;
-
     @FXML
     private Button redoBtn;
-
     @FXML
     private Button previousFrameBtn;
-
     @FXML
     private Button nextFrameBtn;
-
     @FXML
     private Button finishEditingBtn;
-
     @FXML
     private ImageView currentFrameImage;
-    
     @FXML
     private Canvas canvas;
-
     @FXML
     private Slider sliderSeekBar;
     
@@ -134,9 +122,14 @@ public class EditingWindowController {
     	}
     }
 
+    /**
+     * This is currently attached to the finish button. It also only prints to the console, but I will
+     * aim to adjust that tomorrow morning.
+     * @param event
+     */
     @FXML
     void openPopUp(MouseEvent event) {
-
+    	data.exportCSVFile(null);
     }
 
     @FXML
@@ -172,7 +165,13 @@ public class EditingWindowController {
     	gc.fillOval(xCord, yCord,drawX,drawY);
     }
     
-    void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+    /**
+     * Modifies the current animal's centerPoint to the new mouse click. This 
+     * is a helper method for addOrModifyDataPoint
+     * @param currentAnimal
+     * @param newPoint
+     */
+    private void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
     	previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
     	System.out.println("Old point: " + previousPoint);
     	gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
@@ -180,7 +179,13 @@ public class EditingWindowController {
     	System.out.println("New Point: " + newPoint);
     }
     
-    void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+    /**
+     * Adds a new location to the current animal to the new mouse click. This
+     * is a helper method for addOrModifyDataPoint.
+     * @param currentAnimal - the current animalTrack
+     * @param newPoint - the new center point for the animalTrack
+     */
+    private void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
     	currentAnimal.addLocation(newPoint, curFrameNum);
     }
     
@@ -188,13 +193,15 @@ public class EditingWindowController {
     void undoEdit(MouseEvent event) {
     	if(animalCounter>0) {
     		animalCounter--;
-    		if (modifyToggleActive) {
     		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    		
-    		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
-    		currentAnimal.removeLocation();
-    		System.out.println(data.getAnimalTracksList());
+			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
+			//This should edit the point, but I can't test it. 
+    		if (modifyToggleActive) {
+    			currentAnimal.setTimePointAtTime(previousPoint.getPointOpenCV(), curFrameNum);
+    		} else {
+    			currentAnimal.removeLocation();
     		}
+    		System.out.println(data.getAnimalTracksList());
     	} else {
     		Popup popup = new Popup();
     		//TODO: make a popup that says nothing to undo instead of nothing happening.  

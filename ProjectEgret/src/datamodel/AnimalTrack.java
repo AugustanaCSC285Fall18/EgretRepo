@@ -65,16 +65,29 @@ public class AnimalTrack {
 		positions.add(new TimePoint(newCenterPoint, frameNum));
 	}
 	
+	/**
+	 * Takes in a TimePoint and adds the location to the list of previous
+	 * locations. 
+	 * @param pt - the TimePoint with the new center point of the animal at a given
+	 * time stamp (frame number)
+	 */
 	public void add(TimePoint pt) {
 		positions.add(pt);
 	}
 	
+	/**
+	 * Removes the most recently added location
+	 */
 	public void removeLocation() {
 		if(positions.size()>0) {
 			positions.remove(positions.size()-1);
 		}
 	}
 	
+	/**
+	 * @param frameNum - the given frame number
+	 * @return the TimePoint at the frameNum
+	 */
 	public TimePoint getTimePointAtTime(int frameNum) {
 		//TODO: This method's implementation is inefficient [linear search is O(N)]
 		//      Replace this with binary search (O(log n)] or use a Map for fast access
@@ -86,6 +99,12 @@ public class AnimalTrack {
 		return null;
 	}
 	
+	/**
+	 * Checks if the locations has a TimePoint at the given
+	 * frame number.
+	 * @param frameNum - the given frame number
+	 * @return true if the frameNum has a TimePoint
+	 */
 	public boolean hasTimePointAtTime(int frameNum) {
 		//TODO: This method's implementation is inefficient [linear search is O(N)]
 		//      Replace this with binary search (O(log n)] or use a Map for fast access
@@ -95,6 +114,11 @@ public class AnimalTrack {
 		return getTimePointAtTime(frameNum) != null;
 	}
 	
+	/**
+	 * Sets the locations at the given frame number to the animalTrack
+	 * @param curPoint - current TimePoint
+	 * @param frameNum - current frame number
+	 */
 	public void setTimePointAtTime(Point curPoint, int frameNum) {
 		TimePoint currentTimePoint = getTimePointAtTime(frameNum);
 		currentTimePoint.setX(curPoint.x);
