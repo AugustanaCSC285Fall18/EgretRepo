@@ -77,8 +77,11 @@ public class EditingWindowController {
 	private Video videoObject;
 	private GraphicsContext gc;
 	private boolean modifyToggleActive = false;
-	private int drawX = 5;
-	private int drawY = 5;
+	private int drawX = 15;
+	private int drawY = 15;
+	//to make the mouse click at the center of the centerPoint dot
+	private int halfDrawX = drawX / 2;
+	private int halfDrawY = drawY / 2;
 	
 	private TimePoint previousPoint;
     
@@ -154,7 +157,7 @@ public class EditingWindowController {
 		yCord = event.getY();
 		Point centerPoint = new Point(xCord,yCord);
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		
+		System.out.println("Modify active?" + modifyToggleActive);
     	if(modifyToggleActive) {
     		modifyDataPointHelper(currentAnimal, centerPoint);
     	}else {
@@ -162,7 +165,7 @@ public class EditingWindowController {
     	}
     	animalCounter++;
     	System.out.println(data.getAnimalTracksList());
-    	gc.fillOval(xCord, yCord,drawX,drawY);
+    	gc.fillOval(xCord - (drawX / 2), yCord - (drawY / 2),drawX,drawY);
     }
     
     /**
@@ -174,7 +177,9 @@ public class EditingWindowController {
     private void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
     	previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
     	System.out.println("Old point: " + previousPoint);
-    	gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
+    	gc.setFill(Color.BLUE);
+    	gc.fillRect(previousPoint.getX() - halfDrawX, previousPoint.getY() - halfDrawY, drawX, drawY);
+    	gc.setFill(Color.BLACK);
     	currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
     	System.out.println("New Point: " + newPoint);
     }
@@ -194,11 +199,13 @@ public class EditingWindowController {
     	if(animalCounter>0) {
     		animalCounter--;
     		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
+			gc.clearRect(currentAnimal.getX() - halfDrawX, currentAnimal.getY() - halfDrawY, drawX, drawY);
 			//This should edit the point, but I can't test it. 
     		if (modifyToggleActive) {
+    			System.out.println("Undo with modify");
     			currentAnimal.setTimePointAtTime(previousPoint.getPointOpenCV(), curFrameNum);
     		} else {
+    			System.out.println("Undo withOUT modify");
     			currentAnimal.removeLocation();
     		}
     		System.out.println(data.getAnimalTracksList());
@@ -293,6 +300,19 @@ public class EditingWindowController {
 		});
 	}
 	
+	public void updateFrameView() {
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				// effectively grab and process a single frame
+				Mat frame = grabFrame();
+				// convert and show the frame
+				Image imageToShow = Utils.mat2Image(frame);
+				currentFrameImage.setImage(imageToShow);
+			}
+		});
+
+	}
 
 //	private void runJumpTo() {
 //		
@@ -312,17 +332,4 @@ public class EditingWindowController {
 //
 //	}
 
-	public void updateFrameView() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// effectively grab and process a single frame
-				Mat frame = grabFrame();
-				// convert and show the frame
-				Image imageToShow = Utils.mat2Image(frame);
-				currentFrameImage.setImage(imageToShow);
-			}
-		});
-
-	}
 }
