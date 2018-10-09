@@ -36,53 +36,53 @@ public class EditingWindowController {
 
 	@FXML
 	private AnchorPane anchorPane;
-	
+
 	@FXML
-    private MenuItem closeOption;
+	private MenuItem closeOption;
 
-    @FXML
-    private MenuItem saveOption;
+	@FXML
+	private MenuItem saveOption;
 
-    @FXML
-    private MenuItem undoOption;
+	@FXML
+	private MenuItem undoOption;
 
-    @FXML
-    private MenuItem redoOption;
+	@FXML
+	private MenuItem redoOption;
 
-    @FXML
-    private ToggleButton modifyToggleBtn;
+	@FXML
+	private ToggleButton modifyToggleBtn;
 
-    @FXML
-    private Button undoBtn;
+	@FXML
+	private Button undoBtn;
 
-    @FXML
-    private Button redoBtn;
+	@FXML
+	private Button redoBtn;
 
-    @FXML
-    private Button previousFrameBtn;
+	@FXML
+	private Button previousFrameBtn;
 
-    @FXML
-    private Button nextFrameBtn;
+	@FXML
+	private Button nextFrameBtn;
 
-    @FXML
-    private Button finishEditingBtn;
+	@FXML
+	private Button finishEditingBtn;
 
-    @FXML
-    private ImageView currentFrameImage;
-    
-    @FXML
-    private Canvas canvas;
+	@FXML
+	private ImageView currentFrameImage;
 
-    @FXML
-    private Slider sliderSeekBar;
-    
+	@FXML
+	private Canvas canvas;
+
+	@FXML
+	private Slider sliderSeekBar;
+
 	// a timer for acquiring the video stream
 	// private ScheduledExecutorService timer;
 	private VideoCapture capture = new VideoCapture();
 	private String fileName = null;
 	private int curFrameNum;
 	public double numFrame;
-	
+
 	private double xCord;
 	private double yCord;
 	ProjectData data = new ProjectData();
@@ -92,125 +92,122 @@ public class EditingWindowController {
 	private boolean modifyToggleActive = false;
 	private int drawX = 5;
 	private int drawY = 5;
-	
+
 	private TimePoint previousPoint;
-    
-    
 
-    @FXML
-    void closeWindow(ActionEvent event) {
+	@FXML
+	void closeWindow(ActionEvent event) {
 
-    }
+	}
 
-    @FXML
-    void frameStepBack(MouseEvent event) {
-    	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    	animalCounter = 0;
-    	curFrameNum -= Math.floor(videoObject.getFrameRate()*3);
+	@FXML
+	void frameStepBack(MouseEvent event) {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		animalCounter = 0;
+		curFrameNum -= Math.floor(videoObject.getFrameRate() * 3);
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
-    }
+	}
 
-    @FXML
-    void frameStepForward(MouseEvent event) {
-    	gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    	animalCounter = 0;
-    	//change hard coded number into what the user wants to measure
-		curFrameNum += Math.floor(videoObject.getFrameRate()*3);
+	@FXML
+	void frameStepForward(MouseEvent event) {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		animalCounter = 0;
+		// change hard coded number into what the user wants to measure
+		curFrameNum += Math.floor(videoObject.getFrameRate() * 3);
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
-    }
-    
-    protected void frameAdjustHelper() {
-    	AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    	//modifyToggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
-    	//System.out.println(modifyToggleActive);
-    	if(currentAnimal.hasTimePointAtTime(curFrameNum)) {
-    		for(int i = 0; i < data.getAnimalTracksList().size(); i++) {
-    			TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
-    			gc.fillOval(curAnimalPoint.getX(),curAnimalPoint.getY(), drawX,drawY);
-    		}
-    	}
-    }
+	}
 
-    @FXML
-    void openPopUp(MouseEvent event) {
-
-    }
-
-    @FXML
-    void redoEdit(MouseEvent event) {
-
-    }
-
-    @FXML
-    void saveProject(ActionEvent event) {
-
-    }
-
-    @FXML
-    void toggleManualEdit(MouseEvent event) {
-    	modifyToggleActive = !modifyToggleActive;
-    	animalCounter = 0;
-    }
-
-    @FXML //TODO: figure out mechanism for how to modify animal data
-    void addOrModifyDataPoint(MouseEvent event) {
-    	xCord = event.getX();
-		yCord = event.getY();
-		Point centerPoint = new Point(xCord,yCord);
+	protected void frameAdjustHelper() {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		
-    	if(modifyToggleActive) {
-    		modifyDataPointHelper(currentAnimal, centerPoint);
-    	}else {
-    		addDataPointHelper(currentAnimal, centerPoint);
-    	}
-    	animalCounter++;
-    	System.out.println(data.getAnimalTracksList());
-    	gc.fillOval(xCord, yCord,drawX,drawY);
-    }
-    
-    void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
-    	previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
-    	System.out.println("Old point: " + previousPoint);
-    	gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
-    	currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
-    	System.out.println("New Point: " + newPoint);
-    }
-    
-    void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
-    	currentAnimal.addLocation(newPoint, curFrameNum);
-    }
-    
-    @FXML
-    void undoEdit(MouseEvent event) {
-    	if(animalCounter>0) {
-    		animalCounter--;
-    		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-    		
-    		gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
-    		currentAnimal.removeLocation();
-    		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
-    			System.out.println(data.getAnimalTracksList().get(i));
-    		}
-    	} else {
-    		Popup popup = new Popup();
-    		//TODO: make a popup that says nothing to undo instead of nothing happening.  
-    		
-    	}
-    }
-    
-    
+		// modifyToggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
+		// System.out.println(modifyToggleActive);
+		if (currentAnimal.hasTimePointAtTime(curFrameNum)) {
+			for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
+				gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
+			}
+		}
+	}
+
+	@FXML
+	void openPopUp(MouseEvent event) {
+
+	}
+
+	@FXML
+	void redoEdit(MouseEvent event) {
+
+	}
+
+	@FXML
+	void saveProject(ActionEvent event) {
+
+	}
+
+	@FXML
+	void toggleManualEdit(MouseEvent event) {
+		modifyToggleActive = !modifyToggleActive;
+		animalCounter = 0;
+	}
+
+	@FXML // TODO: figure out mechanism for how to modify animal data
+	void addOrModifyDataPoint(MouseEvent event) {
+		xCord = event.getX();
+		yCord = event.getY();
+		Point centerPoint = new Point(xCord, yCord);
+		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+
+		if (modifyToggleActive) {
+			modifyDataPointHelper(currentAnimal, centerPoint);
+		} else {
+			addDataPointHelper(currentAnimal, centerPoint);
+		}
+		animalCounter++;
+		System.out.println(data.getAnimalTracksList());
+		gc.fillOval(xCord, yCord, drawX, drawY);
+	}
+
+	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+		previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
+		System.out.println("Old point: " + previousPoint);
+		gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
+		currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
+		System.out.println("New Point: " + newPoint);
+	}
+
+	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+		currentAnimal.addLocation(newPoint, curFrameNum);
+	}
+
+	@FXML
+	void undoEdit(MouseEvent event) {
+		if (animalCounter > 0) {
+			animalCounter--;
+			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+
+			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
+			currentAnimal.removeLocation();
+			for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+				System.out.println(data.getAnimalTracksList().get(i));
+			}
+		} else {
+			Popup popup = new Popup();
+			// TODO: make a popup that says nothing to undo instead of nothing happening.
+
+		}
+	}
+
 	@FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
 		gc = canvas.getGraphicsContext2D();
 		runSliderSeekBar();
 	}
-	
+
 	@FXML
 	public void handleBrowse() throws FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
@@ -222,22 +219,24 @@ public class EditingWindowController {
 			videoObject = new Video(fileName);
 			capture = videoObject.getVidCap();
 			startVideo();
-		};
+		}
+		;
 		runSliderSeekBar();
-		//runJumpTo(); //prints out which frame you are at
+		// runJumpTo(); //prints out which frame you are at
 	}
-	
+
 	protected void startVideo() {
 
 		// start the video capture
 		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
+		// totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints
+		// total number of frames
 		sliderSeekBar.setDisable(false);
-		//this can be repurposed to allow the client to jump to specific time stamp
-		//jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
+		// this can be repurposed to allow the client to jump to specific time stamp
+		// jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
 		updateFrameView();
-		sliderSeekBar.setMax((int) numFrame -1);
-		sliderSeekBar.setMaxWidth((int) numFrame -1);
+		sliderSeekBar.setMax((int) numFrame - 1);
+		sliderSeekBar.setMaxWidth((int) numFrame - 1);
 
 	}
 
@@ -276,7 +275,8 @@ public class EditingWindowController {
 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				//currentFrameArea.appendText("Current frame: " + ((int) Math.round(newValue.doubleValue())) + "\n");
+				// currentFrameArea.appendText("Current frame: " + ((int)
+				// Math.round(newValue.doubleValue())) + "\n");
 
 				curFrameNum = (int) Math.round(newValue.doubleValue());
 				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
@@ -286,7 +286,6 @@ public class EditingWindowController {
 
 		});
 	}
-	
 
 //	private void runJumpTo() {
 //		

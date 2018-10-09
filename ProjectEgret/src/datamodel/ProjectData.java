@@ -3,11 +3,16 @@ package datamodel;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 import java.awt.Color;
 
 import org.opencv.core.Point;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class ProjectData {
 	private Video video;
@@ -19,10 +24,6 @@ public class ProjectData {
 		for (int i = 0; i < animalTracksList.size(); i++) {
 			System.out.println(animalTracksList.get(i));
 		}
-	}
-	
-	public void saveProject(File projectFile) {
-		
 	}
 	
 	public ProjectData(String videoFilePath) throws FileNotFoundException {
@@ -73,5 +74,28 @@ public class ProjectData {
 
 	public List<Color> getColorArrayForAnimalTracks() {
 		return colorArrayForAnimalTracks;
+	}
+	public void saveToFile(File saveFile) throws FileNotFoundException {
+		String json = toJSON();
+		PrintWriter out = new PrintWriter(saveFile);
+		out.print(json);
+		out.close();
+	}
+	
+	public String toJSON() {
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();		
+		return gson.toJson(this);
+	}
+	
+	public static ProjectData loadFromFile(File loadFile) throws FileNotFoundException {
+		String json = new Scanner(loadFile).useDelimiter("\\Z").next();
+		return fromJSON(json);
+	}
+	
+	public static ProjectData fromJSON(String jsonText) throws FileNotFoundException {
+		Gson gson = new Gson();
+		ProjectData data = gson.fromJson(jsonText, ProjectData.class);
+		data.getVideo().connectVideoCapture();
+		return data;
 	}
 }

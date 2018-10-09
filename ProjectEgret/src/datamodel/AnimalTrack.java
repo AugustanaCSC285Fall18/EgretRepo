@@ -8,11 +8,12 @@ import org.opencv.core.Point;
 public class AnimalTrack {
 	
 	private Point centerPoint;
-	private ArrayList<TimePoint> positions = new ArrayList<TimePoint>();
+	private ArrayList<TimePoint> positions; 
 	private String animalId;
 	
 	public AnimalTrack(String name) {
 		this.animalId = name;
+		positions = new ArrayList<TimePoint>();
 	}
 
 	public void setLocations(ArrayList<TimePoint> position) {
@@ -38,6 +39,13 @@ public class AnimalTrack {
 	 */
 	public Point getCurrentCenterPoint() {
 		return centerPoint;
+	}
+	
+	/**
+	 * @return the current Center Point of the animal
+	 */
+	public int getNumPoints() {
+		return positions.size();
 	}
 	
 	/**
@@ -73,6 +81,10 @@ public class AnimalTrack {
 		if(positions.size()>0) {
 			positions.remove(positions.size()-1);
 		}
+	}
+	
+	public TimePoint getTimePointAtIndex(int index) {
+		return positions.get(index);
 	}
 	
 	public TimePoint getTimePointAtTime(int frameNum) {
@@ -111,6 +123,18 @@ public class AnimalTrack {
 	
 	public double getY() {
 		return centerPoint.y;
+	}
+	
+	public static boolean comparePoint(TimePoint tp1, TimePoint tp2) {
+		if(!(tp1.getX() == tp2.getX())) {
+			return false;
+		}else if(!(tp1.getY() == tp2.getY())) {
+			return false;
+		}else if(!(tp1.getFrameNum() == tp2.getFrameNum())) {
+			return false;
+		}else {
+			return true;
+		}
 	}
 	
 }
