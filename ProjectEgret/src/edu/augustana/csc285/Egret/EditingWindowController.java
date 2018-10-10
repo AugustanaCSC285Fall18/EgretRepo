@@ -164,7 +164,7 @@ public class EditingWindowController {
     		addDataPointHelper(currentAnimal, centerPoint);
     	}
     	animalCounter++;
-    	System.out.println(data.getAnimalTracksList());
+    	System.out.println(data.getAnimalTracksList().get(animalCounter));
     	gc.fillOval(xCord - (drawX / 2), yCord - (drawY / 2),drawX,drawY);
     }
     
@@ -208,7 +208,7 @@ public class EditingWindowController {
     			System.out.println("Undo withOUT modify");
     			currentAnimal.removeLocation();
     		}
-    		System.out.println(data.getAnimalTracksList());
+    		System.out.println(data.getAnimalTracksList().get(animalCounter));
     	} else {
     		Popup popup = new Popup();
     		//TODO: make a popup that says nothing to undo instead of nothing happening.  
