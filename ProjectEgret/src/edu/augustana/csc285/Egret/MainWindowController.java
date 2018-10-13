@@ -3,6 +3,7 @@ package edu.augustana.csc285.Egret;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.opencv.core.Mat;
@@ -48,6 +49,7 @@ public class MainWindowController implements AutoTrackListener {
 	private AutoTracker autotracker;
 	private ProjectData project;
 	private Stage stage;
+	private Video video;
 	
 	@FXML public void initialize() {
 		
@@ -88,7 +90,7 @@ public class MainWindowController implements AutoTrackListener {
 	public void loadVideo(String filePath) {
 		try {
 			project = new ProjectData(filePath);
-			Video video = project.getVideo();
+			video = project.getVideo();
 			sliderVideoTime.setMax(video.getTotalNumFrames()-1);
 			showFrameAt(0);
 		} catch (FileNotFoundException e) {			
@@ -144,12 +146,12 @@ public class MainWindowController implements AutoTrackListener {
 	}
 
 	@Override
-	public void trackingComplete(List<AnimalTrack> trackedSegments) {
+	public void trackingComplete(List<AnimalTrack> trackedSegments){
 		project.getUnassignedSegments().clear();
 		project.getUnassignedSegments().addAll(trackedSegments);
 
 		for (AnimalTrack track: trackedSegments) {
-			System.out.println(track);
+			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
 //			System.out.println("  " + track.getPositions());
 		}
 		Platform.runLater(() -> { 
@@ -157,7 +159,67 @@ public class MainWindowController implements AutoTrackListener {
 			btnAutotrack.setText("Start auto-tracking");
 		});	
 		
+		try {
+			File autoTrackData = new File("full_auto_tracker_data");
+			project.saveToFile(autoTrackData);
+		} catch (FileNotFoundException e) {
+		}
+		
+		//mergeTrackObjects(trackedSegments);
+		
 	}
+	
+	
+//	public void mergeTrackObjects(List<AnimalTrack> trackedSegments) {
+//		int startFrame = video.getStartFrameNum();
+//		List<AnimalTrack> finalAnimalList = new ArrayList<AnimalTrack>();
+//		for(int i = 0; i < trackedSegments.size(); i++) {
+//			if(trackedSegments.get(i).getFirstFrame() == startFrame) {
+//				AnimalTrack tempAnimalTrack = trackedSegments.get(i); 
+//				finalAnimalList.add(tempAnimalTrack);
+//				trackedSegments.remove(i);
+//			}
+//		}
+////		for(int i = 0; i < trackedSegments.size(); i++) {
+////			if(trackedSegments.get(i).getFirstFrame() == startFrame) {
+////				trackedSegments.remove(i);
+////			}
+////		}
+//		for (AnimalTrack track: finalAnimalList) {
+//			System.out.println("final: " + track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
+//		}
+//		
+//		for (AnimalTrack track: trackedSegments) {
+//			System.out.println("unknown: " + track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
+//		}
+//		for(int i = 0; i<finalAnimalList.size(); i++) {
+//			//int trackedSegmentsSize = trackedSegments.size();
+//			int j = 0;
+//			boolean foundData = false;
+//			while(!foundData ||  j > trackedSegments.size()) {
+//				System.out.println(j);
+//				AnimalTrack currentFinalAnimal = finalAnimalList.get(i);
+//				AnimalTrack currentUnknownTrack = trackedSegments.get(j);
+//				System.out.println(currentFinalAnimal.getName() + currentFinalAnimal.getFirstFrame());
+//				System.out.println(currentUnknownTrack.getName() + currentUnknownTrack.getFirstFrame());
+//				if(currentUnknownTrack.getFirstFrame() - currentFinalAnimal.getLastFrame() < 50) {
+//					System.out.println("hi");
+//					if(Math.sqrt(Math.pow(currentFinalAnimal.getTimePointAtIndex(currentFinalAnimal.getNumPoints()).getX()- currentUnknownTrack.getTimePointAtIndex(0).getX(), 2) + 
+//							Math.pow(currentFinalAnimal.getTimePointAtIndex(currentFinalAnimal.getNumPoints()).getY()- currentUnknownTrack.getTimePointAtIndex(0).getY(), 2)) < 40) {
+//						currentFinalAnimal.addTrackSegment(currentUnknownTrack);
+//						//trackedSegments.remove(j);
+//						foundData = true;
+//					}
+//				}
+//				j++;
+//			}
+//		}
+//		for (AnimalTrack track: finalAnimalList) {
+//			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
+//		}
+//		
+//		
+//	}
 	
 	
 	

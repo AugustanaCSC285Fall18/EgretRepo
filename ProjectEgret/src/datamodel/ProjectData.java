@@ -30,25 +30,30 @@ public class ProjectData {
 	}
 
 	public ProjectData() {
-		AnimalTrack animal1 = new AnimalTrack("Chick1");
-		AnimalTrack animal2 = new AnimalTrack("Chick2");
-		AnimalTrack animal3 = new AnimalTrack("Chick3");
-		animalTracksList = new ArrayList<AnimalTrack>();
-		animalTracksList.add(animal1);
-		animalTracksList.add(animal2);
-		animalTracksList.add(animal3);
-
-		colorArrayForAnimalTracks.add(Color.BLACK);
-		colorArrayForAnimalTracks.add(Color.RED);
-		colorArrayForAnimalTracks.add(Color.BLUE);
-		colorArrayForAnimalTracks.add(Color.ORANGE);
-		colorArrayForAnimalTracks.add(Color.GREEN);
+//		AnimalTrack animal1 = new AnimalTrack("Chick1");
+//		AnimalTrack animal2 = new AnimalTrack("Chick2");
+//		AnimalTrack animal3 = new AnimalTrack("Chick3");
+//		animalTracksList = new ArrayList<AnimalTrack>();
+//		animalTracksList.add(animal1);
+//		animalTracksList.add(animal2);
+//		animalTracksList.add(animal3);
+//
+//		colorArrayForAnimalTracks.add(Color.BLACK);
+//		colorArrayForAnimalTracks.add(Color.RED);
+//		colorArrayForAnimalTracks.add(Color.BLUE);
+//		colorArrayForAnimalTracks.add(Color.ORANGE);
+//		colorArrayForAnimalTracks.add(Color.GREEN);
 	}
+	
 
 	public List<AnimalTrack> getAnimalTracksList() {
 		return animalTracksList;
 	}
 
+	public void removeUnassignedSegment(int location) {
+		unassignedSegments.remove(location);
+	}
+	
 	public void setAnimalTracksList(List<AnimalTrack> animalTracks) {
 		this.animalTracksList = animalTracks;
 	}

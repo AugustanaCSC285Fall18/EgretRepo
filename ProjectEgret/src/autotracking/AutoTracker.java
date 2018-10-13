@@ -106,6 +106,7 @@ public class AutoTracker {
 		for (AutoTrackListener listener : listeners) {
 			listener.trackingComplete(archivedTrackedSegments);
 		}
+		
 	}
 	
 	private AnimalTrack getMatchOrCreateAnimalTrackForPoint(TimePoint pt, List<AnimalTrack> currentSegments, double maxPixelMovementPerFrame) {

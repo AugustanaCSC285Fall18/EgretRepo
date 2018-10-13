@@ -24,7 +24,7 @@ public class WelcomeWindowController {
 
     @FXML
     void createProject(ActionEvent event) throws IOException{
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
 		BorderPane root = (BorderPane)loader.load();
 //		EditingWindowController nextController = loader.getController();
 		

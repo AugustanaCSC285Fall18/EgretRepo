@@ -1,6 +1,7 @@
 package datamodel;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.opencv.core.Point;
 
@@ -112,9 +113,20 @@ public class AnimalTrack {
 		currentTimePoint.setX(curPoint.x);
 		currentTimePoint.setY(curPoint.y);
 	}
+	
+	public void addTrackSegment(AnimalTrack newList) {
+		for (int i = 0; i < newList.getNumPoints(); i++) {
+		    positions.add(newList.getTimePointAtIndex(i)); 
+		}
+		//positions.addAll((Collection<? extends TimePoint>) newList);
+	}
 
 	public TimePoint getFinalTimePoint() {
 		return positions.get(positions.size() - 1);
+	}
+	
+	public TimePoint getFirstTimePoint() {
+		return positions.get(0);
 	}
 
 	public double getX() {
@@ -124,6 +136,15 @@ public class AnimalTrack {
 	public double getY() {
 		return centerPoint.y;
 	}
+	
+	public int getFirstFrame() {
+		return positions.get(0).getFrameNum();
+	}
+	
+	public int getLastFrame() {
+		return positions.get(positions.size()-1).getFrameNum();
+	}
+
 
 	public static boolean comparePoint(TimePoint tp1, TimePoint tp2) {
 		if (!(tp1.getX() == tp2.getX())) {
@@ -137,4 +158,5 @@ public class AnimalTrack {
 		}
 	}
 
+	
 }

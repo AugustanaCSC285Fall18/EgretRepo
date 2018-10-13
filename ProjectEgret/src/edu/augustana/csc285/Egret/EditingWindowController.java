@@ -2,6 +2,7 @@ package edu.augustana.csc285.Egret;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -15,11 +16,14 @@ import datamodel.Video;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.ToggleButton;
@@ -27,6 +31,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Window;
@@ -74,6 +79,10 @@ public class EditingWindowController {
 
 	@FXML
 	private Slider sliderSeekBar;
+	
+	@FXML
+	private ChoiceBox<String> PickAnimalTrackBtn = new ChoiceBox<>();
+
 
 	// a timer for acquiring the video stream
 	// private ScheduledExecutorService timer;
@@ -84,40 +93,91 @@ public class EditingWindowController {
 
 	private double xCord;
 	private double yCord;
-	ProjectData data = new ProjectData();
+	//ProjectData data = new ProjectData();
+	ProjectData data;
 	private int animalCounter = 0;
 	private Video videoObject;
 	private GraphicsContext gc;
 	private boolean modifyToggleActive = false;
 	private int drawX = 5;
 	private int drawY = 5;
+	private int frameJumpModifier = 2;
 
 	private TimePoint previousPoint;
+	
+	private int startFrame = 850;
+	private int endFrame = 1500;
 
+	void loadData() throws FileNotFoundException {
+		File dataFile = new File("full_auto_tracker_data");
+		data = ProjectData.loadFromFile(dataFile);
+		//for (AnimalTrack track: data.getUnassignedSegments()) {
+		//	System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
+		//}
+
+		//removes a data string that is less than 4*frame rate
+		for(int i = 0; i < data.getUnassignedSegments().size(); i++) {
+			if(data.getUnassignedSegments().get(i).getNumPoints() < data.getVideo().getFrameRate()* frameJumpModifier*2 ) {
+				data.getUnassignedSegments().remove(i);
+				i--;
+			}
+		}
+		
+		for (AnimalTrack track: data.getUnassignedSegments()) {
+			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
+		}
+	
+		data.getAnimalTracksList().add(new AnimalTrack("Chick 1"));
+		data.getAnimalTracksList().add(new AnimalTrack("Chick 2"));
+		data.getAnimalTracksList().get(1).add(new TimePoint(150,200,5));
+		data.getAnimalTracksList().add(new AnimalTrack("Chick 3"));
+		data.getAnimalTracksList().get(2).add(new TimePoint(250,300,10));
+		
+	}
+	
 	@FXML
 	void closeWindow(ActionEvent event) {
 
 	}
+	
+	void frameChanger(double numOfFrameChange) {
+		if(curFrameNum + numOfFrameChange > endFrame) {
+			animalCounter++;
+			jumpToFrame(startFrame);
+		}else {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		curFrameNum += numOfFrameChange;
+		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		updateFrameView();
+		frameAdjustHelper();
+		displayFutureTracks();
+		}
 
+	}
+	
+	void jumpToFrame(int numOfFrame) {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		curFrameNum = numOfFrame;
+		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		updateFrameView();
+		frameAdjustHelper();
+		displayFutureTracks();
+	}
+	
+	void frameStepBack() {
+		frameChanger(-Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+	}
 	@FXML
 	void frameStepBack(MouseEvent event) {
-		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		animalCounter = 0;
-		curFrameNum -= Math.floor(videoObject.getFrameRate() * 3);
-		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-		updateFrameView();
-		frameAdjustHelper();
+		frameChanger(-Math.floor(videoObject.getFrameRate() * frameJumpModifier));
 	}
 
+	void frameStepForward() {
+		frameChanger(Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+	}
 	@FXML
 	void frameStepForward(MouseEvent event) {
-		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		animalCounter = 0;
-		// change hard coded number into what the user wants to measure
-		curFrameNum += Math.floor(videoObject.getFrameRate() * 3);
-		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-		updateFrameView();
-		frameAdjustHelper();
+		frameChanger(Math.floor(videoObject.getFrameRate() * frameJumpModifier));
 	}
 
 	protected void frameAdjustHelper() {
@@ -125,8 +185,10 @@ public class EditingWindowController {
 		// modifyToggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
 		// System.out.println(modifyToggleActive);
 		if (currentAnimal.hasTimePointAtTime(curFrameNum)) {
-			for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+			//data.getAnimalTracksList().size()
+			for (int i = 0; i < 1; i++) {
 				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
+				gc.fillText("track " + i, curAnimalPoint.getX()+100, curAnimalPoint.getY()+100);
 				gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
 			}
 		}
@@ -165,9 +227,15 @@ public class EditingWindowController {
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 		}
-		animalCounter++;
-		System.out.println(data.getAnimalTracksList());
+		//animalCounter++;
+		System.out.println("chich 0 first point: " + data.getAnimalTracksList().get(0).getFirstTimePoint());
+		System.out.println("chich 0 last point: " + data.getAnimalTracksList().get(0).getFinalTimePoint());
+		System.out.println("chich 1 first point: " + data.getAnimalTracksList().get(1).getFirstTimePoint());
+		System.out.println("chich 1 last point: " + data.getAnimalTracksList().get(1).getFinalTimePoint());
+		System.out.println("chich 2 first point: " + data.getAnimalTracksList().get(2).getFirstTimePoint());
+		System.out.println("chich 2 last point: " + data.getAnimalTracksList().get(2).getFinalTimePoint());
 		gc.fillOval(xCord, yCord, drawX, drawY);
+		frameStepForward();
 	}
 
 	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
@@ -181,11 +249,12 @@ public class EditingWindowController {
 	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, curFrameNum);
 	}
+	
 
 	@FXML
 	void undoEdit(MouseEvent event) {
 		if (animalCounter > 0) {
-			animalCounter--;
+			//animalCounter--;
 			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 
 			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
@@ -199,9 +268,70 @@ public class EditingWindowController {
 
 		}
 	}
+	
+	@FXML
+	void addTrack(MouseEvent event) {
+		if(PickAnimalTrackBtn.getValue() != null) {
+			String chosenValueByUser = new String(PickAnimalTrackBtn.getValue());	
+			String nameOfCurrentTrack = ("");
+			AnimalTrack chosenTrack = null;
+			boolean foundTrack = false;
+			int trackCounter = 1;
+			int i = 0;
+			int chosenTrackNumber = 0;
+			while(i < data.getUnassignedSegments().size() && !foundTrack) {
+				AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
+				//displays a track that is within 10 times the frame rate
+				if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - curFrameNum) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
+					nameOfCurrentTrack = ("Track "+trackCounter);
+					trackCounter++;
+				}
+			System.out.println("name of cur track " + nameOfCurrentTrack);
+			System.out.println("chosenValueByUser " + chosenValueByUser);
+			if(nameOfCurrentTrack.equals(chosenValueByUser)) {
+				chosenTrack = currentTrack;
+				chosenTrackNumber = i;
+				foundTrack = true;
+			}
+			i++;
+			
+			}
+			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
+			data.removeUnassignedSegment(chosenTrackNumber);
+			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum()+1-curFrameNum);
+			
+		}
+
+	}
+	
+	void displayFutureTracks() {
+		int trackCounter = 1;
+		ObservableList<String> listOfTracksDisplayed = FXCollections.observableArrayList();
+
+		for(int i = 0; i < data.getUnassignedSegments().size(); i++) {
+			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
+			//displays a track that is within 10 times the frame rate
+			if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - curFrameNum) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
+				for(int j = 0; j < currentTrack.getNumPoints();j++) {
+					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
+					gc.setFill(Color.BLACK);
+					gc.fillOval(currentTimePoint.getX(), currentTimePoint.getY(), drawX, drawY);
+				}
+				gc.setFill(Color.DARKRED);
+				gc.fillText("Track "+ trackCounter, currentTrack.getFirstTimePoint().getX()+10, currentTrack.getFirstTimePoint().getY()+10);
+				listOfTracksDisplayed.add("Track "+trackCounter);
+				trackCounter++;
+			}
+		}
+		if(listOfTracksDisplayed != null) {
+			PickAnimalTrackBtn.setItems(listOfTracksDisplayed);
+		}
+
+	}
 
 	@FXML
-	public void initialize() {
+	public void initialize() throws FileNotFoundException {
+		loadData();
 		sliderSeekBar.setDisable(true);
 		gc = canvas.getGraphicsContext2D();
 		runSliderSeekBar();
@@ -236,6 +366,7 @@ public class EditingWindowController {
 		updateFrameView();
 		sliderSeekBar.setMax((int) numFrame - 1);
 		sliderSeekBar.setMaxWidth((int) numFrame - 1);
+		jumpToFrame(startFrame);
 
 	}
 
