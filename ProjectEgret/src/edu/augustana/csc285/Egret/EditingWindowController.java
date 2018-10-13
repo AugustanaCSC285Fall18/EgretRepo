@@ -157,6 +157,7 @@ public class EditingWindowController {
 		yCord = event.getY();
 		Point centerPoint = new Point(xCord,yCord);
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+
 		System.out.println("Modify active?" + modifyToggleActive);
 		if(modifyToggleActive) {
 			Point newPoint = currentAnimal.getPointAtTime(curFrameNum);
@@ -219,7 +220,7 @@ public class EditingWindowController {
 		}
 	}
 
-
+ 
 	@FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
