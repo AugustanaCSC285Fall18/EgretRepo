@@ -21,8 +21,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -42,13 +44,11 @@ import javafx.stage.Window;
  	@FXML
 	private MenuItem undoOption;
  	@FXML
-	private MenuItem redoOption;
- 	@FXML
 	private ToggleButton modifyToggleBtn;
  	@FXML
 	private Button undoBtn;
  	@FXML
-	private Button redoBtn;
+	private Button saveBtn;
  	@FXML
 	private Button previousFrameBtn;
  	@FXML
@@ -61,6 +61,10 @@ import javafx.stage.Window;
 	private Canvas canvas;
  	@FXML
 	private Slider sliderSeekBar;
+ 	@FXML
+ 	private TextField timeField;
+ 	@FXML
+ 	private Label timeLabel;
 	
 	@FXML
 	private ChoiceBox<String> PickAnimalTrackBtn = new ChoiceBox<>();
