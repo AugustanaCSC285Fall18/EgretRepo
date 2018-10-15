@@ -96,7 +96,6 @@ public class EditingWindowController {
 	//ProjectData data = new ProjectData();
 	ProjectData data;
 	private int animalCounter = 0;
-	private int totalAmountOfAnimals = 2;
 	private Video videoObject;
 	private GraphicsContext gc;
 	private boolean modifyToggleActive = false;
@@ -107,7 +106,7 @@ public class EditingWindowController {
 	private TimePoint previousPoint;
 	
 	private int startFrame = 850;
-	private int endFrame = 2000;
+	private int endFrame = 1500;
 
 	void loadData() throws FileNotFoundException {
 		File dataFile = new File("full_auto_tracker_data");
@@ -144,40 +143,25 @@ public class EditingWindowController {
 	void frameChanger(double numOfFrameChange) {
 		if(curFrameNum + numOfFrameChange > endFrame) {
 			animalCounter++;
-			if(animalCounter > totalAmountOfAnimals) {
-				saveData();
-				//TODO: make code to end the manual tracking screen
-			}else {
-				jumpToFrame(startFrame);
-			}
+			jumpToFrame(startFrame);
 		}else {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		System.out.println("old frame " + curFrameNum);
 		curFrameNum += numOfFrameChange;
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
-		System.out.println("current frame " + curFrameNum);
-		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
-		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
-		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
 		}
 
 	}
-
+	
 	void jumpToFrame(int numOfFrame) {
-		System.out.println("old frame num " + curFrameNum);
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		curFrameNum = numOfFrame;
-		System.out.println("new frame num " + curFrameNum);
 		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
-		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
-		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
-		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
 	}
 	
 	void frameStepBack() {
@@ -204,6 +188,7 @@ public class EditingWindowController {
 			//data.getAnimalTracksList().size()
 			for (int i = 0; i < 1; i++) {
 				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
+				gc.fillText("track " + i, curAnimalPoint.getX()+100, curAnimalPoint.getY()+100);
 				gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
 			}
 		}
@@ -242,9 +227,13 @@ public class EditingWindowController {
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 		}
-		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
-		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
-		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
+		//animalCounter++;
+		System.out.println("chich 0 first point: " + data.getAnimalTracksList().get(0).getFirstTimePoint());
+		System.out.println("chich 0 last point: " + data.getAnimalTracksList().get(0).getFinalTimePoint());
+		System.out.println("chich 1 first point: " + data.getAnimalTracksList().get(1).getFirstTimePoint());
+		System.out.println("chich 1 last point: " + data.getAnimalTracksList().get(1).getFinalTimePoint());
+		System.out.println("chich 2 first point: " + data.getAnimalTracksList().get(2).getFirstTimePoint());
+		System.out.println("chich 2 last point: " + data.getAnimalTracksList().get(2).getFinalTimePoint());
 		gc.fillOval(xCord, yCord, drawX, drawY);
 		frameStepForward();
 	}
@@ -338,17 +327,6 @@ public class EditingWindowController {
 			PickAnimalTrackBtn.setItems(listOfTracksDisplayed);
 		}
 
-	}
-	
-	private void saveData() {
-		File finalDataFile = new File("final_data_file");
-		try {
-			data.saveToFile(finalDataFile);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
 	}
 
 	@FXML
