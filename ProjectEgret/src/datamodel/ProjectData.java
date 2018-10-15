@@ -27,6 +27,7 @@ public class ProjectData {
 		video = new Video(videoFilePath);
 		animalTracksList = new ArrayList<>();
 		unassignedSegments = new ArrayList<>();
+		addColorsToColorArray();
 	}
 
 	public ProjectData() {
@@ -43,6 +44,15 @@ public class ProjectData {
 //		colorArrayForAnimalTracks.add(Color.BLUE);
 //		colorArrayForAnimalTracks.add(Color.ORANGE);
 //		colorArrayForAnimalTracks.add(Color.GREEN);
+	}
+	
+	
+	private void addColorsToColorArray() {
+		colorArrayForAnimalTracks.add(Color.BLACK);
+		colorArrayForAnimalTracks.add(Color.RED);
+		colorArrayForAnimalTracks.add(Color.BLUE);
+		colorArrayForAnimalTracks.add(Color.ORANGE);
+		colorArrayForAnimalTracks.add(Color.GREEN);
 	}
 	
 

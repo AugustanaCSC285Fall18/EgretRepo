@@ -99,8 +99,11 @@ public class EditingWindowController {
 	private Video videoObject;
 	private GraphicsContext gc;
 	private boolean modifyToggleActive = false;
-	private int drawX = 5;
-	private int drawY = 5;
+	private int drawX = 15;
+	private int drawY = 15;
+	private int halfDrawX = drawX / 2;
+	private int halfDrawY = drawY / 2;
+	
 	private int frameJumpModifier = 2;
 
 	private TimePoint previousPoint;
@@ -223,7 +226,9 @@ public class EditingWindowController {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 
 		if (modifyToggleActive) {
-			modifyDataPointHelper(currentAnimal, centerPoint);
+			Point newPoint = currentAnimal.getPointAtTime(curFrameNum);
+			previousPoint = new TimePoint(newPoint, curFrameNum);
+			modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 		}
@@ -235,30 +240,51 @@ public class EditingWindowController {
 		System.out.println("chich 2 first point: " + data.getAnimalTracksList().get(2).getFirstTimePoint());
 		System.out.println("chich 2 last point: " + data.getAnimalTracksList().get(2).getFinalTimePoint());
 		gc.fillOval(xCord, yCord, drawX, drawY);
-		frameStepForward();
-	}
-
-	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
-		previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
-		System.out.println("Old point: " + previousPoint);
-		gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
-		currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
-		System.out.println("New Point: " + newPoint);
-	}
-
-	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
-		currentAnimal.addLocation(newPoint, curFrameNum);
+		gc.fillOval(xCord - halfDrawX, yCord - halfDrawY,drawX,drawY);
 	}
 	
+	/**
+	 * Adds a new location to the current animal to the new mouse click. This
+	 * is a helper method for addOrModifyDataPoint.
+	 * @param currentAnimal - the current animalTrack
+	 * @param newPoint - the new center point for the animalTrack
+	 */
+	private void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+		currentAnimal.addLocation(newPoint, curFrameNum);
+		previousPoint = new TimePoint(newPoint, curFrameNum);
+	}
+	
+	/**
+	 * Modifies the current animal's centerPoint to the new mouse click. This 
+	 * is a helper method for addOrModifyDataPoint
+	 * @param currentAnimal
+	 * @param newPoint
+	 */
+	private void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint prevPoint) {
 
+		System.out.println("Previous point1: " + previousPoint);
+		System.out.println("Prev point: " + prevPoint);
+		gc.clearRect(prevPoint.getX() - halfDrawX, prevPoint.getY() - halfDrawY, drawX, drawY);
+		currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
+		System.out.println("New Point: " + newPoint);
+	}	
+	
 	@FXML
 	void undoEdit(MouseEvent event) {
 		if (animalCounter > 0) {
 			//animalCounter--;
 			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 
-			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
-			currentAnimal.removeLocation();
+			gc.clearRect(currentAnimal.getX() - halfDrawX, currentAnimal.getY() - halfDrawY, drawX, drawY);
+			if (modifyToggleActive) {
+				TimePoint undoPoint = currentAnimal.getTimePointAtTime(curFrameNum);
+				gc.clearRect(undoPoint.getX() - halfDrawX, undoPoint.getY() - halfDrawY, drawX, drawY);
+				gc.fillOval(previousPoint.getX() - halfDrawX, previousPoint.getY() - halfDrawY, drawX, drawY);
+				modifyDataPointHelper(currentAnimal, previousPoint.getPointOpenCV(), undoPoint);
+				currentAnimal.setTimePointAtTime(previousPoint.getPointOpenCV(), curFrameNum);
+			} else {
+				currentAnimal.removeLocation();
+			}
 			for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
 				System.out.println(data.getAnimalTracksList().get(i));
 			}

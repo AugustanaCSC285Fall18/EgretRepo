@@ -107,6 +107,22 @@ public class AnimalTrack {
 
 		return getTimePointAtTime(frameNum) != null;
 	}
+	
+	/**
+	 * @param frameNum - the given frame number
+	 * @return the Point at the frameNum (NOT the TimePoint)
+	 */
+	public Point getPointAtTime(int frameNum) {
+		//TODO: This method's implementation is inefficient [linear search is O(N)]
+		//      Replace this with binary search (O(log n)] or use a Map for fast access
+		for (TimePoint pt : positions) {
+			if (pt.getFrameNum() == frameNum) {
+				return pt.getPointOpenCV();
+			}
+		}
+		return null;
+	}
+	
 
 	public void setTimePointAtTime(Point curPoint, int frameNum) {
 		TimePoint currentTimePoint = getTimePointAtTime(frameNum);
