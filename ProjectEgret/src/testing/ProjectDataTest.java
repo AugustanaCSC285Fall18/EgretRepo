@@ -1,4 +1,5 @@
-package datamodel;
+package testing;
+import datamodel.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

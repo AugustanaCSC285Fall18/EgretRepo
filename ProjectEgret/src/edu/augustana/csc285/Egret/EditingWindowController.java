@@ -17,8 +17,11 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
@@ -55,8 +58,7 @@ import javafx.stage.Window;
 	private Button nextFrameBtn;
  	@FXML
 	private Button finishEditingBtn;
- 	@FXML
-	private ImageView currentFrameImage;
+ 	@FXML ImageView currentFrameImage;
  	@FXML
 	private Canvas canvas;
  	@FXML
@@ -71,7 +73,7 @@ import javafx.stage.Window;
  	// a timer for acquiring the video stream
 	// private ScheduledExecutorService timer;
 	private VideoCapture capture = new VideoCapture();
-	private String fileName = null;
+	private String fileName = null; //What does this do??? 
 	private int curFrameNum;
 	public double numFrame;
  	private double xCord;
@@ -126,10 +128,10 @@ import javafx.stage.Window;
 			if(animalCounter > totalAmountOfAnimals) {
 				saveData();
 				//TODO: make code to end the manual tracking screen
-			}else {
+			} else {
 				jumpToFrame(startFrame);
 			}
-		}else {
+		} else {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		System.out.println("old frame " + curFrameNum);
 		curFrameNum += numOfFrameChange;
@@ -159,17 +161,22 @@ import javafx.stage.Window;
 	
 	void frameStepBack() {
 		frameChanger(-Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+		timeField.setText("" + videoObject.getTimeInSeconds(curFrameNum));
 	}
+ 	
 	@FXML
 	void frameStepBack(MouseEvent event) {
-		frameChanger(-Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+		frameStepBack();
 	}
+	
  	void frameStepForward() {
 		frameChanger(Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+		timeField.setText("" + videoObject.getTimeInSeconds(curFrameNum));
 	}
+ 	
 	@FXML
 	void frameStepForward(MouseEvent event) {
-		frameChanger(Math.floor(videoObject.getFrameRate() * frameJumpModifier));
+		frameStepForward();
 	}
  	protected void frameAdjustHelper() {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
@@ -236,8 +243,13 @@ import javafx.stage.Window;
 				System.out.println(data.getAnimalTracksList().get(i));
 			}
 		} else {
-			Popup popup = new Popup();
-			// TODO: make a popup that says nothing to undo instead of nothing happening.
+			Alert alert = new Alert(AlertType.INFORMATION);
+			alert.setTitle("Undo Message");
+			alert.setHeaderText(null);
+			alert.setContentText("No more points to undo.");
+			alert.showAndWait();
+			
+			//Cited https://code.makery.ch/blog/javafx-dialogs-official/
  		}
 	}
 	
@@ -318,7 +330,7 @@ import javafx.stage.Window;
  	@FXML
 	public void handleBrowse() throws FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Image File");
+		fileChooser.setTitle("Open Video File");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
@@ -326,8 +338,7 @@ import javafx.stage.Window;
 			videoObject = new Video(fileName);
 			capture = videoObject.getVidCap();
 			startVideo();
-		}
-		;
+		};
 		runSliderSeekBar();
 		// runJumpTo(); //prints out which frame you are at
 	}
@@ -369,6 +380,7 @@ import javafx.stage.Window;
 		}
  		return frame;
 	}
+	
  	private void runSliderSeekBar() {
  		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
@@ -380,6 +392,7 @@ import javafx.stage.Window;
  				updateFrameView();
 			}
  		});
+ 		
 	}
  //	private void runJumpTo() {
 //		
@@ -409,4 +422,8 @@ import javafx.stage.Window;
 			}
 		});
  	}
+
+	public ImageView getCurrentFrameImage() {
+		return currentFrameImage;
+	}
  }

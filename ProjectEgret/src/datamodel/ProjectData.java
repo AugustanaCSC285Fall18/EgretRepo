@@ -28,6 +28,7 @@ public class ProjectData {
 		animalTracksList = new ArrayList<>();
 		unassignedSegments = new ArrayList<>();
 		addColorsToColorArray();
+		System.out.println("Made ProjectData");
 	}
 
 	public ProjectData() {

@@ -11,8 +11,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
    <center>
       <AnchorPane prefHeight="262.0" prefWidth="490.0">
          <children>
@@ -41,8 +40,8 @@
    <bottom>
       <HBox prefHeight="63.0" prefWidth="490.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="returnBtn" mnemonicParsing="false" onMouseClicked="#returnToPrevWindow" prefHeight="150.0" prefWidth="500.0" text="Choose Different Video" />
-            <Button fx:id="continueBtn" mnemonicParsing="false" onMouseClicked="#openExportWindow" prefHeight="150.0" prefWidth="500.0" text="Continue" />
+            <Button fx:id="browseBtn" mnemonicParsing="false" onAction="#handleBrowse" onMouseClicked="#returnToPrevWindow" prefHeight="150.0" prefWidth="500.0" text="Choose Video" />
+            <Button fx:id="continueBtn" mnemonicParsing="false" onAction="#openEditingWindow" onMouseClicked="#openExportWindow" prefHeight="150.0" prefWidth="500.0" text="Continue" />
          </children>
          <BorderPane.margin>
             <Insets top="10.0" />

@@ -25,6 +25,7 @@ public class Video {
 		if (!vidCap.isOpened()) {
 			throw new FileNotFoundException("Unable to open video file: " + filePath);
 		}
+		System.out.println("Made video object");
 		// fill in some reasonable default/starting values for several fields
 		this.emptyFrameNum = 0;
 		this.startFrameNum = 0;
@@ -65,6 +66,10 @@ public class Video {
 	 */
 	public synchronized double getFrameRate() {
 		return vidCap.get(Videoio.CAP_PROP_FPS);
+	}
+	
+	public int getTimeInSeconds(double frameNum) {
+		return (int) (frameNum / getFrameRate());
 	}
 
 	public synchronized int getTotalNumFrames() {

@@ -1,4 +1,4 @@
-package datamodel;
+package testing;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -6,6 +6,9 @@ import java.io.FileNotFoundException;
 
 import org.junit.jupiter.api.Test;
 import org.opencv.core.Point;
+
+import datamodel.AnimalTrack;
+import datamodel.TimePoint;
 
 import static datamodel.AnimalTrack.*;
 
