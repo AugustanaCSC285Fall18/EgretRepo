@@ -13,10 +13,10 @@
 
 <BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
    <center>
-      <AnchorPane prefHeight="262.0" prefWidth="490.0">
+      <AnchorPane prefHeight="500.0" prefWidth="700.0">
          <children>
-            <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" layoutX="75.0" layoutY="27.0" pickOnBounds="true" preserveRatio="true" />
-            <Slider fx:id="sliderSeekBar" layoutX="64.0" layoutY="266.0" prefHeight="14.0" prefWidth="362.0" />
+            <ImageView fx:id="currentFrameImage" fitHeight="403.0" fitWidth="569.0" layoutX="66.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" />
+            <Slider fx:id="sliderSeekBar" layoutX="99.0" layoutY="447.0" prefHeight="14.0" prefWidth="528.0" />
          </children>
       </AnchorPane>
    </center>

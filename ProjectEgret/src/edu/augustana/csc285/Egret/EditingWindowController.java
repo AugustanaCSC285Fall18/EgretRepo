@@ -139,6 +139,7 @@ import javafx.stage.Window;
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
+		displayPastTracks();
 		System.out.println("current frame " + curFrameNum);
 		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
 		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
@@ -218,7 +219,7 @@ import javafx.stage.Window;
 		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
 		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
 		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
-		gc.fillOval(xCord, yCord, drawX, drawY);
+		//gc.fillOval(xCord, yCord, drawX, drawY);
 		frameStepForward();
 	}
  	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
@@ -301,7 +302,7 @@ import javafx.stage.Window;
 				}
 				gc.setFill(Color.DARKRED);
 				gc.fillText("Track "+ trackCounter, currentTrack.getFirstTimePoint().getX()+10, currentTrack.getFirstTimePoint().getY()+10);
-				listOfTracksDisplayed.add("Track "+trackCounter);
+				listOfTracksDisplayed.add("Track " + trackCounter);
 				trackCounter++;
 			}
 		}
@@ -310,15 +311,26 @@ import javafx.stage.Window;
 		}
  	}
 	
+	void displayPastTracks() {
+		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
+			
+			gc.setFill(Color.DARKRED);
+			// draw this segments recent past & near future locations 
+			for (TimePoint prevPt : currentTrack.getTimePointsWithinInterval(curFrameNum-data.getVideo().getFrameRate()*frameJumpModifier*3, curFrameNum+data.getVideo().getFrameRate()*frameJumpModifier*3)) {
+				gc.fillOval(prevPt.getX(), prevPt.getY(), drawX, drawY);
+			}
+
+	}
+	
 	private void saveData() {
 		File finalDataFile = new File("final_data_file");
 		try {
 			data.saveToFile(finalDataFile);
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
+			// TODO: Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+		//TODO: doMoreStuff();
 	}
  	@FXML
 	public void initialize() throws FileNotFoundException {
@@ -381,6 +393,7 @@ import javafx.stage.Window;
  		return frame;
 	}
 	
+	//TODO: Are we making a new listener every time we call this method? 
  	private void runSliderSeekBar() {
  		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override

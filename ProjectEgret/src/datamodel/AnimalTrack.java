@@ -2,8 +2,10 @@ package datamodel;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.opencv.core.Point;
+
 
 public class AnimalTrack {
 
@@ -122,6 +124,17 @@ public class AnimalTrack {
 		}
 		return null;
 	}
+	
+	public List<TimePoint> getTimePointsWithinInterval(double startFrameNum, double endFrameNum) {
+		List<TimePoint> pointsInInterval = new ArrayList<>(); 
+		for (TimePoint pt : positions) {
+			if (pt.getFrameNum() >= startFrameNum && pt.getFrameNum() <= endFrameNum) {
+				pointsInInterval.add(pt);
+			}
+		}
+		return pointsInInterval;
+	}
+	
 	
 
 	public void setTimePointAtTime(Point curPoint, int frameNum) {

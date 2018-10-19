@@ -1,9 +1,6 @@
 {
   "video": {
     "filePath": "testVideos/CircleTest1_no_overlap.mp4",
-    "vidCap": {
-      "nativeObj": 1898770767296
-    },
     "emptyFrameNum": 0,
     "startFrameNum": 0,
     "endFrameNum": 330,

@@ -11,6 +11,8 @@ import org.opencv.videoio.Videoio;
 import datamodel.ProjectData;
 import datamodel.Video;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -51,7 +53,10 @@ public class PreviewWindowController {
     
     ProjectData data;
     
-    
+    private Video videoObject;
+    private VideoCapture capture = new VideoCapture();
+
+	private int curFrameNum;
     
     @FXML
     private void handleBrowse(ActionEvent event) throws FileNotFoundException {
@@ -61,16 +66,19 @@ public class PreviewWindowController {
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
 			String fileName = chosenFile.toURI().toString();
-			data = new ProjectData(fileName);
-			data.getVideo().setVidCap(new VideoCapture());
+			videoObject = new Video(fileName);
+			capture = videoObject.getVidCap();
+			//data = new ProjectData(fileName);
+			//data.getVideo().setVidCap(new VideoCapture());
 			startVideo();
 		};
+		runSliderSeekBar();
     }
     
     
     protected void startVideo() {
  		// start the video capture
-		double numFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		double numFrame = capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 		// totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints
 		// total number of frames
 		sliderSeekBar.setDisable(false);
@@ -128,11 +136,11 @@ public class PreviewWindowController {
 		Mat frame = new Mat();
  		// check if the capture is open
 		System.out.println("Create new mat");
-		if (this.data.getVideo().getVidCap().isOpened()) {
+		if (this.capture.isOpened()) {
 			System.out.println("Opened video");
 			try {
 				// read the current frame
-				this.data.getVideo().getVidCap().read(frame);
+				this.capture.read(frame);
  			} catch (Exception e) {
 				// log the error
 				System.err.println("Exception during the image elaboration: " + e);
@@ -156,4 +164,20 @@ public class PreviewWindowController {
 			}
 		});
  	}
+    
+
+    
+ 	private void runSliderSeekBar() {
+ 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				// currentFrameArea.appendText("Current frame: " + ((int)
+				// Math.round(newValue.doubleValue())) + "\n");
+ 				curFrameNum = (int) Math.round(newValue.doubleValue());
+				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+ 				updateFrameView();
+			}
+ 		});
+ 		
+	}
 }
