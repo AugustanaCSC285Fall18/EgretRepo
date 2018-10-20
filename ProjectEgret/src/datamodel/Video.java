@@ -68,30 +68,58 @@ public class Video {
 		return vidCap.get(Videoio.CAP_PROP_FPS);
 	}
 	
+	/**
+	 * @param frameNum - current frame number
+	 * @return in seconds the current time stamp
+	 */
 	public int getTimeInSeconds(double frameNum) {
 		return (int) (frameNum / getFrameRate());
 	}
-
+	
+	public int getTimeInFrames(int seconds) {
+		return (int) (seconds * getFrameRate());
+	}
+	
+	/**
+	 * @return total number of frames
+	 */
 	public synchronized int getTotalNumFrames() {
 		return (int) vidCap.get(Videoio.CAP_PROP_FRAME_COUNT);
 	}
 
+	/**
+	 * @return the frame number with the empty view
+	 */
 	public int getEmptyFrameNum() {
 		return emptyFrameNum;
 	}
 
+	/**
+	 * Sets the current empty frame to the new one (Empty frame is 
+	 * where the empty view is)
+	 * @param emptyFrameNum - the new empty frame
+	 */
 	public void setEmptyFrameNum(int emptyFrameNum) {
 		this.emptyFrameNum = emptyFrameNum;
 	}
 
+	/**
+	 * @return the calibrated start frame number
+	 */
 	public int getStartFrameNum() {
 		return startFrameNum;
 	}
-
+	/**
+	 * 
+	 * @param startFrameNum
+	 */
 	public void setStartFrameNum(int startFrameNum) {
 		this.startFrameNum = startFrameNum;
 	}
 
+	/**
+	 * @return the calibrated end frame number
+	 */
 	public int getEndFrameNum() {
 		return endFrameNum;
 	}
@@ -100,6 +128,9 @@ public class Video {
 		this.endFrameNum = endFrameNum;
 	}
 
+	/**
+	 * @return the number of x pixels per centimeter (cm)
+	 */
 	public double getXPixelsPerCm() {
 		return xPixelsPerCm;
 	}
@@ -108,6 +139,9 @@ public class Video {
 		this.xPixelsPerCm = xPixelsPerCm;
 	}
 
+	/**
+	 * @return the number of y pixels per centimeter (cm)
+	 */
 	public double getYPixelsPerCm() {
 		return yPixelsPerCm;
 	}
@@ -142,6 +176,9 @@ public class Video {
 
 	public void setVidCap(VideoCapture vidCap) {
 		this.vidCap = vidCap;
+	}
+	public void setVidCap() {
+		this.vidCap = new VideoCapture();
 	}
 
 }

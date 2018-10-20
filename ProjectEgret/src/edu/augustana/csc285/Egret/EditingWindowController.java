@@ -1,7 +1,6 @@
 package edu.augustana.csc285.Egret;
  import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
  import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.videoio.VideoCapture;
@@ -24,6 +23,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -35,7 +35,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.Popup;
 import javafx.stage.Window;
  public class EditingWindowController {
  	@FXML
@@ -69,27 +68,27 @@ import javafx.stage.Window;
  	private Label timeLabel;
 	
 	@FXML
-	private ChoiceBox<String> PickAnimalTrackBtn = new ChoiceBox<>();
+	private ChoiceBox<String> pickUnassignedAnimalTrackBtn = new ChoiceBox<>();
+	@FXML
+	private ComboBox<String> animalTrackObjectComboBox;
  	// a timer for acquiring the video stream
 	// private ScheduledExecutorService timer;
-	private VideoCapture capture = new VideoCapture();
-	private String fileName = null; //What does this do??? 
+	//private VideoCapture capture = new VideoCapture();
+	//private String fileName = null; //What does this do??? 
 	private int curFrameNum;
-	public double numFrame;
- 	private double xCord;
-	private double yCord;
+	public double totalNumFrame;
 	//ProjectData data = new ProjectData();
 	ProjectData data;
 	private int animalCounter = 0;
-	private int totalAmountOfAnimals = 2;
-	private Video videoObject;
 	private GraphicsContext gc;
 	private boolean modifyToggleActive = false;
-	private int drawX = 5;
-	private int drawY = 5;
+	private static final int drawX = 15;
+	private static final int drawY = 15;
 	private int frameJumpModifier = 2;
  	private TimePoint previousPoint;
-	
+ 	
+ 	//from calibration; random assignment at the moment
+	private int totalAmountOfAnimals = 2; 
 	private int startFrame = 850;
 	private int endFrame = 2000;
  	void loadData() throws FileNotFoundException {
@@ -105,17 +104,10 @@ import javafx.stage.Window;
 				i--;
 			}
 		}
-		
+		//Prints out unassigned tracks
 		for (AnimalTrack track: data.getUnassignedSegments()) {
 			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
 		}
-	
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 1"));
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 2"));
-		data.getAnimalTracksList().get(1).add(new TimePoint(150,200,5));
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 3"));
-		data.getAnimalTracksList().get(2).add(new TimePoint(250,300,10));
-		
 	}
 	
 	@FXML
@@ -135,7 +127,7 @@ import javafx.stage.Window;
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		System.out.println("old frame " + curFrameNum);
 		curFrameNum += numOfFrameChange;
-		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
@@ -151,18 +143,32 @@ import javafx.stage.Window;
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		curFrameNum = numOfFrame;
 		System.out.println("new frame num " + curFrameNum);
-		capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
+//		showSpecifiedAnimalTrack();
 		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
 		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
 		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
+		
 	}
 	
+ 	/*
+ 	 * Aims to draw a circle around the track that is currently being focused by the animalTrack combo box. 
+ 	 * Currently does not work because the field immediately has nothing in it, unsure how to fix.
+ 	 * TODO: fix this too.
+ 	 */
+//	public void showSpecifiedAnimalTrack() {
+//		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
+//		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
+//		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
+//		gc.strokeOval(curAnimal.getTimePointAtTime(curFrameNum).getX() - (drawX * 3), curAnimal.getTimePointAtTime(curFrameNum).getY() - (drawY * 3), drawX * 3, drawY *3);
+//	}
+
 	void frameStepBack() {
-		frameChanger(-Math.floor(videoObject.getFrameRate() * frameJumpModifier));
-		timeField.setText("" + videoObject.getTimeInSeconds(curFrameNum));
+		frameChanger(-Math.floor(data.getVideo().getFrameRate() * frameJumpModifier));
+		timeField.setText("" + data.getVideo().getTimeInSeconds(curFrameNum));
 	}
  	
 	@FXML
@@ -171,8 +177,8 @@ import javafx.stage.Window;
 	}
 	
  	void frameStepForward() {
-		frameChanger(Math.floor(videoObject.getFrameRate() * frameJumpModifier));
-		timeField.setText("" + videoObject.getTimeInSeconds(curFrameNum));
+		frameChanger(Math.floor(data.getVideo().getFrameRate() * frameJumpModifier));
+		timeField.setText("" + data.getVideo().getTimeInSeconds(curFrameNum));
 	}
  	
 	@FXML
@@ -207,8 +213,8 @@ import javafx.stage.Window;
 	}
  	@FXML // TODO: figure out mechanism for how to modify animal data
 	void addOrModifyDataPoint(MouseEvent event) {
-		xCord = event.getX();
-		yCord = event.getY();
+		double xCord = event.getX();
+		double yCord = event.getY();
 		Point centerPoint = new Point(xCord, yCord);
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
  		if (modifyToggleActive) {
@@ -245,7 +251,7 @@ import javafx.stage.Window;
 			}
 		} else {
 			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Undo Message");
+			alert.setTitle("Undo Attempt");
 			alert.setHeaderText(null);
 			alert.setContentText("No more points to undo.");
 			alert.showAndWait();
@@ -256,8 +262,8 @@ import javafx.stage.Window;
 	
 	@FXML
 	void addTrack(MouseEvent event) {
-		if(PickAnimalTrackBtn.getValue() != null) {
-			String chosenValueByUser = new String(PickAnimalTrackBtn.getValue());	
+		if(pickUnassignedAnimalTrackBtn.getValue() != null) {
+			String chosenValueByUser = new String(pickUnassignedAnimalTrackBtn.getValue());	
 			String nameOfCurrentTrack = ("");
 			AnimalTrack chosenTrack = null;
 			boolean foundTrack = false;
@@ -307,7 +313,7 @@ import javafx.stage.Window;
 			}
 		}
 		if(listOfTracksDisplayed != null) {
-			PickAnimalTrackBtn.setItems(listOfTracksDisplayed);
+			pickUnassignedAnimalTrackBtn.setItems(listOfTracksDisplayed);
 		}
  	}
 	
@@ -338,7 +344,11 @@ import javafx.stage.Window;
 		sliderSeekBar.setDisable(true);
 		gc = canvas.getGraphicsContext2D();
 		runSliderSeekBar();
+		data.getVideo().setVidCap();
+		data = new ProjectData();
+		setAnimalTrackObjectComboBox();
 	}
+ 	
  	@FXML
 	public void handleBrowse() throws FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
@@ -346,40 +356,48 @@ import javafx.stage.Window;
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
-			fileName = chosenFile.toURI().toString();
-			videoObject = new Video(fileName);
-			capture = videoObject.getVidCap();
+			String fileName = chosenFile.toURI().toString();
+			data.setVideo(new Video(fileName));
 			startVideo();
 		};
-		runSliderSeekBar();
+		//runSliderSeekBar();
+		//changeFrameWithTextField();
 		// runJumpTo(); //prints out which frame you are at
 	}
+ 	
+ 	public void setAnimalTrackObjectComboBox() {
+ 		for (int i = 0; i <= totalAmountOfAnimals; i++) {
+ 			String name = data.getAnimalTracksList().get(i).getName();
+ 			animalTrackObjectComboBox.getItems().add(name);
+ 		}
+ 	}
+ 	
  	protected void startVideo() {
  		// start the video capture
-		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		totalNumFrame = this.data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 		// totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints
 		// total number of frames
 		sliderSeekBar.setDisable(false);
 		// this can be repurposed to allow the client to jump to specific time stamp
 		// jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
 		updateFrameView();
-		sliderSeekBar.setMax((int) numFrame - 1);
-		sliderSeekBar.setMaxWidth((int) numFrame - 1);
+		timeField.setText("" + data.getVideo().getTimeInSeconds(startFrame));
+		sliderSeekBar.setMax((int) totalNumFrame - 1);
+		sliderSeekBar.setMaxWidth((int) totalNumFrame - 1);
 		jumpToFrame(startFrame);
  	}
  	/**
 	 * Get a frame from the opened video stream (if any)
-	 *
 	 * @return the {@link Mat} to show
 	 */
 	private Mat grabFrame() {
 		// init everything
 		Mat frame = new Mat();
  		// check if the capture is open
-		if (this.capture.isOpened()) {
+		if (this.data.getVideo().getVidCap().isOpened()) {
 			try {
 				// read the current frame
-				this.capture.read(frame);
+				this.data.getVideo().getVidCap().read(frame);
  				// if the frame is not empty, process it to black and white color
 				/*
 				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
@@ -400,14 +418,36 @@ import javafx.stage.Window;
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				// currentFrameArea.appendText("Current frame: " + ((int)
 				// Math.round(newValue.doubleValue())) + "\n");
- 				curFrameNum = (int) Math.round(newValue.doubleValue());
-				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+ 				timeField.setText("" + data.getVideo().getTimeInSeconds(curFrameNum));
+				curFrameNum = (int) Math.round(newValue.doubleValue());
+				data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
  				updateFrameView();
 			}
  		});
  		
 	}
- //	private void runJumpTo() {
+ 	
+ 	/*
+ 	 * This method is supposed to change the displayed frame with the new frame inputted by the timeField
+ 	 * For some reason, there cannot be any input. Unsure why.
+ 	 * TODO: make this work.
+ 	 */
+// 	private void changeFrameWithTextField() {
+// 		timeField.textProperty().addListener(new ChangeListener<String>() {
+// 			@Override
+// 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+// 				int newTime = Integer.parseInt(newValue);
+// 				timeField.setText("" + newTime);
+// 				int newTimeInFrames = data.getVideo().getTimeInFrames(newTime);
+// 				sliderSeekBar.setValue(newTimeInFrames);
+// 				curFrameNum = newTimeInFrames;
+// 				data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+// 				updateFrameView();
+// 			}
+// 		});
+// 	}
+ 	
+//	private void runJumpTo() {
 //		
 //		jumpToFrameArea.textProperty().addListener(new ChangeListener<String>() {
 //			@Override
