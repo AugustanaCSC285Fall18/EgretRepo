@@ -188,7 +188,7 @@ public class PreviewWindowController {
 
     }
     
-    @FXML //throw exception if non number is entered.... or prevent it from being entered
+    @FXML //throw exception if non number is entered... or prevent it from being entered
     void handleStartTime(KeyEvent event) {
 
     }
