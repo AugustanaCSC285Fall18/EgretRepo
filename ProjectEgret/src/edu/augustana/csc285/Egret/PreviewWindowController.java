@@ -40,7 +40,7 @@ import javafx.stage.Window;
 public class PreviewWindowController {
 
     @FXML
-    private BorderPane browseBtn;
+    private Button browseBtn;
 
     @FXML
     private MenuItem advancedSettings;
@@ -58,8 +58,19 @@ public class PreviewWindowController {
     private Button browseBtn;
 
     @FXML
-
     private Slider sliderSeekBar;
+    
+    @FXML
+    private Button loadBtn;
+
+    @FXML
+    private Button callibrateBtn;
+    
+    @FXML
+    private TextField startField;
+
+    @FXML
+    private TextField endField;
 
 //    private Button continueBtn;
     
@@ -71,6 +82,17 @@ public class PreviewWindowController {
 
 
 	private int curFrameNum;
+	
+	private String fileName = null;
+	private int curFrameNum;
+	public double numFrame;
+	
+	private double xCord;
+	private double yCord;
+	ProjectData data = new ProjectData();
+	private int animalCounter = 0;
+	private Video videoObject;
+	private GraphicsContext gc;
     
     @FXML
     private void handleBrowse(ActionEvent event) throws FileNotFoundException {
@@ -88,44 +110,6 @@ public class PreviewWindowController {
 		};
 		runSliderSeekBar();
     }
-    
-    
-    protected void startVideo() {
- 		// start the video capture
-		double numFrame = capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		// totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints
-		// total number of frames
-		sliderSeekBar.setDisable(false);
-		// this can be repurposed to allow the client to jump to specific time stamp
-		// jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
-		updateFrameView();
-		sliderSeekBar.setMax((int) numFrame - 1);
-		sliderSeekBar.setMaxWidth((int) numFrame - 1);
- 	}
-    
-    @FXML
-    private Button loadBtn;
-
-    @FXML
-    private Button callibrateBtn;
-    
-    @FXML
-    private TextField startField;
-
-    @FXML
-    private TextField endField;
-    
-    private VideoCapture capture = new VideoCapture();
-	private String fileName = null;
-	private int curFrameNum;
-	public double numFrame;
-	
-	private double xCord;
-	private double yCord;
-	ProjectData data = new ProjectData();
-	private int animalCounter = 0;
-	private Video videoObject;
-	private GraphicsContext gc;
 
 	@FXML
 	public void initialize() {
@@ -149,50 +133,6 @@ public class PreviewWindowController {
 		runSliderSeekBar();
 		//runJumpTo(); //prints out which frame you are at
     }
-    
-    protected void startVideo() {
-
-		// start the video capture
-		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
-		sliderSeekBar.setDisable(false);
-		//this can be repurposed to allow the client to jump to specific time stamp
-		//jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
-		updateFrameView();
-		sliderSeekBar.setMax((int) numFrame -1);
-		sliderSeekBar.setMaxWidth((int) numFrame -1);
-
-	}
-
-	/**
-	 * Get a frame from the opened video stream (if any)
-	 *
-	 * @return the {@link Mat} to show
-	 */
-	private Mat grabFrame() {
-		// init everything
-		Mat frame = new Mat();
-
-		// check if the capture is open
-		if (this.capture.isOpened()) {
-			try {
-				// read the current frame
-				this.capture.read(frame);
-
-				// if the frame is not empty, process it to black and white color
-				/*
-				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
-				 * }
-				 */
-
-			} catch (Exception e) {
-				// log the error
-				System.err.println("Exception during the image elaboration: " + e);
-			}
-		}
-
-		return frame;
-	}
 
 	private void runSliderSeekBar() {
 
@@ -291,6 +231,20 @@ public class PreviewWindowController {
 //        }
     }
     
+    protected void startVideo() {
+
+		// start the video capture
+		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
+		sliderSeekBar.setDisable(false);
+		//this can be repurposed to allow the client to jump to specific time stamp
+		//jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
+		updateFrameView();
+		sliderSeekBar.setMax((int) numFrame -1);
+		sliderSeekBar.setMaxWidth((int) numFrame -1);
+
+	}
+    
     public ImageView getCurrentFrameImage() {
     	return currentFrameImage;
     }
@@ -334,20 +288,5 @@ public class PreviewWindowController {
 		});
  	}
     
-
-    
- 	private void runSliderSeekBar() {
- 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
-			@Override
-			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				// currentFrameArea.appendText("Current frame: " + ((int)
-				// Math.round(newValue.doubleValue())) + "\n");
- 				curFrameNum = (int) Math.round(newValue.doubleValue());
-				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
- 				updateFrameView();
-			}
- 		});
- 		
-	}
 }
 
