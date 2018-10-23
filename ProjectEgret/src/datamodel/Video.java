@@ -1,5 +1,6 @@
 package datamodel;
 
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.FileNotFoundException;
 
@@ -18,6 +19,7 @@ public class Video {
 	private double xPixelsPerCm;
 	private double yPixelsPerCm;
 	private Rectangle arenaBounds;
+	private Point origin;
 
 	public Video(String filePath) throws FileNotFoundException {
 		this.filePath = filePath;
@@ -179,8 +181,13 @@ public class Video {
 	public void setVidCap(VideoCapture vidCap) {
 		this.vidCap = vidCap;
 	}
-	public void setVidCap() {
-		this.vidCap = new VideoCapture();
+	
+	public void setOriginPoint(Point origin) {
+		this.origin = origin;
+	}
+	
+	public Point getOriginPoint() {
+		return origin;
 	}
 
 }

@@ -430,7 +430,6 @@ import javafx.stage.Window;
 		sliderSeekBar.setDisable(true);
 		gc = canvas.getGraphicsContext2D();
 		//runSliderSeekBar();
-		data.getVideo().setVidCap();
 		setAnimalTrackObjectComboBox();
 	}
  	

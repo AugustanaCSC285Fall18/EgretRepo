@@ -35,6 +35,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
@@ -73,8 +74,7 @@ public class PreviewWindowController {
 
 //    private Button continueBtn;
     
-    private Video videoObject;
-    private VideoCapture capture = new VideoCapture();
+   private VideoCapture capture = new VideoCapture();
 	
 	//private String fileName = null;
 	private int curFrameNum;
@@ -86,8 +86,11 @@ public class PreviewWindowController {
 	private int animalCounter = 0;
 	private GraphicsContext gc;
 	
-	Point upperLeftCorner;
-	Point lowerRightCorner;
+	Point upperLeftCorner = new Point();
+	Point lowerRightCorner = new Point();
+	Point origin = new Point();
+	int step = 0;
+	Alert alert = new Alert(AlertType.INFORMATION);
 	
 	//doesn't currently work
 //    @FXML
@@ -107,18 +110,7 @@ public class PreviewWindowController {
 //		runSliderSeekBar();
 //    }
     
-    @FXML
-    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
-    	browseForVideoFile();
-    }
-    
-	@FXML
-	public void initialize() {
-		sliderSeekBar.setDisable(true);
-		gc = canvas.getGraphicsContext2D();
-		runSliderSeekBar();
-	}
-
+	//various methods
 	private void runSliderSeekBar() {
 
 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
@@ -153,63 +145,8 @@ public class PreviewWindowController {
 //		});
 //
 //	}
-
-//note for another time ProgressMonitor in JOption Pane
 	
-    @FXML
-    void handleCallibration(MouseEvent event) {
-    	setBoxArena();
-    	setLengthMeasurements();
-    	setEmptyFrame();
-    	setChickenNames();
-    }
-
-    @FXML
-    void handleClose(ActionEvent event) {
-    	Platform.exit();
-    }
-
-    //replaces video in window... need to make sure 
-    @FXML
-    void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
-    	browseForVideoFile();
-    }
-    
-    @FXML
-    void openEditingWindow(ActionEvent event) throws IOException {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
-		BorderPane root = (BorderPane)loader.load();
-		EditingWindowController nextController = loader.getController();
-		
-		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		
-		//Stage primary = (Stage) continueBtn.getScene().getWindow();
-		//primary.setScene(nextScene);
-    }
-
-    @FXML
-    void handleSettings(ActionEvent event) {
-
-    }
-    
-
-    @FXML //throw exception if non number is entered... or prevent it from being entered
-    void handleStartTime(KeyEvent event) {
-
-    }
-    
-    //Avery... still working on it
-    @FXML //throw exception if non number is entered.... or prevent it from being entered
-    void handleEndTime(KeyEvent event) {
-//    	int i = key.getKeyCode();
-//        if (i >= 65 && i <= 90)
-//        {
-//           ((TextField)event.getSource()).cancelKey();
-//        }
-    }
-    
-    public void browseForVideoFile() throws FileNotFoundException{
+	public void browseForVideoFile() throws FileNotFoundException{
     	FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Video File");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
@@ -305,16 +242,12 @@ public class PreviewWindowController {
  	}
     
     public void setBoxArena() {
-    	Alert alert = new Alert(AlertType.INFORMATION);
-    		alert.setTitle("Callibration");
-    		alert.setHeaderText("Please initialize the box's area.");
-    		alert.setContentText("Please select the upper left corner of the box.");
-//    		addActionListener(new ActionListener e) {
-//    			Rectangle r = new Rectangle;
-//    			r.add(upperLeftCorner);
-//    			r.add(lowerRightCorner);
-//    		
-//    		}
+    	alert.initModality(Modality.WINDOW_MODAL);
+		alert.setTitle("Callibration");
+		step = 1;
+		alert.setHeaderText("Please initialize the box's area.");
+		alert.setContentText("Please select the upper left corner of the box.");
+		alert.showAndWait();
     }
     
     public void setLengthMeasurements() {
@@ -325,16 +258,108 @@ public class PreviewWindowController {
     	
     }
     
-    public void setOriginPoint() {
-    	
-    }
-    
     public void setTimeStep() {
     	
     }
     
     public void setChickenNames() {
     	
+    }
+
+//note for another time ProgressMonitor in JOption Pane
+	
+	//event handlers
+	@FXML
+    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
+    	browseForVideoFile();
+    }
+	
+	@FXML
+    void handleCallibration(MouseEvent event) {
+    	setBoxArena();
+    	//setLengthMeasurements();
+    	//setEmptyFrame();
+    	//setChickenNames();
+    }
+    
+    @FXML
+    void handleCanvasClick(MouseEvent event) {
+    	Rectangle rect = new Rectangle();
+    	if (step==1) {
+    		System.out.println(step);
+    		upperLeftCorner.setLocation(event.getX(), event.getY());
+    		rect.add(upperLeftCorner);
+    		System.out.println(upperLeftCorner.getX() + " " + upperLeftCorner.getY());
+    		
+    		step=2;
+    		alert.setContentText("Please select the lower right hand corner of the box");
+    	}else if (step==2) {
+    		System.out.println(step);
+    		lowerRightCorner.setLocation(event.getX(), event.getY());
+    		System.out.println(lowerRightCorner.getX() + " " + lowerRightCorner.getY());
+    		rect.add(lowerRightCorner);
+    		data.getVideo().setArenaBounds(rect);
+    		
+    		step=3;
+    		alert.setContentText("Please select where you would like your origin to be located.");
+    	}else if (step==3) {
+    		System.out.println(step);
+    		origin.setLocation(event.getX(), event.getY());
+    		System.out.println(origin.getX() + " " + origin.getY());
+    		data.getVideo().setOriginPoint(origin);
+    	}
+    }
+
+    @FXML
+    void handleClose(ActionEvent event) {
+    	Platform.exit();
+    }
+    
+    @FXML
+	public void initialize() {
+		sliderSeekBar.setDisable(true);
+		gc = canvas.getGraphicsContext2D();
+		runSliderSeekBar();
+	}
+
+    //replaces video in window... need to make sure 
+    @FXML
+    void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
+    	browseForVideoFile();
+    }
+
+    @FXML
+    void handleSettings(ActionEvent event) {
+
+    }
+    
+
+    @FXML //throw exception if non number is entered... or prevent it from being entered
+    void handleStartTime(KeyEvent event) {
+
+    }
+    
+    //Avery... still working on it
+    @FXML //throw exception if non number is entered.... or prevent it from being entered
+    void handleEndTime(KeyEvent event) {
+//    	int i = key.getKeyCode();
+//        if (i >= 65 && i <= 90)
+//        {
+//           ((TextField)event.getSource()).cancelKey();
+//        }
+    }
+    
+    @FXML
+    void openEditingWindow(ActionEvent event) throws IOException {
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
+		BorderPane root = (BorderPane)loader.load();
+		EditingWindowController nextController = loader.getController();
+		
+		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		
+		//Stage primary = (Stage) continueBtn.getScene().getWindow();
+		//primary.setScene(nextScene);
     }
 }
 
