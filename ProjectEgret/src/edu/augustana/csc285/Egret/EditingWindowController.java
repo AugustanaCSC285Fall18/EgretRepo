@@ -1,7 +1,9 @@
 package edu.augustana.csc285.Egret;
  import java.io.File;
 import java.io.FileNotFoundException;
- import org.opencv.core.Mat;
+import java.io.IOException;
+
+import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
@@ -16,7 +18,9 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -33,8 +37,10 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
  public class EditingWindowController {
  	@FXML
@@ -57,7 +63,8 @@ import javafx.stage.Window;
 	private Button nextFrameBtn;
  	@FXML
 	private Button finishEditingBtn;
- 	@FXML ImageView currentFrameImage;
+ 	@FXML 
+ 	ImageView currentFrameImage;
  	@FXML
 	private Canvas canvas;
  	@FXML
@@ -75,7 +82,6 @@ import javafx.stage.Window;
 	// private ScheduledExecutorService timer;
 	//private VideoCapture capture = new VideoCapture();
 	//private String fileName = null; //What does this do??? 
-	private int curFrameNum;
 	public double totalNumFrame;
 	//ProjectData data = new ProjectData();
 	ProjectData data;
@@ -92,7 +98,7 @@ import javafx.stage.Window;
  	//from calibration: random assignment at the moment
 	private int totalAmountOfAnimals = 2; 
 	private int startFrame = 850;
-	private int endFrame = 7500;
+	private int endFrame = 2000;
 
 	
  	void loadData() throws FileNotFoundException {
@@ -120,6 +126,8 @@ import javafx.stage.Window;
 		data.getAnimalTracksList().add(new AnimalTrack("Chick 3"));
 		data.getAnimalTracksList().get(2).add(new TimePoint(250,300,10));
 	}
+ 	
+ 	
 	
 	@FXML
 	void closeWindow(ActionEvent event) {
@@ -127,25 +135,25 @@ import javafx.stage.Window;
  	}
 	
 	void frameChanger(double numOfFrameChange) {
-		if(curFrameNum + numOfFrameChange > endFrame) {
+		if(data.getVideo().getCurrentFrameNum() + numOfFrameChange > endFrame) {
 			animalCounter++;
 			if(animalCounter > totalAmountOfAnimals) {
-				saveData();
+				saveFinishedProject();
 				//TODO: make code to end the manual tracking screen
 			} else {
 				jumpToFrame(startFrame);
 			}
 		} else {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		System.out.println("old frame " + curFrameNum);
-		curFrameNum += numOfFrameChange;
-		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		System.out.println("old frame " + data.getVideo().getCurrentFrameNum());
+		data.getVideo().setCurrentFrameNum(data.getVideo().getCurrentFrameNum() + numOfFrameChange);
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, data.getVideo().getCurrentFrameNum());
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
 		displayPastTracks();
 		updateTextAndSlider();
-		System.out.println("current frame " + curFrameNum);
+		System.out.println("current frame " + data.getVideo().getCurrentFrameNum());
 		System.out.println("chicken 0 data " + data.getAnimalTracksList().get(0));
 		System.out.println("chicken 1 data " + data.getAnimalTracksList().get(1));
 		System.out.println("chicken 2 data " + data.getAnimalTracksList().get(2));
@@ -153,11 +161,11 @@ import javafx.stage.Window;
 		}
  	}
  	void jumpToFrame(int numOfFrame) {
-		System.out.println("old frame num " + curFrameNum);
+		System.out.println("old frame num " + data.getVideo().getCurrentFrameNum());
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-		curFrameNum = numOfFrame;
-		System.out.println("new frame num " + curFrameNum);
-		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
+		data.getVideo().setCurrentFrameNum(numOfFrame);
+		System.out.println("new frame num " + data.getVideo().getCurrentFrameNum());
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, data.getVideo().getCurrentFrameNum());
 		updateFrameView();
 		frameAdjustHelper();
 		displayFutureTracks();
@@ -178,7 +186,7 @@ import javafx.stage.Window;
 //		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
 //		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
 //		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
-//		gc.strokeOval(curAnimal.getTimePointAtTime(curFrameNum).getX() - (drawX * 3), curAnimal.getTimePointAtTime(curFrameNum).getY() - (drawY * 3), drawX * 3, drawY *3);
+//		gc.strokeOval(curAnimal.getTimePointAtTime(data.getVideo().getCurrentFrameNum()).getX() - (drawX * 3), curAnimal.getTimePointAtTime(data.getVideo().getCurrentFrameNum()).getY() - (drawY * 3), drawX * 3, drawY *3);
 //	}
 
 	void frameStepBack() {
@@ -202,12 +210,12 @@ import javafx.stage.Window;
 	
  	protected void frameAdjustHelper() {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		// modifyToggleActive = currentAnimal.isTimePointAtTime(curFrameNum);
+		// modifyToggleActive = currentAnimal.isTimePointAtTime(data.getVideo().getCurrentFrameNum());
 		// System.out.println(modifyToggleActive);
-		if (currentAnimal.hasTimePointAtTime(curFrameNum)) {
+		if (currentAnimal.hasTimePointAtTime(data.getVideo().getCurrentFrameNum())) {
 			//data.getAnimalTracksList().size()
 			for (int i = 0; i < 1; i++) {
-				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(curFrameNum);
+				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(data.getVideo().getCurrentFrameNum());
 				gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
 			}
 		}
@@ -221,9 +229,30 @@ import javafx.stage.Window;
 	void redoEdit(MouseEvent event) {
  	}
  	
- 	@FXML
-	void saveProject(ActionEvent event) {
+	void saveFinishedProject() {
+ 		File finalDataFile = new File("finished_data_file");
+		try {
+			data.saveToFile(finalDataFile);
+		} catch (FileNotFoundException e) {
+			// TODO: Auto-generated catch block
+			e.printStackTrace();
+		}
+		
  	}
+ 	
+ 	@FXML
+	private void saveUnfinishedProject() {
+		File tempDataFile = new File("not_finished_data_file2");
+		try {
+			data.saveToFile(tempDataFile);
+			loadWelcomeWindow();
+		} catch (FileNotFoundException e) {
+			// TODO: Auto-generated catch block
+			e.printStackTrace();
+		}
+		//TODO: doMoreStuff();
+	}
+	
  	
  	@FXML
 	void toggleManualEdit(MouseEvent event) {
@@ -238,8 +267,8 @@ import javafx.stage.Window;
 		Point centerPoint = new Point(xCord, yCord);
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
  		if (modifyToggleActive) {
- 			Point newPoint = currentAnimal.getPointAtTime(curFrameNum);
- 			previousPoint = new TimePoint(newPoint, curFrameNum);
+ 			Point newPoint = currentAnimal.getPointAtTime(data.getVideo().getCurrentFrameNum());
+ 			previousPoint = new TimePoint(newPoint, data.getVideo().getCurrentFrameNum());
 			modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
@@ -254,24 +283,24 @@ import javafx.stage.Window;
 		
  	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
 		gc.clearRect(previousPoint.getX() - halfDrawX, previousPoint.getY() - halfDrawY, drawX, drawY);
-		currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
+		currentAnimal.setTimePointAtTime(newPoint, data.getVideo().getCurrentFrameNum());
 	}
  	
  	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
-		currentAnimal.addLocation(newPoint, curFrameNum);
+		currentAnimal.addLocation(newPoint, data.getVideo().getCurrentFrameNum());
 	}
 	
  	@FXML
  	void undoEdit(MouseEvent event) {
-		if(previousPoint.getFrameNum() < curFrameNum) {
+		if(previousPoint.getFrameNum() < data.getVideo().getCurrentFrameNum()) {
 			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 			gc.clearRect(currentAnimal.getX() - halfDrawX, currentAnimal.getY() - halfDrawY, drawX, drawY);
 			if (modifyToggleActive) {
-				TimePoint undoPoint = currentAnimal.getTimePointAtTime(curFrameNum);
+				TimePoint undoPoint = currentAnimal.getTimePointAtTime(data.getVideo().getCurrentFrameNum());
 				gc.clearRect(undoPoint.getX() - halfDrawX, undoPoint.getY() - halfDrawY, drawX, drawY);
 				gc.fillOval(previousPoint.getX() - halfDrawX, previousPoint.getY() - halfDrawY, drawX, drawY);
 				modifyDataPointHelper(currentAnimal, previousPoint.getPointOpenCV(), undoPoint);
-				currentAnimal.setTimePointAtTime(previousPoint.getPointOpenCV(), curFrameNum);
+				currentAnimal.setTimePointAtTime(previousPoint.getPointOpenCV(), data.getVideo().getCurrentFrameNum());
 			} else {
 				currentAnimal.removeLocation();
 			}
@@ -287,27 +316,6 @@ import javafx.stage.Window;
 
 		}
 	}
- 	
-//	@FXML
-//	void undoEdit(MouseEvent event) {
-//		if (animalCounter >= 0) {
-//			//animalCounter--;
-//			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-// 			gc.clearRect(currentAnimal.getX(), currentAnimal.getY(), drawX, drawY);
-//			currentAnimal.removeLocation();
-//			for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
-//				System.out.println(data.getAnimalTracksList().get(i));
-//			}
-//		} else {
-//			Alert alert = new Alert(AlertType.INFORMATION);
-//			alert.setTitle("Undo Attempt");
-//			alert.setHeaderText(null);
-//			alert.setContentText("No more points to undo.");
-//			alert.showAndWait();
-//			
-//			//Cited https://code.makery.ch/blog/javafx-dialogs-official/
-// 		}
-//	}
 	
 	@FXML
 	void addTrack(MouseEvent event) {
@@ -322,7 +330,7 @@ import javafx.stage.Window;
 			while(i < data.getUnassignedSegments().size() && !foundTrack) {
 				AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 				//displays a track that is within 10 times the frame rate
-				if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - curFrameNum) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
+				if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - data.getVideo().getCurrentFrameNum()) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
 					nameOfCurrentTrack = ("Track "+trackCounter);
 					trackCounter++;
 				}
@@ -338,7 +346,7 @@ import javafx.stage.Window;
 			}
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
 			data.removeUnassignedSegment(chosenTrackNumber);
-			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum()+1-curFrameNum);
+			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum()+1-data.getVideo().getCurrentFrameNum());
 			
 		}
  	}
@@ -349,7 +357,7 @@ import javafx.stage.Window;
  		for(int i = 0; i < data.getUnassignedSegments().size(); i++) {
 			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 			//displays a track that is within 10 times the frame rate
-			if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - curFrameNum) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
+			if(Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - data.getVideo().getCurrentFrameNum()) < data.getVideo().getFrameRate()*frameJumpModifier*5) {
 				for(int j = 0; j < currentTrack.getNumPoints();j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
 					gc.setFill(Color.BLACK);
@@ -370,7 +378,9 @@ import javafx.stage.Window;
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
 			gc.setFill(Color.DARKRED);
 			// draw this segments recent past & near future locations 
-			for (TimePoint prevPt : currentTrack.getTimePointsWithinInterval(curFrameNum-data.getVideo().getFrameRate()*frameJumpModifier*3, curFrameNum+data.getVideo().getFrameRate()*frameJumpModifier*3)) {
+			for (TimePoint prevPt : currentTrack.getTimePointsWithinInterval(data.getVideo().getCurrentFrameNum()-
+					data.getVideo().getFrameRate()*frameJumpModifier*3, data.getVideo().getCurrentFrameNum()+
+					data.getVideo().getFrameRate()*frameJumpModifier*3)) {
 				gc.fillOval(prevPt.getX(), prevPt.getY(), drawX, drawY);
 			}
 
@@ -409,30 +419,46 @@ import javafx.stage.Window;
  	}
 	
  	public void updateTextAndSlider() {
- 		timeField.setText("" + (int) (curFrameNum/data.getVideo().getFrameRate())); 
- 		sliderSeekBar.setValue(curFrameNum);
+ 		timeField.setText("" + (int) (data.getVideo().getCurrentFrameNum()/data.getVideo().getFrameRate())); 
+ 		sliderSeekBar.setValue(data.getVideo().getCurrentFrameNum());
  	}
- 	
-	private void saveData() {
-		File finalDataFile = new File("final_data_file");
+
+	private void loadWelcomeWindow() {
+		System.out.println("reached method");
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("WelcomeWindow.fxml"));
 		try {
-			data.saveToFile(finalDataFile);
-		} catch (FileNotFoundException e) {
-			// TODO: Auto-generated catch block
+			System.out.println("reached try");
+			AnchorPane root = (AnchorPane)loader.load();
+			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			Stage primary = (Stage) saveBtn.getScene().getWindow();
+			primary.setScene(scene); 
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//TODO: doMoreStuff();
+
 	}
 	
  	@FXML
 	public void initialize() throws FileNotFoundException {
-		loadData();
-		sliderSeekBar.setDisable(true);
+//		loadData();
+//		sliderSeekBar.setDisable(true);
+//		gc = canvas.getGraphicsContext2D();
+//		runSliderSeekBar();
+//		data.getVideo().setVidCap();
+//		setAnimalTrackObjectComboBox();
+	}
+ 	
+ 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
+ 		data = projectData;
+ 		System.out.println(data.getVideo().getFilePath());
 		gc = canvas.getGraphicsContext2D();
 		//runSliderSeekBar();
-		data.getVideo().setVidCap();
 		setAnimalTrackObjectComboBox();
-	}
+		
+		startVideo();
+ 	}
  	
  	@FXML
 	public void handleBrowse() throws FileNotFoundException {
@@ -442,6 +468,8 @@ import javafx.stage.Window;
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
 			String fileName = chosenFile.toURI().toString();
+			System.out.println(fileName);
+
 			data.setVideo(new Video(fileName));
 			startVideo();
 		};
@@ -454,16 +482,16 @@ import javafx.stage.Window;
  	
  	protected void startVideo() {
  		// start the video capture
-		totalNumFrame = this.data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-		// totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints
-		// total number of frames
-		sliderSeekBar.setDisable(false);
-		// this can be repurposed to allow the client to jump to specific time stamp
-		// jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
+		totalNumFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		
 		updateFrameView();
-		timeField.setText("" + data.getVideo().getTimeInSeconds(startFrame));
 		sliderSeekBar.setMax((int) totalNumFrame - 1);
 		sliderSeekBar.setMaxWidth((int) totalNumFrame - 1);
+
+		sliderSeekBar.setDisable(false);
+		
+		updateTextAndSlider();
+
 		jumpToFrame(startFrame);
  	}
  	
@@ -475,10 +503,10 @@ import javafx.stage.Window;
 		// init everything
 		Mat frame = new Mat();
  		// check if the capture is open
-		if (this.data.getVideo().getVidCap().isOpened()) {
+		if (data.getVideo().getVidCap().isOpened()) {
 			try {
 				// read the current frame
-				this.data.getVideo().getVidCap().read(frame);
+				data.getVideo().getVidCap().read(frame);
  				// if the frame is not empty, process it to black and white color
 				/*
 				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
@@ -491,60 +519,7 @@ import javafx.stage.Window;
 		}
  		return frame;
 	}
-	
-//	//Are we making a new listener every time we call this method? 
-// 	private void runSliderSeekBar() {
-// 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
-//			@Override
-//			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-//				// currentFrameArea.appendText("Current frame: " + ((int)
-//				// Math.round(newValue.doubleValue())) + "\n");
-// 				timeField.setText("" + data.getVideo().getTimeInSeconds(curFrameNum));
-//				curFrameNum = (int) Math.round(newValue.doubleValue());
-//				data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-// 				updateFrameView();
-//			}
-// 		});
-// 		
-//	}
 
- 	
- 	/*
- 	 * This method is supposed to change the displayed frame with the new frame inputted by the timeField
- 	 * For some reason, there cannot be any input. Unsure why.
- 	 */
-// 	private void changeFrameWithTextField() {
-// 		timeField.textProperty().addListener(new ChangeListener<String>() {
-// 			@Override
-// 			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-// 				System.out.println(newValue);
-// 				int newTime = Integer.parseInt(newValue);
-// 				timeField.appendText("" + newTime);
-// 				int newTimeInFrames = data.getVideo().getTimeInFrames(newTime);
-// 				//sliderSeekBar.setValue(newTimeInFrames);
-// 				jumpToFrame(curFrameNum);
-// 				data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-// 				updateFrameView();
-// 			}
-// 		});
-// 	}
- 	
-//	private void runJumpTo() {
-//		
-//		jumpToFrameArea.textProperty().addListener(new ChangeListener<String>() {
-//			@Override
-//			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//				int realValue = Integer.parseInt(newValue);
-//				currentFrameArea.appendText("Current frame: " + (realValue) + "\n");
-//				sliderSeekBar.setValue(realValue);
-//				curFrameNum = realValue;
-//				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-//				updateFrameView();
-//			}
-//
- //		});
-//
-//	}
  	public void updateFrameView() {
 		Platform.runLater(new Runnable() {
 			@Override
