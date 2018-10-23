@@ -26,7 +26,7 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
               <MenuItem fx:id="closeOption" mnemonicParsing="false" onAction="#closeWindow" text="Close" />
-                  <MenuItem fx:id="saveOption" mnemonicParsing="false" onAction="#saveProject" text="Save" />
+                  <MenuItem fx:id="saveOption" mnemonicParsing="false" text="Save" />
             </items>
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
@@ -67,7 +67,7 @@
          <children>
             <Button fx:id="previousFrameBtn" mnemonicParsing="false" onMouseClicked="#frameStepBack" prefHeight="150.0" prefWidth="200.0" text="Previous" />
             <Button fx:id="nextFrameBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#frameStepForward" prefHeight="150.0" prefWidth="200.0" text="Next" />
-            <Button fx:id="saveBtn" mnemonicParsing="false" onMouseClicked="#redoEdit" prefHeight="150.0" prefWidth="200.0" text="Save">
+            <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveUnfinishedProject" prefHeight="150.0" prefWidth="200.0" text="Save">
                <HBox.margin>
                   <Insets left="100.0" />
                </HBox.margin></Button>
