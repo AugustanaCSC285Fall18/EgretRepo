@@ -325,6 +325,14 @@ public class PreviewWindowController {
     	
     }
     
+    public void setOriginPoint() {
+    	
+    }
+    
+    public void setTimeStep() {
+    	
+    }
+    
     public void setChickenNames() {
     	
     }
