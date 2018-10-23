@@ -1,5 +1,8 @@
 package edu.augustana.csc285.Egret;
 
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Graphics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -14,33 +17,29 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
->>>>>>> branch 'master' of https://github.com/AugustanaCSC285Fall18/EgretRepo.git
+
 import javafx.fxml.FXML;
-<<<<<<< HEAD
 import javafx.scene.canvas.Canvas;
-=======
+import javafx.scene.canvas.GraphicsContext;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
->>>>>>> branch 'master' of https://github.com/AugustanaCSC285Fall18/EgretRepo.git
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-<<<<<<< HEAD
 import javafx.scene.layout.BorderPane;
-=======
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-//
-public class PreviewWindowController {
 
-    @FXML
-    private Button browseBtn;
+public class PreviewWindowController {
 
     @FXML
     private MenuItem advancedSettings;
@@ -74,16 +73,10 @@ public class PreviewWindowController {
 
 //    private Button continueBtn;
     
-    //this was also added with continueBtn but unlike the button this will not conflict with my edits
-    ProjectData data;
-    
     private Video videoObject;
     private VideoCapture capture = new VideoCapture();
-
-
-	private int curFrameNum;
 	
-	private String fileName = null;
+	//private String fileName = null;
 	private int curFrameNum;
 	public double numFrame;
 	
@@ -91,48 +84,40 @@ public class PreviewWindowController {
 	private double yCord;
 	ProjectData data = new ProjectData();
 	private int animalCounter = 0;
-	private Video videoObject;
 	private GraphicsContext gc;
+	
+	Point upperLeftCorner;
+	Point lowerRightCorner;
+	
+	//doesn't currently work
+//    @FXML
+//    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
+//    	FileChooser fileChooser = new FileChooser();
+//		fileChooser.setTitle("Open Video File");
+//		Window mainWindow = currentFrameImage.getScene().getWindow();
+//		File chosenFile = fileChooser.showOpenDialog(mainWindow);
+//		if (chosenFile != null) {
+//			String fileName = chosenFile.toURI().toString();
+//			videoObject = new Video(fileName);
+//			capture = videoObject.getVidCap();
+//			//data = new ProjectData(fileName);
+//			//data.getVideo().setVidCap(new VideoCapture());
+//			startVideo();
+//		};
+//		runSliderSeekBar();
+//    }
     
     @FXML
-    private void handleBrowse(ActionEvent event) throws FileNotFoundException {
-    	FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Video File");
-		Window mainWindow = currentFrameImage.getScene().getWindow();
-		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-		if (chosenFile != null) {
-			String fileName = chosenFile.toURI().toString();
-			videoObject = new Video(fileName);
-			capture = videoObject.getVidCap();
-			//data = new ProjectData(fileName);
-			//data.getVideo().setVidCap(new VideoCapture());
-			startVideo();
-		};
-		runSliderSeekBar();
+    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
+    	browseForVideoFile();
     }
-
+    
 	@FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
 		gc = canvas.getGraphicsContext2D();
 		runSliderSeekBar();
 	}
-	
-    @FXML
-    void handleBrowse(MouseEvent event) {
-    	FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Image File");
-		Window mainWindow = currentFrameImage.getScene().getWindow();
-		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-		if (chosenFile != null) {
-			fileName = chosenFile.toURI().toString();
-			videoObject = new Video(fileName);
-			capture = videoObject.getVidCap();
-			startVideo();
-		};
-		runSliderSeekBar();
-		//runJumpTo(); //prints out which frame you are at
-    }
 
 	private void runSliderSeekBar() {
 
@@ -150,7 +135,7 @@ public class PreviewWindowController {
 		});
 	}
 	
-
+	//might use this
 //	private void runJumpTo() {
 //		
 //		jumpToFrameArea.textProperty().addListener(new ChangeListener<String>() {
@@ -169,33 +154,25 @@ public class PreviewWindowController {
 //
 //	}
 
-	public void updateFrameView() {
-		Platform.runLater(new Runnable() {
-			@Override
-			public void run() {
-				// effectively grab and process a single frame
-				Mat frame = grabFrame();
-				// convert and show the frame
-				Image imageToShow = Utils.mat2Image(frame);
-				currentFrameImage.setImage(imageToShow);
-			}
-		});
-
-	}
-
+//note for another time ProgressMonitor in JOption Pane
+	
     @FXML
     void handleCallibration(MouseEvent event) {
-
+    	setBoxArena();
+    	setLengthMeasurements();
+    	setEmptyFrame();
+    	setChickenNames();
     }
 
     @FXML
     void handleClose(ActionEvent event) {
-
+    	Platform.exit();
     }
 
+    //replaces video in window... need to make sure 
     @FXML
-    void handleLoadVideo(MouseEvent event) {
-
+    void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
+    	browseForVideoFile();
     }
     
     @FXML
@@ -207,8 +184,8 @@ public class PreviewWindowController {
 		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
 		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		
-		Stage primary = (Stage) continueBtn.getScene().getWindow();
-		primary.setScene(nextScene);
+		//Stage primary = (Stage) continueBtn.getScene().getWindow();
+		//primary.setScene(nextScene);
     }
 
     @FXML
@@ -222,6 +199,7 @@ public class PreviewWindowController {
 
     }
     
+    //Avery... still working on it
     @FXML //throw exception if non number is entered.... or prevent it from being entered
     void handleEndTime(KeyEvent event) {
 //    	int i = key.getKeyCode();
@@ -231,8 +209,21 @@ public class PreviewWindowController {
 //        }
     }
     
+    public void browseForVideoFile() throws FileNotFoundException{
+    	FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Video File");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showOpenDialog(mainWindow);
+		if (chosenFile != null) {
+			String fileName = chosenFile.toURI().toString();
+			data.setVideo(new Video(fileName));
+			startVideo();
+		};
+		runSliderSeekBar();
+		//runJumpTo(); //prints out which frame you are at
+    }
+    
     protected void startVideo() {
-
 		// start the video capture
 		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
@@ -242,35 +233,60 @@ public class PreviewWindowController {
 		updateFrameView();
 		sliderSeekBar.setMax((int) numFrame -1);
 		sliderSeekBar.setMaxWidth((int) numFrame -1);
-
 	}
     
     public ImageView getCurrentFrameImage() {
     	return currentFrameImage;
     }
-
- 	/**
+    
+    //doesn't currently work
+// 	/**
+//	 * Get a frame from the opened video stream (if any)
+//	 *
+//	 * @return the {@link Mat} to show
+//	 */
+//	private Mat grabFrame() {
+//		// init everything
+//		Mat frame = new Mat();
+// 		// check if the capture is open
+//		System.out.println("Create new mat");
+//		if (this.capture.isOpened()) {
+//			System.out.println("Opened video");
+//			try {
+//				// read the current frame
+//				this.capture.read(frame);
+// 			} catch (Exception e) {
+//				// log the error
+//				System.err.println("Exception during the image elaboration: " + e);
+//			}
+//			
+//		} else {
+//			System.out.println("Failed to open video");
+//		}
+// 		return frame;
+//	}
+	
+	/**
 	 * Get a frame from the opened video stream (if any)
-	 *
 	 * @return the {@link Mat} to show
 	 */
 	private Mat grabFrame() {
 		// init everything
 		Mat frame = new Mat();
  		// check if the capture is open
-		System.out.println("Create new mat");
-		if (this.capture.isOpened()) {
-			System.out.println("Opened video");
+		if (this.data.getVideo().getVidCap().isOpened()) {
 			try {
 				// read the current frame
-				this.capture.read(frame);
+				this.data.getVideo().getVidCap().read(frame);
+ 				// if the frame is not empty, process it to black and white color
+				/*
+				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
+				 * }
+				 */
  			} catch (Exception e) {
 				// log the error
 				System.err.println("Exception during the image elaboration: " + e);
 			}
-			
-		} else {
-			System.out.println("Failed to open video");
 		}
  		return frame;
 	}
@@ -288,5 +304,29 @@ public class PreviewWindowController {
 		});
  	}
     
+    public void setBoxArena() {
+    	Alert alert = new Alert(AlertType.INFORMATION);
+    		alert.setTitle("Callibration");
+    		alert.setHeaderText("Please initialize the box's area.");
+    		alert.setContentText("Please select the upper left corner of the box.");
+//    		addActionListener(new ActionListener e) {
+//    			Rectangle r = new Rectangle;
+//    			r.add(upperLeftCorner);
+//    			r.add(lowerRightCorner);
+//    		
+//    		}
+    }
+    
+    public void setLengthMeasurements() {
+    	
+    }
+    
+    public void setEmptyFrame() {
+    	
+    }
+    
+    public void setChickenNames() {
+    	
+    }
 }
 

@@ -162,13 +162,15 @@ public class Video {
 		this.arenaBounds = arenaBounds;
 	}
 
-	public double convertFrameNumsToSeconds(int numFrames) {
-		return numFrames / getFrameRate();
-	}
-
-	public int convertSecondsToFrameNums(double numSecs) {
-		return (int) Math.round(numSecs * getFrameRate());
-	}
+	//same as get time in seconds
+//	public double convertFrameNumsToSeconds(int numFrames) {
+//		return numFrames / getFrameRate();
+//	}
+	
+	//same as get time in frames
+//	public int convertSecondsToFrameNums(double numSecs) {
+//		return (int) Math.round(numSecs * getFrameRate());
+//	}
 
 	public VideoCapture getVidCap() {
 		return vidCap;

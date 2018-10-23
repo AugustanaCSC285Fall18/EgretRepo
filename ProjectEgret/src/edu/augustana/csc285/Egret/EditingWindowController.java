@@ -112,6 +112,7 @@ import javafx.stage.Window;
 	
 	@FXML
 	void closeWindow(ActionEvent event) {
+		Platform.exit();
  	}
 	
 	void frameChanger(double numOfFrameChange) {
@@ -197,20 +198,25 @@ import javafx.stage.Window;
 			}
 		}
 	}
+ 	
  	@FXML
 	void openPopUp(MouseEvent event) {
  	}
+ 	
  	@FXML
 	void redoEdit(MouseEvent event) {
  	}
+ 	
  	@FXML
 	void saveProject(ActionEvent event) {
  	}
+ 	
  	@FXML
 	void toggleManualEdit(MouseEvent event) {
 		modifyToggleActive = !modifyToggleActive;
 		animalCounter = 0;
 	}
+ 	
  	@FXML // TODO: figure out mechanism for how to modify animal data
 	void addOrModifyDataPoint(MouseEvent event) {
 		double xCord = event.getX();
@@ -228,6 +234,7 @@ import javafx.stage.Window;
 		//gc.fillOval(xCord, yCord, drawX, drawY);
 		frameStepForward();
 	}
+ 	
  	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		previousPoint = currentAnimal.getTimePointAtTime(curFrameNum);
 		System.out.println("Old point: " + previousPoint);
@@ -235,6 +242,7 @@ import javafx.stage.Window;
 		currentAnimal.setTimePointAtTime(newPoint, curFrameNum);
 		System.out.println("New Point: " + newPoint);
 	}
+ 	
  	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, curFrameNum);
 	}
@@ -328,6 +336,7 @@ import javafx.stage.Window;
 
 	}
 	
+	//is this going to be different than the saveProject method?? if so let's get rid of saveProject.
 	private void saveData() {
 		File finalDataFile = new File("final_data_file");
 		try {
@@ -338,6 +347,7 @@ import javafx.stage.Window;
 		}
 		//TODO: doMoreStuff();
 	}
+	
  	@FXML
 	public void initialize() throws FileNotFoundException {
 		loadData();
@@ -386,6 +396,7 @@ import javafx.stage.Window;
 		sliderSeekBar.setMaxWidth((int) totalNumFrame - 1);
 		jumpToFrame(startFrame);
  	}
+ 	
  	/**
 	 * Get a frame from the opened video stream (if any)
 	 * @return the {@link Mat} to show
@@ -424,7 +435,6 @@ import javafx.stage.Window;
  				updateFrameView();
 			}
  		});
- 		
 	}
  	
  	/*
