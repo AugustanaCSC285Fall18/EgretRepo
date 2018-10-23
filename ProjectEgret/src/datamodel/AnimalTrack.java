@@ -87,7 +87,12 @@ public class AnimalTrack {
 	}
 
 	public TimePoint getTimePointAtIndex(int index) {
-		return positions.get(index);
+		if (positions.size()<= index) {
+			return null;
+		} else {
+			return positions.get(index);
+		}
+		
 	}
 
 	public TimePoint getTimePointAtTime(int frameNum) {
@@ -108,6 +113,13 @@ public class AnimalTrack {
 		System.out.println("positions: " + positions);
 
 		return getTimePointAtTime(frameNum) != null;
+	}
+	
+	public boolean hasTimePointAtIndex(int index) {
+		// TODO: This method's implementation is inefficient [linear search is O(N)]
+		// Replace this with binary search (O(log n)] or use a Map for fast access
+
+		return getTimePointAtIndex(index) != null;
 	}
 	
 	/**
