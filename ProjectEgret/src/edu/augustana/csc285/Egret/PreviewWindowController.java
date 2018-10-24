@@ -24,6 +24,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -81,6 +82,9 @@ public class PreviewWindowController {
 
     @FXML
     private TextField endField;
+    
+    @FXML
+    private ChoiceBox<?> timeStepBox;
 
 //    private Button continueBtn;
     
@@ -271,10 +275,6 @@ public class PreviewWindowController {
     public void setTimeStep() {
     	
     }
-    
-    public void setChickenNames() {
-    	
-    }
 
 //note for another time ProgressMonitor in JOption Pane
 	
@@ -294,7 +294,6 @@ public class PreviewWindowController {
     	setBoxArena();
     	//setLengthMeasurements();
     	//setEmptyFrame();
-    	//setChickenNames();
     }
     
     @FXML
