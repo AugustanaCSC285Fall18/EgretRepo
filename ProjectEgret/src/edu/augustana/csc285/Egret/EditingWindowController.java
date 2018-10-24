@@ -153,17 +153,12 @@ public class EditingWindowController {
 	void frameChanger(double numOfFrameChange) {
 		if (currentFrameNumber + numOfFrameChange > endFrame) {
 			animalCounter++;
-			setAnimalTrackObjectComboBox();
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Time Change");
-			alert.setHeaderText(null);
-			alert.setContentText("You are now adding data for chicken " + animalCounter+1);
-			alert.showAndWait();
 			if (animalCounter > totalAmountOfAnimals) {
 				saveFinishedProject();
-				// TODO: make code to end the manual tracking screen
+				makeAlert("Analysis Complete","You have completed the analysis!");
 			} else {
-				jumpToFrame(startFrame);
+				setAnimalTrackObjectComboBox();
+				makeAlert("Tracking New Chicken","You are now adding data for chicken " + data.getAnimalTracksList().get(animalCounter).getName());
 			}
 		} else {
 			gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -228,7 +223,8 @@ public class EditingWindowController {
 				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
 				gc.fillOval(xCord, yCord, drawX, drawY);
 			} else {
-				//TODO: MAKE A POP UP WINDOW THAT SAYS "NO DATA POINT TO MODIFY"
+				setAnimalTrackObjectComboBox();
+				makeAlert("Modify Location Error", "No data point to modify");
 			}
 			
 		} else {
@@ -345,20 +341,10 @@ public class EditingWindowController {
 					jumpToFrame(currentAnimal.getFinalTimePoint().getFrameNum());
 				}
 			} else {
-				Alert alert = new Alert(AlertType.INFORMATION);
-				alert.setTitle("Undo Attempt");
-				alert.setHeaderText(null);
-				alert.setContentText("No more points to undo.");
-				alert.showAndWait();
-	
-				// Cited https://code.makery.ch/blog/javafx-dialogs-official/
+				makeAlert("Undo Error", "No more points to undo for this chicken." );
 			}
 		}else {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Undo Attempt");
-			alert.setHeaderText(null);
-			alert.setContentText("Undo Does Not Work in Modify Mode");
-			alert.showAndWait();
+			makeAlert("Undo Error", "Undo Does Not Work in Modify Mode" );
 		}
 	}
 
@@ -367,13 +353,7 @@ public class EditingWindowController {
 		int newTime = Integer.parseInt(timeField.getText());
 		int maxTime = (int) Math.floor((data.getVideo().getTotalNumFrames() / frameJumpAmount));
 		if (newTime > maxTime) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Time Change");
-			alert.setHeaderText(null);
-			alert.setContentText("The video is between 0 and " + maxTime + " seconds long.");
-			alert.showAndWait();
-
-			// Cited https://code.makery.ch/blog/javafx-dialogs-official/
+			makeAlert("Time Change Error", "The video is between 0 and " + maxTime + " seconds long.");
 		}
 		int frameNumber = (int) Math.round((newTime * frameJumpAmount));
 		jumpToFrame(frameNumber);
@@ -415,6 +395,15 @@ public class EditingWindowController {
     	}else if(e.getCode() == KeyCode.Q) {
     		undoEdit(null);
     	}
+    }
+    
+    private void makeAlert(String title, String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
+		// Cited https://code.makery.ch/blog/javafx-dialogs-official/
     }
 
 	private void loadWelcomeWindow() {
