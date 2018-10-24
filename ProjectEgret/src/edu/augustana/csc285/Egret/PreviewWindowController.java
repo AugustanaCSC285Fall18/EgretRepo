@@ -26,6 +26,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -72,6 +73,9 @@ public class PreviewWindowController {
     private Slider sliderSeekBar;
     
     @FXML
+    private Label instructLabel;
+    
+    @FXML
     private Button loadBtn;
 
     @FXML
@@ -87,7 +91,7 @@ public class PreviewWindowController {
     private ChoiceBox<?> timeStepBox;
 
 //    private Button continueBtn;
-//
+
     
    private VideoCapture capture = new VideoCapture();
 	
@@ -257,12 +261,8 @@ public class PreviewWindowController {
  	}
     
     public void setBoxArena() {
-    	alert.initModality(Modality.WINDOW_MODAL);
-		alert.setTitle("Callibration");
 		step = 1;
-		alert.setHeaderText("Please initialize the box's area.");
-		alert.setContentText("Please select the upper left corner of the box.");
-		alert.showAndWait();
+		instructLabel.setText("Please select the upper left corner of the box.");
     }
     
     public void setLengthMeasurements() {
@@ -291,6 +291,7 @@ public class PreviewWindowController {
     }
 	
 	@FXML
+	// calls various methods to handle multiple steps of calibration
     void handleCallibration(MouseEvent event) {
     	setBoxArena();
     	//setLengthMeasurements();
@@ -298,30 +299,33 @@ public class PreviewWindowController {
     }
     
     @FXML
-    void handleCanvasClick(MouseEvent event) {
+    void handleCanvasClick(MouseEvent event) throws InterruptedException {
     	Rectangle rect = new Rectangle();
     	if (step==1) {
-    		System.out.println(step);
     		upperLeftCorner.setLocation(event.getX(), event.getY());
     		rect.add(upperLeftCorner);
-    		System.out.println(upperLeftCorner.getX() + " " + upperLeftCorner.getY());
     		
     		step=2;
-    		alert.setContentText("Please select the lower right hand corner of the box");
+    		instructLabel.setText("Please select the lower right hand corner of the box");
     	}else if (step==2) {
-    		System.out.println(step);
     		lowerRightCorner.setLocation(event.getX(), event.getY());
-    		System.out.println(lowerRightCorner.getX() + " " + lowerRightCorner.getY());
     		rect.add(lowerRightCorner);
     		data.getVideo().setArenaBounds(rect);
-    		
     		step=3;
-    		alert.setContentText("Please select where you would like your origin to be located.");
+    		instructLabel.setText("Please select where you would like your origin to be located.");
     	}else if (step==3) {
-    		System.out.println(step);
     		origin.setLocation(event.getX(), event.getY());
-    		System.out.println(origin.getX() + " " + origin.getY());
     		data.getVideo().setOriginPoint(origin);
+    		instructLabel.setText("You are done calibrating! Press calibrate again to reset calibration.");
+    		//wait 2 seconds
+    		new java.util.Timer().schedule(
+    			    new java.util.TimerTask() {
+    			        @Override
+    			        public void run() {
+    			            Platform.runLater(() -> instructLabel.setText(""));
+    			        }
+    			    }, 
+    			    2000);   // the delay time in milliseconds
     	}
     }
 

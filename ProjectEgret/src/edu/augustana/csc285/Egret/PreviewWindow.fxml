@@ -18,7 +18,10 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <!--  -->
+
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
@@ -41,11 +44,12 @@
 <!--       <AnchorPane prefHeight="500.0" prefWidth="700.0"> -->
 
          <children>
+            <Button fx:id="browseBtn" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleBrowse" text="Browse" />
             <ComboBox fx:id="chicksComboBox" layoutX="100.0" layoutY="12.0" prefWidth="150.0" />
             <Button fx:id="addChickBtn" layoutX="260.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleAddChickBtn" text="Add Chicken" />
             <Button fx:id="removeChickBtn" layoutX="350.0" layoutY="12.0" mnemonicParsing="false" onMouseDragged="#handleRemoveChickBtn" text="Remove Chicken" />
 
-            <StackPane layoutX="75.0" layoutY="70.0">
+            <StackPane layoutX="75.0" layoutY="80.0">
                <children>
                   <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" pickOnBounds="true" preserveRatio="true" />
                   <Canvas fx:id="canvas" height="232.0" onMouseClicked="#handleCanvasClick" width="341.0">
@@ -54,13 +58,30 @@
                      </StackPane.margin></Canvas>
                </children>
             </StackPane>
-            <Slider fx:id="sliderSeekBar" layoutX="64.0" layoutY="266.0" prefHeight="14.0" prefWidth="362.0" />
-            <Button fx:id="browseBtn" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleBrowse" text="Browse" />
+            <Slider fx:id="sliderSeekBar" layoutX="65.0" layoutY="318.0" prefHeight="14.0" prefWidth="362.0" />
+            <StackPane layoutY="50.0" prefWidth="500.0">
+               <children>
+                  <Label fx:id="instructLabel">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                     <StackPane.margin>
+                        <Insets />
+                     </StackPane.margin>
+                     <padding>
+                        <Insets left="30.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
 
 <!--             <ImageView fx:id="currentFrameImage" fitHeight="403.0" fitWidth="569.0" layoutX="66.0" layoutY="20.0" pickOnBounds="true" preserveRatio="true" /> -->
 <!--             <Slider fx:id="sliderSeekBar" layoutX="99.0" layoutY="447.0" prefHeight="14.0" prefWidth="528.0" /> -->
 
          </children>
+         <BorderPane.margin>
+            <Insets left="50.0" />
+         </BorderPane.margin>
       </AnchorPane>
    </center>
 
