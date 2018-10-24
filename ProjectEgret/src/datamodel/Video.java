@@ -52,11 +52,11 @@ public class Video {
 
 	
 	public void setCurrentFrameNum(double seekFrame) {
-		vidCap.set(Videoio.CV_CAP_PROP_POS_FRAMES, seekFrame);
+		vidCap.set((int)Math.floor(Videoio.CV_CAP_PROP_POS_FRAMES), seekFrame);
 	}
 
 	public synchronized int getCurrentFrameNum() {
-		return (int) Math.ceil(vidCap.get(Videoio.CV_CAP_PROP_POS_FRAMES));
+		return (int) Math.floor(vidCap.get(Videoio.CV_CAP_PROP_POS_FRAMES));
 	}
 
 	public synchronized Mat readFrame() {

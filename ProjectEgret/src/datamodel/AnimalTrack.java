@@ -85,7 +85,7 @@ public class AnimalTrack {
 	}
 
 	public TimePoint getTimePointAtIndex(int index) {
-		if (positions.size()<= index) {
+		if (positions.size()<= index || index < 0) {
 			return null;
 		} else {
 			return positions.get(index);
@@ -158,13 +158,22 @@ public class AnimalTrack {
 	}
 
 	public TimePoint getFinalTimePoint() {
-		return positions.get(positions.size() - 1);
+		if(positions.size() <= 0) { 
+			return null;
+		}else {
+			return positions.get(positions.size() - 1);
+		}
 	}
 	
 	public TimePoint getFirstTimePoint() {
-		return positions.get(0);
+		if(positions.size() <= 0) {
+			return null;
+		}else {
+		
+			return positions.get(0);
+	
+		}
 	}
-
 	public double getX() {
 		return centerPoint.x;
 	}
