@@ -24,6 +24,8 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
@@ -47,6 +49,15 @@ public class PreviewWindowController {
 
     @FXML
     private MenuItem closeOption;
+    
+    @FXML
+    private ComboBox<?> chicksComboBox;
+
+    @FXML
+    private Button addChickBtn;
+
+    @FXML
+    private Button removeChickBtn;
 
     @FXML
     private ImageView currentFrameImage;
@@ -71,8 +82,12 @@ public class PreviewWindowController {
 
     @FXML
     private TextField endField;
+    
+    @FXML
+    private ChoiceBox<?> timeStepBox;
 
 //    private Button continueBtn;
+//
     
    private VideoCapture capture = new VideoCapture();
 	
@@ -261,15 +276,16 @@ public class PreviewWindowController {
     public void setTimeStep() {
     	
     }
-    
-    public void setChickenNames() {
-    	
-    }
 
 //note for another time ProgressMonitor in JOption Pane
 	
 	//event handlers
-	@FXML
+    @FXML
+    void handleAddChickBtn(MouseEvent event) {
+
+    }
+    
+    @FXML
     private void handleBrowse(MouseEvent event) throws FileNotFoundException {
     	browseForVideoFile();
     }
@@ -279,7 +295,6 @@ public class PreviewWindowController {
     	setBoxArena();
     	//setLengthMeasurements();
     	//setEmptyFrame();
-    	//setChickenNames();
     }
     
     @FXML
@@ -315,6 +330,16 @@ public class PreviewWindowController {
     	Platform.exit();
     }
     
+  //Avery... still working on it
+    @FXML //throw exception if non number is entered.... or prevent it from being entered
+    void handleEndTime(KeyEvent event) {
+//    	int i = key.getKeyCode();
+//        if (i >= 65 && i <= 90)
+//        {
+//           ((TextField)event.getSource()).cancelKey();
+//        }
+    }
+    
     @FXML
 	public void initialize() {
 		sliderSeekBar.setDisable(true);
@@ -327,26 +352,20 @@ public class PreviewWindowController {
     void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
     	browseForVideoFile();
     }
+    
+    @FXML //throw exception if non number is entered... or prevent it from being entered
+    void handleStartTime(KeyEvent event) {
+
+    }
 
     @FXML
     void handleSettings(ActionEvent event) {
 
     }
     
+    @FXML
+    void handleRemoveChickBtn(MouseEvent event) {
 
-    @FXML //throw exception if non number is entered... or prevent it from being entered
-    void handleStartTime(KeyEvent event) {
-
-    }
-    
-    //Avery... still working on it
-    @FXML //throw exception if non number is entered.... or prevent it from being entered
-    void handleEndTime(KeyEvent event) {
-//    	int i = key.getKeyCode();
-//        if (i >= 65 && i <= 90)
-//        {
-//           ((TextField)event.getSource()).cancelKey();
-//        }
     }
     
     @FXML
