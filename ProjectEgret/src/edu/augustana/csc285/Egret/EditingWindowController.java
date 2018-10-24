@@ -159,15 +159,11 @@ public class EditingWindowController {
 			} else {
 				setAnimalTrackObjectComboBox();
 				makeAlert("Tracking New Chicken","You are now adding data for chicken " + data.getAnimalTracksList().get(animalCounter).getName());
+				jumpToFrame(startFrame);
 			}
 		} else {
 			gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-			//System.out.println("old frame number: " + data.getVideo().getCurrentFrameNum());
-			System.out.println("Old Frame: " + currentFrameNumber );
-			//data.getVideo().setCurrentFrameNum(data.getVideo().getCurrentFrameNum() + numOfFrameChange);
 			currentFrameNumber += numOfFrameChange;
-			//System.out.println("new frame number: " + data.getVideo().getCurrentFrameNum());
-			System.out.println("New Frame: " + currentFrameNumber );
 			updateFrameView();
 			frameAdjustHelper();
 			displayFutureTracks();
@@ -216,7 +212,6 @@ public class EditingWindowController {
 		Point centerPoint = new Point(xCord, yCord);
 		setAnimalCounter();
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		System.out.println(currentAnimal.getTimePointAtIndex(1));
 		if (modifyToggleActive) {
 			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
 				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
@@ -232,7 +227,6 @@ public class EditingWindowController {
 			frameStepForward();
 			gc.fillOval(xCord, yCord, drawX, drawY);
 		}
-		System.out.println("final time point for current animal " + data.getAnimalTracksList().get(animalCounter).getName() + data.getAnimalTracksList().get(animalCounter).getFinalTimePoint() );
 	}
 
 	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
