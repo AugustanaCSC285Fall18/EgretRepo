@@ -99,6 +99,7 @@ public class EditingWindowController {
 	private int frameJumpAmount;
 	private int currentFrameNumber = startFrame;
 
+	//
 
 	void loadData() throws FileNotFoundException {
 		File dataFile = new File("full_auto_tracker_data");
