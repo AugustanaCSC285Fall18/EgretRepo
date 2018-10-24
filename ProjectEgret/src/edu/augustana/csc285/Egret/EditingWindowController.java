@@ -201,7 +201,7 @@ public class EditingWindowController {
 		animalCounter = 0;
 	}
 
-	@FXML 
+	@FXML
 	void addOrModifyDataPoint(MouseEvent event) {
 		double xCord = event.getX();
 		double yCord = event.getY();
@@ -209,13 +209,19 @@ public class EditingWindowController {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 		System.out.println(currentAnimal.getTimePointAtIndex(1));
 		if (modifyToggleActive) {
-			previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
-			modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
+			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
+				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
+				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
+				gc.fillOval(xCord, yCord, drawX, drawY);
+			}else {
+				//TODO: MAKE A POP UP WINDOW THAT SAYS "NO DATA POINT TO MODIFY"
+			}
+			
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 			frameStepForward();
+			gc.fillOval(xCord, yCord, drawX, drawY);
 		}
-		gc.fillOval(xCord, yCord, drawX, drawY);
 	}
 
 	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
@@ -313,10 +319,10 @@ public class EditingWindowController {
 	@FXML
 	void undoEdit(MouseEvent event) {
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		if (currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints()-1) != null) {
-			TimePoint previousTP = currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints()-1);
+		if (currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1) != null) {
+			TimePoint previousTP = currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1);
 			gc.clearRect(previousTP.getX(), previousTP.getY(), drawX, drawY);
-			currentAnimal.removeLocation(currentAnimal.getNumPoints()-1);
+			currentAnimal.removeLocation(currentAnimal.getNumPoints() - 1);
 			frameStepBack();
 		} else {
 			Alert alert = new Alert(AlertType.INFORMATION);
