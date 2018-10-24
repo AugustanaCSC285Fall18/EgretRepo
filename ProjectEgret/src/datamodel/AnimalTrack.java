@@ -80,10 +80,8 @@ public class AnimalTrack {
 		positions.add(pt);
 	}
 
-	public void removeLocation() {
-		if (positions.size() > 0) {
-			positions.remove(positions.size() - 1);
-		}
+	public void removeLocation(int index) {
+		positions.remove(index);
 	}
 
 	public TimePoint getTimePointAtIndex(int index) {
@@ -109,9 +107,6 @@ public class AnimalTrack {
 	public boolean hasTimePointAtTime(int frameNum) {
 		// TODO: This method's implementation is inefficient [linear search is O(N)]
 		// Replace this with binary search (O(log n)] or use a Map for fast access
-		System.out.println("frame: " + frameNum);
-		System.out.println("positions: " + positions);
-
 		return getTimePointAtTime(frameNum) != null;
 	}
 	
