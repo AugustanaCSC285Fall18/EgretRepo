@@ -56,9 +56,5 @@ class AnimalTrackTester {
 		assertEquals(true, comparePoint(new TimePoint(15,10,5), ptAt2));
 		
 		assertEquals(true, comparePoint(new TimePoint(15,10,5), fake.getFinalTimePoint()));
-		
-		fake.removeLocation();
-		assertEquals(2,fake.getNumPoints());
-		
 	}
 }

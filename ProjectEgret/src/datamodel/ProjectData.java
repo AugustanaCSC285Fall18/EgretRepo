@@ -21,12 +21,6 @@ public class ProjectData {
 	private List<AnimalTrack> unassignedSegments;
 	private List<Color> colorArrayForAnimalTracks = new ArrayList<Color>();
 
-	public void exportCSVFile(File outFile) {
-		for (int i = 0; i < animalTracksList.size(); i++) {
-			System.out.println(animalTracksList.get(i));
-		}
-	}
-
 	public ProjectData(String videoFilePath) throws FileNotFoundException {
 		video = new Video(videoFilePath);
 		animalTracksList = new ArrayList<>();
