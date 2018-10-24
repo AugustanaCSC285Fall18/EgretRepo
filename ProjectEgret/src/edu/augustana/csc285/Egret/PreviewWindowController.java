@@ -87,6 +87,7 @@ public class PreviewWindowController {
     private ChoiceBox<?> timeStepBox;
 
 //    private Button continueBtn;
+//
     
    private VideoCapture capture = new VideoCapture();
 	
