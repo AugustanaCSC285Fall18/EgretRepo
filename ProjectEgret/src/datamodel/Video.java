@@ -26,8 +26,6 @@ public class Video {
 		connectVideoCapture();
 		if (!vidCap.isOpened()) {
 			throw new FileNotFoundException("Unable to open video file: " + filePath);
-		} else {
-			System.out.println("Made video object");
 		}
 		// fill in some reasonable default/starting values for several fields
 		this.emptyFrameNum = 0;
@@ -43,8 +41,6 @@ public class Video {
 		this.vidCap = new VideoCapture(filePath);
 		Mat mat = new Mat();
 		this.vidCap.read(mat);
-		System.err.println("vidCap: " + this.vidCap);
-		System.err.println("mat size: " + mat.size());
 		if (!vidCap.isOpened()) {
 			throw new FileNotFoundException("Unable to open video file: " + filePath);
 		}
@@ -67,6 +63,10 @@ public class Video {
 
 	public String getFilePath() {
 		return this.filePath;
+	}
+	
+	public String getFilePathJustName() {
+		return filePath.substring(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'));
 	}
 
 	/**
