@@ -24,21 +24,15 @@ public class Analysis {
 
 	private static ProjectData data;
 
-	public static void main(String[] args) throws IOException {
-		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-		File dataFile = new File("final_data_file");
-		data = ProjectData.loadFromFile(dataFile);
-		exportToCSV();
-		totalDistanceTraveled();
-		averageDistanceBetweenPointsToCSV();
-	}
 
-	public Analysis(ProjectData data) {
-		this.data = data;
+	public static void runAnalysis(ProjectData dataInformation) throws IOException {
+		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+		data = dataInformation;
+		exportToCSV();
+		averageDistanceBetweenPointsAndTotalDistanceToCSV();
 	}
 
 	public static void exportToCSV() throws IOException {
-		System.out.println(data.getVideo().getFilePathJustName());
 		FileWriter fileWriter = new FileWriter(new File(data.getVideo().getFilePathJustName() + ".csv"));
 		StringBuilder s = new StringBuilder();
 		int maxNumTimePoints = 0;
@@ -84,10 +78,9 @@ public class Analysis {
 		}
 		fileWriter.append(s);
 		fileWriter.close();
-		System.out.println("done!");
 	}
 
-	public static void totalDistanceTraveled() {
+	public static double[] totalDistanceTraveled() {
 		double[] distanceTraveledList = new double[data.getAnimalTracksList().size()];
 		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
 			AnimalTrack currentTrack = data.getAnimalTracksList().get(i);
@@ -97,14 +90,22 @@ public class Analysis {
 				distanceTraveledList[i] += tempDistance;
 			}
 		}
-		System.out.println(Arrays.toString(distanceTraveledList));
+		return distanceTraveledList;
 	}
 
-	public static void averageDistanceBetweenPointsToCSV() throws IOException {
-		FileWriter fileWriter = new FileWriter(new File("AverageDistance " + data.getVideo().getFilePathJustName() + ".csv"));
+	public static void averageDistanceBetweenPointsAndTotalDistanceToCSV() throws IOException {	
+		double[] distanceTraveledList = totalDistanceTraveled();
+		FileWriter fileWriter = new FileWriter(new File("Total Distance and Average Distance " + data.getVideo().getFilePathJustName() + ".csv"));
 		StringBuilder s = new StringBuilder();
 		
 		int numOfTracks = data.getAnimalTracksList().size();
+
+		for(int i = 0; i < numOfTracks; i++) {
+			AnimalTrack currentAnimal = data.getAnimalTracksList().get(i);
+			s.append("Total Distance " + currentAnimal.getName() + " Traveled: " + distanceTraveledList[i]);
+			s.append('\n');
+		}
+		s.append('\n');
 
 		for(int i = 0; i < numOfTracks-1; i++) {
 			AnimalTrack currentTrack = data.getAnimalTracksList().get(i);
@@ -120,8 +121,6 @@ public class Analysis {
 					if(comparingTrack.hasTimePointAtTime(currentTrack.getTimePointAtIndex(k).getFrameNum())) {
 						TimePoint currentTrackCurrentTP = currentTrack.getTimePointAtIndex(k);
 						TimePoint comparingTrackCurrentTP = comparingTrack.getTimePointAtTime(currentTrackCurrentTP.getFrameNum());
-						System.out.println("current track " + currentTrackCurrentTP);
-						System.out.println("comparing track " + comparingTrackCurrentTP);
 						s.append(currentTrackCurrentTP.getFrameNum());
 						s.append(",");
 						double distance = Math.sqrt(Math.pow(currentTrackCurrentTP.getX() - comparingTrackCurrentTP.getX(), 2) + Math.pow(currentTrackCurrentTP.getY() - comparingTrackCurrentTP.getY(),2));
@@ -133,10 +132,8 @@ public class Analysis {
 				s.append('\n');
 			}
 		}
-		
 		fileWriter.append(s);
 		fileWriter.close();
-		System.out.println("done!");
 	}
 
 }

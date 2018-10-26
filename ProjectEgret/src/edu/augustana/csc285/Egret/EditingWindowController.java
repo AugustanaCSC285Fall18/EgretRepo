@@ -8,6 +8,7 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.videoio.Videoio;
 
+import Analysis.Analysis;
 import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.TimePoint;
@@ -105,8 +106,6 @@ public class EditingWindowController {
 	private int frameJumpAmount;
 	private int currentFrameNumber = startFrame;
 
-	//
-
 	void loadData() throws FileNotFoundException {
 		File dataFile = new File("full_auto_tracker_data");
 		data = ProjectData.loadFromFile(dataFile);
@@ -149,7 +148,7 @@ public class EditingWindowController {
 			animalCounter++;
 			if (animalCounter > totalAmountOfAnimals) {
 				saveFinishedProject();
-				makeAlert("Analysis Complete","You have completed the analysis!");
+				makeAlert("Tracking Complete","You have completed the tracking! Your file has been saved as \"" + data.getVideo().getFilePathJustName() + "\" Hit the finish button to recieve csv files and analysis");
 			} else {
 				setAnimalTrackObjectComboBox();
 				makeAlert("Tracking New Chicken","You are now adding data for chicken " + data.getAnimalTracksList().get(animalCounter).getName());
@@ -176,7 +175,7 @@ public class EditingWindowController {
 				    50);   // the delay time in milliseconds
 		} else {
 			jumpToFrame(oldCurrentFrame);
-			makeAlert("Review Complete", "Reviewing Process is finished");
+			makeAlert("Review Complete", "Reviewing process is finished");
 	
 		}
 	}
@@ -254,6 +253,7 @@ public class EditingWindowController {
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 			frameStepForward();
+			gc.setFill(Color.DARKGREEN);
 			gc.fillOval(xCord, yCord, drawX, drawY);
 		}
 	}
@@ -328,23 +328,16 @@ public class EditingWindowController {
 	void displayPastTracks() {
 		setAnimalCounter();
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
-		gc.setFill(Color.DARKRED);
-		// draw this segments recent past & near future locations
-		for (TimePoint prevPt : currentTrack.getTimePointsWithinInterval(
-				currentFrameNumber - frameJumpAmount * frameJumpModifier * 3,
-				currentFrameNumber + frameJumpAmount * frameJumpModifier * 3)) {
-			gc.fillOval(prevPt.getX(), prevPt.getY(), drawX, drawY);
+		if( currentTrack.getTimePointAtTime(currentFrameNumber) != null) {
+			TimePoint currentTP = currentTrack.getTimePointAtTime(currentFrameNumber);
+			gc.setFill(Color.AQUAMARINE);
+			gc.fillOval(currentTP.getX(), currentTP.getY(), drawX, drawY);
 		}
-
 	}
 
 	@FXML
 	void closeWindow(ActionEvent event) {
 		Platform.exit();
-	}
-
-	@FXML
-	void openPopUp(MouseEvent event) {
 	}
 
 	@FXML
@@ -371,11 +364,8 @@ public class EditingWindowController {
 		}
 	}
 	
-	//TODO: Currently does not work, need to figure out mechanism to slow it down, 
-	//		so the user can see its progress
 	@FXML 
 	void reviewTrack(MouseEvent event) throws InterruptedException{
-		System.out.println("hi");
 		oldCurrentFrame = currentFrameNumber;
 		currentFrameNumber = startFrame;
 		reviewTimeChanger();
@@ -439,42 +429,48 @@ public class EditingWindowController {
 		// Cited https://code.makery.ch/blog/javafx-dialogs-official/
     }
 
-	private void loadWelcomeWindow() {
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("WelcomeWindow.fxml"));
-		try {
-			AnchorPane root = (AnchorPane) loader.load();
-			Scene scene = new Scene(root, root.getPrefWidth(), root.getPrefHeight());
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			Stage primary = (Stage) saveBtn.getScene().getWindow();
-			primary.setScene(scene);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+//	private void loadWelcomeWindow() {
+//		FXMLLoader loader = new FXMLLoader(getClass().getResource("WelcomeWindow.fxml"));
+//		try {
+//			AnchorPane root = (AnchorPane) loader.load();
+//			Scene scene = new Scene(root, root.getPrefWidth(), root.getPrefHeight());
+//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+//			Stage primary = (Stage) saveBtn.getScene().getWindow();
+//			primary.setScene(scene);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//	}
 
 	void saveFinishedProject() {
-		File finalDataFile = new File("finished_data_file");
+		File finalDataFile = new File(data.getVideo().getFilePathJustName());
 		try {
 			data.saveToFile(finalDataFile);
 		} catch (FileNotFoundException e) {
-			// TODO: Auto-generated catch block
+			e.printStackTrace();	
+		}
+	}
+	
+	@FXML
+	void analyzeProjectData() {
+		try {
+			Analysis.runAnalysis(data);
+			makeAlert("Analysis Complete", "CSV Files and Analysis have been added to your computer.");
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
 	@FXML
 	private void saveUnfinishedProject() {
-		File tempDataFile = new File("not_finished_data_file2");
+		File tempDataFile = new File("Unfinished" + data.getVideo().getFilePathJustName());
 		try {
 			data.saveToFile(tempDataFile);
-			loadWelcomeWindow();
+			makeAlert("Tracking Saved","You have saved your project! Your file has been saved as \"Unfinished " + data.getVideo().getFilePathJustName() + "\". Hit the finish button to recieve CSV files and analysis");
 		} catch (FileNotFoundException e) {
-			// TODO: Auto-generated catch block
 			e.printStackTrace();
 		}
-		// TODO: doMoreStuff();
 	}
 
 	@FXML

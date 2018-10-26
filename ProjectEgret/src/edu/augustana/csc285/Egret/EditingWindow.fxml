@@ -81,7 +81,7 @@
                <HBox.margin>
                   <Insets left="100.0" />
                </HBox.margin></Button>
-            <Button fx:id="finishEditingBtn" mnemonicParsing="false" onMouseClicked="#openPopUp" prefHeight="150.0" prefWidth="200.0" text="Finish" />
+            <Button fx:id="finishEditingBtn" mnemonicParsing="false" onAction="#analyzeProjectData" prefHeight="150.0" prefWidth="200.0" text="Finish" />
          </children>
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" />
