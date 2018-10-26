@@ -27,6 +27,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -57,7 +58,7 @@ public class PreviewWindowController {
     private MenuItem closeOption;
     
     @FXML
-    private ComboBox<?> chicksComboBox;
+    private ComboBox<String> chicksComboBox;
 
     @FXML
     private Button addChickBtn;
@@ -88,6 +89,9 @@ public class PreviewWindowController {
     
     @FXML
     private Button setLengthsBtn;
+    
+    @FXML
+    private Button continueBtn;
     
     @FXML
     private TextField startField;
@@ -254,19 +258,6 @@ public class PreviewWindowController {
 		});
  	}
     
-    public void setBoxArena() {
-		step = 1;
-		instructLabel.setText("Please select the upper left corner of the box.");
-    }
-    
-    public void setLengthMeasurements() {
-    	
-    }
-    
-    public void setEmptyFrame() {
-    	
-    }
-    
     public void setTimeStep() {
     	
     }
@@ -289,7 +280,7 @@ public class PreviewWindowController {
 			data.getAnimalTracksList().add(new AnimalTrack(chickName));
 			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
 			chicksComboBox.getItems().add(chickName);
-			chicksComboBox.getSelectionModel().select(index);
+			chicksComboBox.getSelectionModel().select(chickName);
 		}
     }
     
@@ -299,11 +290,12 @@ public class PreviewWindowController {
     }
 	
 	@FXML
-	// calls various methods to handle multiple steps of calibration
+	// handles first step of calibration, handleCanvasClick handles the rest
     void handleCallibration(MouseEvent event) {
-    	setBoxArena();
-    	//setLengthMeasurements();
-    	//setEmptyFrame();
+		if(step==0) {
+			step = 1;
+			instructLabel.setText("Please select the upper left corner of the box.");
+		}
     }
     
     @FXML
@@ -319,14 +311,19 @@ public class PreviewWindowController {
     		lowerRightCorner.setLocation(event.getX(), event.getY());
     		rect.add(lowerRightCorner);
     		data.getVideo().setArenaBounds(rect);
+    		
     		step=3;
     		instructLabel.setText("Please select the lower left hand corner of the box.");
     	}else if (step==3) {
     		lowerLeftCorner.setLocation(event.getX(), event.getY());
+    		
+    		step=4;
     		instructLabel.setText("Please select where you would like your origin to be located.");
     	}else if (step==4) {
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
+    		
+    		step=0;
     		instructLabel.setText("You are done calibrating! Press calibrate again to reset calibration.");
     		//wait 2 seconds
     		new java.util.Timer().schedule(
@@ -342,7 +339,17 @@ public class PreviewWindowController {
 
     @FXML
     void handleClose(ActionEvent event) {
-    	Platform.exit();
+    	Alert alert = new Alert(AlertType.CONFIRMATION);
+    	alert.setTitle("Confirmation Dialog");
+    	alert.setHeaderText("Close Window");
+    	alert.setContentText("Are you sure you want to close? Any unsaved data will be lost.");
+
+    	Optional<ButtonType> result = alert.showAndWait();
+    	if (result.get() == ButtonType.OK){
+    		Platform.exit();
+    	} else {
+    	    alert.close();
+    	}
     }
     
   //Avery... still working on it
@@ -370,7 +377,13 @@ public class PreviewWindowController {
     
     @FXML //throw exception if non number is entered... or prevent it from being entered
     void handleStartTime(KeyEvent event) {
-
+    	String result = event.getText();
+    	int index = result.indexOf(":");
+    	int mins = Integer.valueOf(result.substring(0, index));
+    	int secs = Integer.valueOf(result.substring(index));
+    	int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+    	data.getVideo().setStartFrameNum(startFrame);
+    	
     }
 
     @FXML
@@ -384,40 +397,44 @@ public class PreviewWindowController {
     	dialog.setTitle("Additional Callibration");
     	dialog.setHeaderText("Length Callibration");
     	dialog.setContentText("Please enter the height of the box in cm: ");
-    	Button next = (Button)dialog.getDialogPane().lookupButton(ButtonType.NEXT);
+    	ButtonType buttonTypeNext = new ButtonType("Next", ButtonData.NEXT_FORWARD);
+    	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
-    	// Traditional way to get the response value.
+    	//dialog.getButtonTypes().setAll(buttonTypeNext, buttonTypeCancel);
+
+    	// Get the response value.
     	Optional<String> result = dialog.showAndWait();
     	double length = Double.valueOf(result.get());
     	if (result.isPresent()){
     		data.getVideo().setYPixelsPerCm(length, upperLeftCorner, lowerLeftCorner);
     		
-    		next.addEventFilter(ActionEvent.ACTION, e -> {
+    		
     			dialog.setContentText("Please enter the width of the box in cm: ");
     			dialog.setResult("0");
     			if(result.isPresent()) {
     				data.getVideo().setXPixelsPerCm(length, lowerRightCorner, lowerLeftCorner);
     			}
-    		});
+    		
     	}
+    	//citation: 
     }
     
     @FXML
     void handleRemoveChickBtn(MouseEvent event) {
-TextInputDialog dialog = new TextInputDialog();
-		
+    	TextInputDialog dialog = new TextInputDialog();
+    	dialog.setHeaderText("Note: Names are case sensitive.");
+    	
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			String chickName = result.get();
 			data.getAnimalTracksList().remove(new AnimalTrack(chickName));
 			chicksComboBox.getItems().remove(chickName);
-			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
-			chicksComboBox.getSelectionModel().select(index);
+			chicksComboBox.getSelectionModel().select(chickName);
 		}
     }
     
     @FXML
-    void openEditingWindow(ActionEvent event) throws IOException {
+    void handleContinueBtn(MouseEvent event) throws IOException {
     	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
 		BorderPane root = (BorderPane)loader.load();
 		EditingWindowController nextController = loader.getController();
