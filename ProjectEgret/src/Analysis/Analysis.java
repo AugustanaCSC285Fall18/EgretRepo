@@ -25,6 +25,8 @@ public class Analysis {
 	private static ProjectData data;
 
 
+	//
+	
 	public static void runAnalysis(ProjectData dataInformation) throws IOException {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		data = dataInformation;

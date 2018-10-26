@@ -266,6 +266,8 @@ public class EditingWindowController {
 	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, currentFrameNumber);
 	}
+	
+	//
 
 	@FXML
 	void addTrack(MouseEvent event) {
