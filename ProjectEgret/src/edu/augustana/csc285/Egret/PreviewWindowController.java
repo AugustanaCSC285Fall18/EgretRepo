@@ -282,6 +282,7 @@ public class PreviewWindowController {
 		dialog.setHeaderText(null);
 		dialog.setContentText("Enter Chick Name:");
 
+		//
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			String chickName = result.get();
