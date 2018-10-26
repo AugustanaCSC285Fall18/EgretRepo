@@ -57,7 +57,7 @@ public class PreviewWindowController {
     private MenuItem closeOption;
     
     @FXML
-    private ComboBox<?> chicksComboBox;
+    private ComboBox<String> chicksComboBox;
 
     @FXML
     private Button addChickBtn;
@@ -289,7 +289,7 @@ public class PreviewWindowController {
 			data.getAnimalTracksList().add(new AnimalTrack(chickName));
 			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
 			chicksComboBox.getItems().add(chickName);
-			chicksComboBox.getSelectionModel().select(index);
+			chicksComboBox.getSelectionModel().select(chickName);
 		}
     }
     
@@ -302,7 +302,6 @@ public class PreviewWindowController {
 	// calls various methods to handle multiple steps of calibration
     void handleCallibration(MouseEvent event) {
     	setBoxArena();
-    	//setLengthMeasurements();
     	//setEmptyFrame();
     }
     
@@ -384,7 +383,7 @@ public class PreviewWindowController {
     	dialog.setTitle("Additional Callibration");
     	dialog.setHeaderText("Length Callibration");
     	dialog.setContentText("Please enter the height of the box in cm: ");
-    	Button next = (Button)dialog.getDialogPane().lookupButton(ButtonType.NEXT);
+    	Button next = (Button)dialog.getDialogPane().lookupButton(ButtonType.OK);
 
     	// Traditional way to get the response value.
     	Optional<String> result = dialog.showAndWait();
