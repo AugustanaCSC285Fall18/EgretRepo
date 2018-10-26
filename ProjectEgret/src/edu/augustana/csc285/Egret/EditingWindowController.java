@@ -35,6 +35,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
@@ -55,6 +57,8 @@ public class EditingWindowController {
 	private ToggleButton modifyToggleBtn;
 	@FXML
 	private Button undoBtn;
+	@FXML
+	private Button reviewTrackBtn;
 	@FXML
 	private Button saveBtn;
 	@FXML
@@ -87,18 +91,21 @@ public class EditingWindowController {
 	private static final int drawY = 5;
 	private TimePoint previousPoint;
 	private int frameJumpModifier = 2;
+	
+	// from calibration: random assignment at the moment
+	private int totalAmountOfAnimals = 2;
+	private int startFrame = 850;
+	private int endFrame = 1500;
+	private int oldCurrentFrame = 0;
 
 	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, IT'S BULLSHIT
 	// BUT IT'S THE ONLY THING I FOUND FIXES THE MODIFY FUNCTION
 	// Also, setting current frame number and frame jump amount beforehand
 	// really reduces lag in the program
 	private int frameJumpAmount;
-	private int currentFrameNumber = 850;
+	private int currentFrameNumber = startFrame;
 
-	// from calibration: random assignment at the moment
-	private int totalAmountOfAnimals = 2;
-	private int startFrame = 850;
-	private int endFrame = 2000;
+	//
 
 	void loadData() throws FileNotFoundException {
 		File dataFile = new File("full_auto_tracker_data");
@@ -109,18 +116,12 @@ public class EditingWindowController {
 				i--;
 			}
 		}
+		
 		// Prints out unassigned tracks
 		for (AnimalTrack track : data.getUnassignedSegments()) {
 			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: "
 					+ track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
 		}
-
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 1"));
-		data.getAnimalTracksList().get(0).add(new TimePoint(100, 200, 5));
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 2"));
-		data.getAnimalTracksList().get(1).add(new TimePoint(150, 200, 5));
-		data.getAnimalTracksList().add(new AnimalTrack("Chick 3"));
-		data.getAnimalTracksList().get(2).add(new TimePoint(250, 300, 10));
 	}
 
 	/*
@@ -138,12 +139,8 @@ public class EditingWindowController {
 	void jumpToFrame(int numOfFrame) {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		currentFrameNumber = numOfFrame;
-		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
-		updateFrameView();
-		frameAdjustHelper();
-		displayFutureTracks();
-		updateTextAndSlider();
-//		showSpecifiedAnimalTrack();
+		frameJumpHelper();
+		//showSpecifiedAnimalTrack();
 
 	}
 
@@ -152,23 +149,38 @@ public class EditingWindowController {
 			animalCounter++;
 			if (animalCounter > totalAmountOfAnimals) {
 				saveFinishedProject();
-				// TODO: make code to end the manual tracking screen
+				makeAlert("Analysis Complete","You have completed the analysis!");
 			} else {
+				setAnimalTrackObjectComboBox();
+				makeAlert("Tracking New Chicken","You are now adding data for chicken " + data.getAnimalTracksList().get(animalCounter).getName());
 				jumpToFrame(startFrame);
 			}
 		} else {
 			gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-			System.out.println("old frame number: " + currentFrameNumber);
 			currentFrameNumber += numOfFrameChange;
-			System.out.println("new frame number: " + currentFrameNumber);
-			updateFrameView();
-			frameAdjustHelper();
-			displayFutureTracks();
-			displayPastTracks();
-			updateTextAndSlider();
+			frameJumpHelper();
 		}
 	}
-
+	
+	void reviewTimeChanger() {
+		if (currentFrameNumber < endFrame - frameJumpAmount) {
+			currentFrameNumber += frameJumpAmount;
+			frameReviewJumpHelper();
+			new java.util.Timer().schedule(
+				    new java.util.TimerTask() {
+				        @Override
+				        public void run() {
+				            Platform.runLater(() -> reviewTimeChanger());
+				        }
+				    }, 
+				    50);   // the delay time in milliseconds
+		} else {
+			jumpToFrame(oldCurrentFrame);
+			makeAlert("Review Complete", "Reviewing Process is finished");
+	
+		}
+	}
+	
 	void frameStepBack() {
 		frameChanger(-frameJumpAmount);
 
@@ -188,20 +200,38 @@ public class EditingWindowController {
 		frameStepForward();
 	}
 
-	protected void frameAdjustHelper() {
+	protected void drawPointsAtCurrentFrame() {
+		setAnimalCounter();
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 		if (currentAnimal.hasTimePointAtTime(currentFrameNumber)) {
-			for (int i = 0; i < 1; i++) {
-				TimePoint curAnimalPoint = data.getAnimalTracksList().get(i).getTimePointAtTime(currentFrameNumber);
-				gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
-			}
+			TimePoint curAnimalPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
+			gc.setStroke(Color.GREEN);
+			gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
 		}
+	}
+	
+	void frameJumpHelper() {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
+		updateFrameView();
+		drawPointsAtCurrentFrame();
+		displayFutureTracks();
+		displayPastTracks();
+		updateTextAndSlider();
+	}
+	
+	void frameReviewJumpHelper() {
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
+		updateFrameView();
+		drawPointsAtCurrentFrame();
+		displayPastTracks();
+		updateTextAndSlider();
 	}
 
 	@FXML
 	void toggleManualEdit(MouseEvent event) {
 		modifyToggleActive = !modifyToggleActive;
-		animalCounter = 0;
 	}
 
 	@FXML
@@ -209,15 +239,16 @@ public class EditingWindowController {
 		double xCord = event.getX();
 		double yCord = event.getY();
 		Point centerPoint = new Point(xCord, yCord);
+		setAnimalCounter();
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		System.out.println(currentAnimal.getTimePointAtIndex(1));
 		if (modifyToggleActive) {
 			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
 				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
 				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
 				gc.fillOval(xCord, yCord, drawX, drawY);
-			}else {
-				//TODO: MAKE A POP UP WINDOW THAT SAYS "NO DATA POINT TO MODIFY"
+			} else {
+				setAnimalTrackObjectComboBox();
+				makeAlert("Modify Location Error", "No data point to modify");
 			}
 			
 		} else {
@@ -262,10 +293,10 @@ public class EditingWindowController {
 				i++;
 
 			}
+			setAnimalCounter();
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
 			data.removeUnassignedSegment(chosenTrackNumber);
 			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum() + 1 - currentFrameNumber);
-
 		}
 	}
 
@@ -274,7 +305,7 @@ public class EditingWindowController {
 		ObservableList<String> listOfTracksDisplayed = FXCollections.observableArrayList();
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
 			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
-			// displays a track that is within 10 times the frame rate
+			// displays a track that is within x times the frame rate
 			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameJumpAmount
 					* frameJumpModifier * 5) {
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
@@ -295,6 +326,7 @@ public class EditingWindowController {
 	}
 
 	void displayPastTracks() {
+		setAnimalCounter();
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
 		gc.setFill(Color.DARKRED);
 		// draw this segments recent past & near future locations
@@ -321,21 +353,32 @@ public class EditingWindowController {
 
 	@FXML
 	void undoEdit(MouseEvent event) {
-		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		if (currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1) != null) {
-			TimePoint previousTP = currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1);
-			gc.clearRect(previousTP.getX(), previousTP.getY(), drawX, drawY);
-			currentAnimal.removeLocation(currentAnimal.getNumPoints() - 1);
-			frameStepBack();
-		} else {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Undo Attempt");
-			alert.setHeaderText(null);
-			alert.setContentText("No more points to undo.");
-			alert.showAndWait();
-
-			// Cited https://code.makery.ch/blog/javafx-dialogs-official/
+		if(!modifyToggleActive) {
+			setAnimalCounter();
+			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+			if (currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1) != null) {
+				TimePoint previousTP = currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1);
+				gc.clearRect(previousTP.getX(), previousTP.getY(), drawX, drawY);
+				currentAnimal.removeLocation(currentAnimal.getNumPoints() - 1);
+				if(currentAnimal.getFinalTimePoint() != null) {
+					jumpToFrame(currentAnimal.getFinalTimePoint().getFrameNum());
+				}
+			} else {
+				makeAlert("Undo Error", "No more points to undo for this chicken." );
+			}
+		}else {
+			makeAlert("Undo Error", "Undo Does Not Work in Modify Mode" );
 		}
+	}
+	
+	//TODO: Currently does not work, need to figure out mechanism to slow it down, 
+	//		so the user can see its progress
+	@FXML 
+	void reviewTrack(MouseEvent event) throws InterruptedException{
+		System.out.println("hi");
+		oldCurrentFrame = currentFrameNumber;
+		currentFrameNumber = startFrame;
+		reviewTimeChanger();
 	}
 
 	@FXML
@@ -343,23 +386,26 @@ public class EditingWindowController {
 		int newTime = Integer.parseInt(timeField.getText());
 		int maxTime = (int) Math.floor((data.getVideo().getTotalNumFrames() / frameJumpAmount));
 		if (newTime > maxTime) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setTitle("Time Change");
-			alert.setHeaderText(null);
-			alert.setContentText("The video is between 0 and " + maxTime + " seconds long.");
-			alert.showAndWait();
-
-			// Cited https://code.makery.ch/blog/javafx-dialogs-official/
+			makeAlert("Time Change Error", "The video is between 0 and " + maxTime + " seconds long.");
 		}
 		int frameNumber = (int) Math.round((newTime * frameJumpAmount));
 		jumpToFrame(frameNumber);
 	}
 
-	public void setAnimalTrackObjectComboBox() {
+	public void initializeAnimalTrackObjectComboBox() {
 		for (int i = 0; i <= totalAmountOfAnimals; i++) {
 			String name = data.getAnimalTracksList().get(i).getName();
 			animalTrackObjectComboBox.getItems().add(name);
 		}
+		animalTrackObjectComboBox.getSelectionModel().select(0);
+	}
+	
+	public void setAnimalCounter() {
+		animalCounter = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
+	}
+	
+	public void setAnimalTrackObjectComboBox() {
+		animalTrackObjectComboBox.getSelectionModel().select(animalCounter);
 	}
 
 	@FXML
@@ -372,6 +418,26 @@ public class EditingWindowController {
 		timeField.setText("" + (int) (currentFrameNumber / frameJumpAmount));
 		sliderSeekBar.setValue(currentFrameNumber);
 	}
+	
+    @FXML
+    public void keyPressed(KeyEvent e) {
+    	if(e.getCode() == KeyCode.D) {
+    		frameStepForward();
+    	}else if(e.getCode() == KeyCode.A) {
+    		frameStepBack();
+    	}else if(e.getCode() == KeyCode.Q) {
+    		undoEdit(null);
+    	}
+    }
+    
+    private void makeAlert(String title, String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(title);
+		alert.setHeaderText(null);
+		alert.setContentText(message);
+		alert.showAndWait();
+		// Cited https://code.makery.ch/blog/javafx-dialogs-official/
+    }
 
 	private void loadWelcomeWindow() {
 		FXMLLoader loader = new FXMLLoader(getClass().getResource("WelcomeWindow.fxml"));
@@ -413,12 +479,6 @@ public class EditingWindowController {
 
 	@FXML
 	public void initialize() throws FileNotFoundException {
-//		loadData();
-//		sliderSeekBar.setDisable(true);
-//		gc = canvas.getGraphicsContext2D();
-//		runSliderSeekBar();
-//		data.getVideo().setVidCap();
-//		setAnimalTrackObjectComboBox();
 	}
 
 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
@@ -426,7 +486,7 @@ public class EditingWindowController {
 		frameJumpAmount = (int) Math.floor(data.getVideo().getFrameRate());
 		gc = canvas.getGraphicsContext2D();
 		// runSliderSeekBar();
-		setAnimalTrackObjectComboBox();
+		initializeAnimalTrackObjectComboBox();
 
 		startVideo();
 	}

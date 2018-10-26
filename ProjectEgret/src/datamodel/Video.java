@@ -27,8 +27,6 @@ public class Video {
 		connectVideoCapture();
 		if (!vidCap.isOpened()) {
 			throw new FileNotFoundException("Unable to open video file: " + filePath);
-		} else {
-			System.out.println("Made video object");
 		}
 		// fill in some reasonable default/starting values for several fields
 		this.emptyFrameNum = 0;
@@ -44,8 +42,6 @@ public class Video {
 		this.vidCap = new VideoCapture(filePath);
 		Mat mat = new Mat();
 		this.vidCap.read(mat);
-		System.err.println("vidCap: " + this.vidCap);
-		System.err.println("mat size: " + mat.size());
 		if (!vidCap.isOpened()) {
 			throw new FileNotFoundException("Unable to open video file: " + filePath);
 		}
@@ -53,11 +49,11 @@ public class Video {
 
 	
 	public void setCurrentFrameNum(double seekFrame) {
-		vidCap.set(Videoio.CV_CAP_PROP_POS_FRAMES, seekFrame);
+		vidCap.set((int)Math.floor(Videoio.CV_CAP_PROP_POS_FRAMES), seekFrame);
 	}
 
 	public synchronized int getCurrentFrameNum() {
-		return (int) Math.ceil(vidCap.get(Videoio.CV_CAP_PROP_POS_FRAMES));
+		return (int) Math.floor(vidCap.get(Videoio.CV_CAP_PROP_POS_FRAMES));
 	}
 
 	public synchronized Mat readFrame() {
@@ -68,6 +64,10 @@ public class Video {
 
 	public String getFilePath() {
 		return this.filePath;
+	}
+	
+	public String getFilePathJustName() {
+		return filePath.substring(filePath.lastIndexOf('/') + 1, filePath.lastIndexOf('.'));
 	}
 
 	/**
