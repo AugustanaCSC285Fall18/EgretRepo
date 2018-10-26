@@ -118,10 +118,15 @@
          <children>
             <Button fx:id="loadBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleLoadVideo" prefHeight="40.0" text="Load Different Video">
                <VBox.margin>
-                  <Insets bottom="20.0" top="100.0" />
+                  <Insets bottom="20.0" top="80.0" />
                </VBox.margin>
             </Button>
             <Button fx:id="callibrateBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleCallibration" prefHeight="40.0" prefWidth="90.0" text="Callibrate">
+               <VBox.margin>
+                  <Insets bottom="20.0" top="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="setLengthsBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleSetLengthsBtn" prefHeight="40.0" prefWidth="90.0" text="Set Box Lengths">
                <VBox.margin>
                   <Insets top="20.0" />
                </VBox.margin>

@@ -7,14 +7,17 @@ import java.io.IOException;
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.videoio.Videoio;
+
 import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.TimePoint;
 import datamodel.Video;
+
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -85,8 +88,8 @@ public class EditingWindowController {
 	private TimePoint previousPoint;
 	private int frameJumpModifier = 2;
 
-	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, ITS BULLSHIT
-	// BUT ITS THE ONLY THING I FOUND FIXES THE MODIFY FUNCTION
+	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, IT'S BULLSHIT
+	// BUT IT'S THE ONLY THING I FOUND FIXES THE MODIFY FUNCTION
 	// Also, setting current frame number and frame jump amount beforehand
 	// really reduces lag in the program
 	private int frameJumpAmount;
@@ -393,7 +396,6 @@ public class EditingWindowController {
 			// TODO: Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 
 	@FXML
@@ -439,9 +441,8 @@ public class EditingWindowController {
 			String fileName = chosenFile.toURI().toString();
 			data.setVideo(new Video(fileName));
 			startVideo();
-		}
-		;
-		// runSliderSeekBar();
+		};
+		//runSliderSeekBar();
 		// changeFrameWithTextField();
 		// runJumpTo(); //prints out which frame you are at
 	}

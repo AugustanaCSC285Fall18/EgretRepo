@@ -6,11 +6,13 @@ import java.awt.Graphics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Optional;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 
+import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.Video;
 import javafx.application.Platform;
@@ -24,12 +26,15 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
@@ -82,6 +87,9 @@ public class PreviewWindowController {
     private Button callibrateBtn;
     
     @FXML
+    private Button setLengthsBtn;
+    
+    @FXML
     private TextField startField;
 
     @FXML
@@ -107,35 +115,17 @@ public class PreviewWindowController {
 	
 	Point upperLeftCorner = new Point();
 	Point lowerRightCorner = new Point();
+	Point lowerLeftCorner = new Point();
 	Point origin = new Point();
 	int step = 0;
-	Alert alert = new Alert(AlertType.INFORMATION);
-	
-	//doesn't currently work
-//    @FXML
-//    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
-//    	FileChooser fileChooser = new FileChooser();
-//		fileChooser.setTitle("Open Video File");
-//		Window mainWindow = currentFrameImage.getScene().getWindow();
-//		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-//		if (chosenFile != null) {
-//			String fileName = chosenFile.toURI().toString();
-//			videoObject = new Video(fileName);
-//			capture = videoObject.getVidCap();
-//			//data = new ProjectData(fileName);
-//			//data.getVideo().setVidCap(new VideoCapture());
-//			startVideo();
-//		};
-//		runSliderSeekBar();
-//    }
     
 	//various methods
 	private void runSliderSeekBar() {
-
 		sliderSeekBar.valueProperty().addListener(new ChangeListener<Number>() {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-				//currentFrameArea.appendText("Current frame: " + ((int) Math.round(newValue.doubleValue())) + "\n");
+				int currentTime = data.getVideo().getTimeInSeconds((double) newValue);
+				startField.setText(currentTime/60 +":"+ currentTime%60);
 
 				curFrameNum = (int) Math.round(newValue.doubleValue());
 				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
@@ -176,6 +166,10 @@ public class PreviewWindowController {
 			startVideo();
 		};
 		runSliderSeekBar();
+		
+		startField.setText("0:00");
+		int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
+		endField.setText(endTime/60 + ":" + endTime%60);
 		//runJumpTo(); //prints out which frame you are at
     }
     
@@ -282,7 +276,20 @@ public class PreviewWindowController {
 	//event handlers
     @FXML
     void handleAddChickBtn(MouseEvent event) {
+    	String suggestedInput = "Chick #" + (chicksComboBox.getItems().size() + 1);
+		TextInputDialog dialog = new TextInputDialog(suggestedInput);
+		dialog.setTitle("Add Chick:");
+		dialog.setHeaderText(null);
+		dialog.setContentText("Enter Chick Name:");
 
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String chickName = result.get();
+			data.getAnimalTracksList().add(new AnimalTrack(chickName));
+			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
+			chicksComboBox.getItems().add(chickName);
+			chicksComboBox.getSelectionModel().select(index);
+		}
     }
     
     @FXML
@@ -312,8 +319,11 @@ public class PreviewWindowController {
     		rect.add(lowerRightCorner);
     		data.getVideo().setArenaBounds(rect);
     		step=3;
-    		instructLabel.setText("Please select where you would like your origin to be located.");
+    		instructLabel.setText("Please select the lower left hand corner of the box.");
     	}else if (step==3) {
+    		lowerLeftCorner.setLocation(event.getX(), event.getY());
+    		instructLabel.setText("Please select where you would like your origin to be located.");
+    	}else if (step==4) {
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
     		instructLabel.setText("You are done calibrating! Press calibrate again to reset calibration.");
@@ -368,8 +378,41 @@ public class PreviewWindowController {
     }
     
     @FXML
-    void handleRemoveChickBtn(MouseEvent event) {
+    void handleSetLengthsBtn(MouseEvent event) {
+    	TextInputDialog dialog = new TextInputDialog("0");
+    	dialog.setTitle("Additional Callibration");
+    	dialog.setHeaderText("Length Callibration");
+    	dialog.setContentText("Please enter the height of the box in cm: ");
+    	Button next = (Button)dialog.getDialogPane().lookupButton(ButtonType.NEXT);
 
+    	// Traditional way to get the response value.
+    	Optional<String> result = dialog.showAndWait();
+    	double length = Double.valueOf(result.get());
+    	if (result.isPresent()){
+    		data.getVideo().setYPixelsPerCm(length, upperLeftCorner, lowerLeftCorner);
+    		
+    		next.addEventFilter(ActionEvent.ACTION, e -> {
+    			dialog.setContentText("Please enter the width of the box in cm: ");
+    			dialog.setResult("0");
+    			if(result.isPresent()) {
+    				data.getVideo().setXPixelsPerCm(length, lowerRightCorner, lowerLeftCorner);
+    			}
+    		});
+    	}
+    }
+    
+    @FXML
+    void handleRemoveChickBtn(MouseEvent event) {
+TextInputDialog dialog = new TextInputDialog();
+		
+		Optional<String> result = dialog.showAndWait();
+		if (result.isPresent()) {
+			String chickName = result.get();
+			data.getAnimalTracksList().remove(new AnimalTrack(chickName));
+			chicksComboBox.getItems().remove(chickName);
+			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
+			chicksComboBox.getSelectionModel().select(index);
+		}
     }
     
     @FXML

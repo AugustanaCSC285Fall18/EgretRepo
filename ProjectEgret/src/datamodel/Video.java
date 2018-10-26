@@ -2,6 +2,7 @@ package datamodel;
 
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.io.FileNotFoundException;
 
 import org.opencv.core.Mat;
@@ -143,8 +144,9 @@ public class Video {
 		return xPixelsPerCm;
 	}
 
-	public void setXPixelsPerCm(double xPixelsPerCm) {
-		this.xPixelsPerCm = xPixelsPerCm;
+	public void setXPixelsPerCm(double boxWidthCm, Point a, Point b) {
+		double distance = Point2D.distance(a.getX(), a.getY(), b.getX(), b.getY());
+		yPixelsPerCm = distance/boxWidthCm;
 	}
 
 	/**
@@ -154,8 +156,9 @@ public class Video {
 		return yPixelsPerCm;
 	}
 
-	public void setYPixelsPerCm(double yPixelsPerCm) {
-		this.yPixelsPerCm = yPixelsPerCm;
+	public void setYPixelsPerCm(double boxHeightCm, Point a, Point b) {
+		double distance = Point2D.distance(a.getX(), a.getY(), b.getX(), b.getY());
+		yPixelsPerCm = distance/boxHeightCm;
 	}
 
 	public double getAvgPixelsPerCm() {
