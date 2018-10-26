@@ -47,7 +47,7 @@
             <Button fx:id="browseBtn" layoutX="14.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleBrowse" text="Browse" />
             <ComboBox fx:id="chicksComboBox" layoutX="100.0" layoutY="12.0" prefWidth="150.0" />
             <Button fx:id="addChickBtn" layoutX="260.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleAddChickBtn" text="Add Chicken" />
-            <Button fx:id="removeChickBtn" layoutX="350.0" layoutY="12.0" mnemonicParsing="false" onMouseDragged="#handleRemoveChickBtn" text="Remove Chicken" />
+            <Button fx:id="removeChickBtn" layoutX="350.0" layoutY="12.0" mnemonicParsing="false" onMouseClicked="#handleRemoveChickBtn" text="Remove Chicken" />
 
             <StackPane layoutX="75.0" layoutY="80.0">
                <children>
@@ -118,17 +118,22 @@
          <children>
             <Button fx:id="loadBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleLoadVideo" prefHeight="40.0" text="Load Different Video">
                <VBox.margin>
-                  <Insets bottom="20.0" top="80.0" />
+                  <Insets bottom="10.0" top="60.0" />
                </VBox.margin>
             </Button>
             <Button fx:id="callibrateBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleCallibration" prefHeight="40.0" prefWidth="90.0" text="Callibrate">
                <VBox.margin>
-                  <Insets bottom="20.0" top="20.0" />
+                  <Insets bottom="10.0" top="10.0" />
                </VBox.margin>
             </Button>
             <Button fx:id="setLengthsBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleSetLengthsBtn" prefHeight="40.0" prefWidth="90.0" text="Set Box Lengths">
                <VBox.margin>
-                  <Insets top="20.0" />
+                  <Insets bottom="20.0" top="10.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="continueBtn" maxWidth="200.0" mnemonicParsing="false" onMouseClicked="#handleContinueBtn" prefHeight="40.0" prefWidth="90.0" text="Continue">
+               <VBox.margin>
+                  <Insets top="10.0" />
                </VBox.margin>
             </Button>
          </children>
