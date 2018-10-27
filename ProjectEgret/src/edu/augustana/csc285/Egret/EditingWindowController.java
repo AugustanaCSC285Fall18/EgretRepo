@@ -107,7 +107,7 @@ public class EditingWindowController {
 	// than continuously calling for an int value. 
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
-	
+
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
 		frameJumpModifier=timeStep;
@@ -145,7 +145,7 @@ public class EditingWindowController {
 	private void frameChanger(double numOfFrameChange) {
 		if (currentFrameNumber + numOfFrameChange > endFrame) {
 			animalCounter++;
-			if (animalCounter > totalAmountOfAnimals) {
+			if (animalCounter >= totalAmountOfAnimals) {
 				saveFinishedProject();
 				makeAlert("Tracking Complete","You have completed the tracking! Your file has been saved as \"" + data.getVideo().getFilePathJustName() + "\" Hit the finish button to recieve csv files and analysis");
 			} else {
@@ -331,7 +331,7 @@ public class EditingWindowController {
 			while (i < data.getUnassignedSegments().size() && !foundTrack) {
 				AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 				// displays a track that is within 10 times the frame rate
-				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
+				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) <  frameRate
 						* frameJumpModifier * 5) {
 					nameOfCurrentTrack = ("Track " + trackCounter);
 					trackCounter++;
@@ -346,7 +346,7 @@ public class EditingWindowController {
 			setAnimalCounter();
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
 			data.removeUnassignedSegment(chosenTrackNumber);
-			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum() + 1 - currentFrameNumber);
+			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum() - currentFrameNumber);
 		}
 	}
 
@@ -359,7 +359,7 @@ public class EditingWindowController {
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
 			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 			// displays a track that is within x times the frame rate
-			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
+			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) <  frameRate
 					* frameJumpModifier * 5) {
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
@@ -617,6 +617,7 @@ public class EditingWindowController {
 		totalAmountOfAnimals = data.getAnimalTracksList().size();
 		startFrame = data.getVideo().getStartFrameNum();
 		endFrame = data.getVideo().getEndFrameNum();
+		currentFrameNumber = startFrame;
 		gc = canvas.getGraphicsContext2D();
 		frameJumpModifier = data.getVideo().getTimeStep();
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());

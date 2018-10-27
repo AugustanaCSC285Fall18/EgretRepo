@@ -136,6 +136,7 @@ public class PreviewWindowController {
 		if (chosenFile != null) {
 			String fileName = chosenFile.toURI().toString();
 			data = new ProjectData(fileName);
+			data.getVideo().setTimeStep(1);
 			startVideo();
 		};
 		//runSliderSeekBar();
@@ -367,7 +368,7 @@ public class PreviewWindowController {
 	    		int mins = Integer.valueOf(minsString);
 	    		int secs = Integer.valueOf(secsString);
 	    		int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-	    		data.getVideo().setStartFrameNum(endFrame);
+	    		data.getVideo().setEndFrameNum(endFrame);
 	    		jumpToFrame(data.getVideo().getEndFrameNum());
 	    	}
     	}
