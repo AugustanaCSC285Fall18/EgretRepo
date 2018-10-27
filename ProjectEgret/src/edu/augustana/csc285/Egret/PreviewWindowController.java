@@ -54,7 +54,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-
+//
 public class PreviewWindowController {
 
     @FXML
@@ -117,7 +117,7 @@ public class PreviewWindowController {
 	
 	ProjectData data = new ProjectData();
 	
-	boolean pointsCalibrated=false;
+	boolean pointsCalibrated = false;
 	Point upperLeftCorner = new Point();
 	Point lowerRightCorner = new Point();
 	Point lowerLeftCorner = new Point();
@@ -209,7 +209,7 @@ public class PreviewWindowController {
     @FXML
 	public void initialize() {
 		timeStepBox.setItems(items);
-		//data.getVideo().setStartFrameNum();
+		timeStepBox.getSelectionModel().select(0);
 	}
     
 	//event handlers
@@ -253,19 +253,19 @@ public class PreviewWindowController {
     		
     		step=2;
     		instructLabel.setText("Please select the lower right hand corner of the box");
-    	}else if (step==2) {
+    	} else if (step==2) {
     		lowerRightCorner.setLocation(event.getX(), event.getY());
     		rect.add(lowerRightCorner);
     		data.getVideo().setArenaBounds(rect);
     		
     		step=3;
     		instructLabel.setText("Please select the lower left hand corner of the box.");
-    	}else if (step==3) {
+    	} else if (step==3) {
     		lowerLeftCorner.setLocation(event.getX(), event.getY());
     		
     		step=4;
     		instructLabel.setText("Please select where you would like your origin to be located.");
-    	}else if (step==4) {
+    	} else if (step==4) {
     		pointsCalibrated=true;
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
@@ -354,12 +354,21 @@ public class PreviewWindowController {
     void handleEndTime(KeyEvent event) {
     	keyIgnore(event);
 
-    	String result = event.getText();
+    	String result = endField.getText();
     	int index = result.indexOf(":");
-    	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
-    	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-    	data.getVideo().setStartFrameNum(endFrame);
+    	if(index!=-1) {
+    		String minsString =result.substring(0, index);
+        	String secsString = result.substring(index+1);
+	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
+	    		int mins = Integer.valueOf(minsString);
+	    		System.out.println(result.substring(0, index));
+	    		int secs = Integer.valueOf(secsString);
+	    		System.out.println(result.substring(index+1));
+	    		int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+	    		data.getVideo().setStartFrameNum(endFrame);
+	    		jumpToFrame(data.getVideo().getEndFrameNum());
+	    	}
+    	}
     }
 
     //replaces video in window... need to make sure 
@@ -372,13 +381,21 @@ public class PreviewWindowController {
     void handleStartTime(KeyEvent event) {
     	keyIgnore(event);
     	
-    	String result = event.getText();
-    	int index = result.indexOf(":");
-    	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
-    	int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-    	data.getVideo().setStartFrameNum(startFrame);
-    	//sliderSeekBar.setValue();
+    	String result = startField.getText();
+    	int index = result.indexOf(':');
+    	if(index!=-1) {
+    		String minsString =result.substring(0, index);
+        	String secsString = result.substring(index+1);
+	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
+	    		int mins = Integer.valueOf(minsString);
+	    		System.out.println(result.substring(0, index));
+	    		int secs = Integer.valueOf(secsString);
+	    		System.out.println(result.substring(index+1));
+	    		int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+	    		data.getVideo().setStartFrameNum(startFrame);
+	    		jumpToFrame(data.getVideo().getStartFrameNum());
+	    	}
+    	}
     	
     }
 

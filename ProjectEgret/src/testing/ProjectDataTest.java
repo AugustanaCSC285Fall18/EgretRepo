@@ -26,10 +26,10 @@ class ProjectDataTest {
 		project.getAnimalTracksList().add(track1);
 		project.getAnimalTracksList().add(track2);
 		
-		track1.add(new TimePoint(100,200,0));
-		track1.add(new TimePoint(105,225,30));
+		track1.addTimePoint(new TimePoint(100,200,0));
+		track1.addTimePoint(new TimePoint(105,225,30));
 		
-		track2.add(new TimePoint(300,400,90));
+		track2.addTimePoint(new TimePoint(300,400,90));
 		return project;
 	}
 	
