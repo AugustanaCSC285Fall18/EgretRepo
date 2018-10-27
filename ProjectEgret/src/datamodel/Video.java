@@ -21,6 +21,8 @@ public class Video {
 	private double yPixelsPerCm;
 	private Rectangle arenaBounds;
 	private Point origin;
+	
+	private int timeStep;
 
 	public Video(String filePath) throws FileNotFoundException {
 		this.filePath = filePath;
@@ -171,6 +173,14 @@ public class Video {
 
 	public void setArenaBounds(Rectangle arenaBounds) {
 		this.arenaBounds = arenaBounds;
+	}
+	
+	public int getTimeStep() {
+		return timeStep;
+	}
+	
+	public void setTimeStep(int timeStep) {
+		this.timeStep=timeStep;
 	}
 
 	//same as get time in seconds

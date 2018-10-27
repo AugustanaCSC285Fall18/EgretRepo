@@ -63,16 +63,6 @@ public class WelcomeWindowController {
 		
 		Stage primary = (Stage) openProjectBtn.getScene().getWindow();
 		primary.setScene(nextScene);
-
-//    	FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
-//		BorderPane root = (BorderPane)loader.load();
-////		EditingWindowController nextController = loader.getController();
-//		
-//		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-//		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-//		
-//		Stage primary = (Stage) newProjectBtn.getScene().getWindow();
-//		primary.setScene(nextScene);
     }
 
     @FXML
@@ -97,7 +87,7 @@ public class WelcomeWindowController {
 			nextController.initializeWithProjectData(chosenProject);
 		}
     }
-    
+   
     @FXML
     void showAboutMessage() {
     	Alert alert = new Alert(AlertType.INFORMATION);
@@ -113,4 +103,3 @@ public class WelcomeWindowController {
 		alert.showAndWait();
     }
 }
-

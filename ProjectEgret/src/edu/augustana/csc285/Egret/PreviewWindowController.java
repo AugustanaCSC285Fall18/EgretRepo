@@ -6,6 +6,8 @@ import java.awt.Graphics;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -19,6 +21,9 @@ import datamodel.Video;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableIntegerArray;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
@@ -101,7 +106,7 @@ public class PreviewWindowController {
     private TextField endField;
     
     @FXML
-    private ChoiceBox<?> timeStepBox;
+    private ChoiceBox<Integer> timeStepBox;
 
 //    private Button continueBtn;
 
@@ -118,6 +123,9 @@ public class PreviewWindowController {
 	Point lowerLeftCorner = new Point();
 	Point origin = new Point();
 	int step = 0;
+
+	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+	private ObservableList items = FXCollections.observableList(list);
 
 	public void browseForVideoFile() throws FileNotFoundException{
     	FileChooser fileChooser = new FileChooser();
@@ -195,11 +203,12 @@ public class PreviewWindowController {
  	}
     
     public void setTimeStep() {
-    	
+    	data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
     }
 
     @FXML
 	public void initialize() {
+		timeStepBox.setItems(items);
 	}
     
 	//event handlers
@@ -326,15 +335,16 @@ public class PreviewWindowController {
 
     	Optional<ButtonType> result = alert.showAndWait();
     	if (result.get() == ButtonType.OK){
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
-    		BorderPane root = (BorderPane)loader.load();
-    		EditingWindowController nextController = loader.getController();
-    		
-    		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-    		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-    		
-    		Stage primary = (Stage) continueBtn.getScene().getWindow();
-    		primary.setScene(nextScene);
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+			BorderPane root = (BorderPane)loader.load();
+			MainWindowController controller = loader.getController();
+			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			Stage primary = (Stage) continueBtn.getScene().getWindow();
+			primary.setScene(scene);
+			controller.initializeWithStage(primary);
+			controller.loadVideo(data.getVideo().getFilePath(), data);
+			primary.show();
     	} else {
     	    alert.close();
     	}
