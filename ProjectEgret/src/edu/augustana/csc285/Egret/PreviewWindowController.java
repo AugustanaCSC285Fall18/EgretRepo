@@ -118,8 +118,7 @@ public class PreviewWindowController {
 	Point lowerLeftCorner = new Point();
 	Point origin = new Point();
 	int step = 0;
-    
-	
+
 	public void browseForVideoFile() throws FileNotFoundException{
     	FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Video File");
@@ -262,19 +261,44 @@ public class PreviewWindowController {
     		pointsCalibrated=true;
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
-    		
-    		step=0;
-    		instructLabel.setText("You are done calibrating! Press calibrate again to reset calibration.");
-    		//wait 2 seconds
-    		new java.util.Timer().schedule(
-    			    new java.util.TimerTask() {
-    			        @Override
-    			        public void run() {
-    			            Platform.runLater(() -> instructLabel.setText(""));
-    			        }
-    			    }, 
-    			    2000);   // the delay time in milliseconds
+    		openEmptyFrameDialog();
+    		endCalibration();
     	}
+    }
+    
+    public void openEmptyFrameDialog() {
+    	TextInputDialog dialog = new TextInputDialog("0:00");
+    	dialog.setTitle("Callibration");
+    	dialog.setHeaderText("Empty Box Callibration");
+    	dialog.setContentText("Please enter a time in which the box has no chickens: ");
+    	
+    	Optional<String> result = dialog.showAndWait();
+//    	String text = dialog.getContentText();
+//    	if(! Pattern.matches("``^[a-zA-Z]+$`", result.get())) {
+//    		
+//    	}
+    	if (result.isPresent()){
+    		String string = result.get();
+    		int index = string.indexOf(":");
+        	int mins = Integer.valueOf(string.substring(0, index));
+        	int secs = Integer.valueOf(string.substring(index+1));
+        	int emptyFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+        	data.getVideo().setEmptyFrameNum(emptyFrame);
+    	}
+    }
+    
+    public void endCalibration() {
+    	step=0;
+		instructLabel.setText("You are done calibrating! Press calibrate again to reset calibration.");
+		//wait 2 seconds
+		new java.util.Timer().schedule(
+			    new java.util.TimerTask() {
+			        @Override
+			        public void run() {
+			            Platform.runLater(() -> instructLabel.setText(""));
+			        }
+			    }, 
+			    2000);   // the delay time in milliseconds
     }
 
     @FXML
@@ -294,15 +318,26 @@ public class PreviewWindowController {
     
     @FXML
     void handleContinueBtn(MouseEvent event) throws IOException {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
-		BorderPane root = (BorderPane)loader.load();
-		EditingWindowController nextController = loader.getController();
-		
-		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		
-		//Stage primary = (Stage) continueBtn.getScene().getWindow();
-		//primary.setScene(nextScene);
+    	Alert alert = new Alert(AlertType.CONFIRMATION);
+    	alert.setTitle("Continue");
+    	alert.setHeaderText("You are about to leave the Preview Window");
+    	alert.setContentText("Please review your calibration.\n"
+    			+ "Once you continue you will not be able to make any changes.\n Would you like to continue?");
+
+    	Optional<ButtonType> result = alert.showAndWait();
+    	if (result.get() == ButtonType.OK){
+    		FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
+    		BorderPane root = (BorderPane)loader.load();
+    		EditingWindowController nextController = loader.getController();
+    		
+    		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+    		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+    		
+    		Stage primary = (Stage) continueBtn.getScene().getWindow();
+    		primary.setScene(nextScene);
+    	} else {
+    	    alert.close();
+    	}
     }
     
   //Avery... still working on it
@@ -356,10 +391,6 @@ public class PreviewWindowController {
     	dialog.setTitle("Additional Callibration");
     	dialog.setHeaderText("Length Callibration");
     	dialog.setContentText("Please enter the height of the box in cm: ");
-//    	ButtonType buttonTypeNext = new ButtonType("Next", ButtonData.NEXT_FORWARD);
-//    	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
-
-    	//dialog.getButtonTypes().setAll(buttonTypeNext, buttonTypeCancel);
 
     	// Get the response value.
     	Optional<String> result = dialog.showAndWait();
