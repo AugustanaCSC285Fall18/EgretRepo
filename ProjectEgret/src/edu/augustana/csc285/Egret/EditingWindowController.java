@@ -131,9 +131,9 @@ public class EditingWindowController {
 	 * @param numOfFrameChange - how many frames to move
 	 */
 	void frameChanger(double numOfFrameChange) {
-		if (currentFrameNumber + numOfFrameChange > endFrame) {
+		if (currentFrameNumber + numOfFrameChange >= endFrame) {
 			animalCounter++;
-			if (animalCounter > totalAmountOfAnimals) {
+			if (animalCounter >= totalAmountOfAnimals) {
 				saveFinishedProject();
 				makeAlert("Tracking Complete","You have completed the tracking! Your file has been saved as \"" + data.getVideo().getFilePathJustName() + "\" Hit the finish button to recieve csv files and analysis");
 			} else {
@@ -334,7 +334,7 @@ public class EditingWindowController {
 			setAnimalCounter();
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
 			data.removeUnassignedSegment(chosenTrackNumber);
-			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum() + 1 - currentFrameNumber);
+			frameChanger(chosenTrack.getFinalTimePoint().getFrameNum() - currentFrameNumber);
 		}
 	}
 
