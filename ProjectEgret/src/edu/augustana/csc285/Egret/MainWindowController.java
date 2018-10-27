@@ -74,6 +74,7 @@ public class MainWindowController implements AutoTrackListener {
 		video = project.getVideo();
 		sliderVideoTime.setMax(video.getTotalNumFrames()-1);
 		showFrameAt(0);
+		System.out.println("Main window" + data.getVideo().getTimeStep());
 	}
 	
 	public void showFrameAt(int frameNum) {

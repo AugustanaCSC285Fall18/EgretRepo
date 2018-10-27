@@ -133,6 +133,7 @@ public class EditingWindowController {
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
 		frameJumpModifier=timeStep;
+		timeStepField.setText("" + frameJumpModifier);
 	}
 
 	/*
@@ -636,7 +637,7 @@ public class EditingWindowController {
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
-		timeStepField.setText("" + data.getVideo().getFrameRate());
+		timeStepField.setText("" + data.getVideo().getTimeStep());
 
 		startVideo();
 	}
