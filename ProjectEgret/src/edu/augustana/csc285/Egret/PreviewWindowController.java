@@ -54,7 +54,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-
+//
 public class PreviewWindowController {
 
     @FXML
@@ -209,6 +209,7 @@ public class PreviewWindowController {
     @FXML
 	public void initialize() {
 		timeStepBox.setItems(items);
+		timeStepBox.getSelectionModel().select(0);
 	}
     
 	//event handlers
@@ -219,8 +220,6 @@ public class PreviewWindowController {
 		dialog.setTitle("Add Chick:");
 		dialog.setHeaderText(null);
 		dialog.setContentText("Enter Chick Name:");
-
-		//
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			String chickName = result.get();
@@ -355,12 +354,21 @@ public class PreviewWindowController {
     void handleEndTime(KeyEvent event) {
     	keyIgnore(event);
 
-    	String result = event.getText();
+    	String result = endField.getText();
     	int index = result.indexOf(":");
-    	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
-    	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-    	data.getVideo().setStartFrameNum(endFrame);
+    	if(index!=-1) {
+    		String minsString =result.substring(0, index);
+        	String secsString = result.substring(index+1);
+	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
+	    		int mins = Integer.valueOf(minsString);
+	    		System.out.println(result.substring(0, index));
+	    		int secs = Integer.valueOf(secsString);
+	    		System.out.println(result.substring(index+1));
+	    		int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+	    		data.getVideo().setStartFrameNum(endFrame);
+	    		jumpToFrame(data.getVideo().getEndFrameNum());
+	    	}
+    	}
     }
 
     //replaces video in window... need to make sure 
@@ -373,13 +381,21 @@ public class PreviewWindowController {
     void handleStartTime(KeyEvent event) {
     	keyIgnore(event);
     	
-    	String result = event.getText();
-    	int index = result.indexOf(":");
-    	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
-    	int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-    	data.getVideo().setStartFrameNum(startFrame);
-    	//sliderSeekBar.setValue();
+    	String result = startField.getText();
+    	int index = result.indexOf(':');
+    	if(index!=-1) {
+    		String minsString =result.substring(0, index);
+        	String secsString = result.substring(index+1);
+	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
+	    		int mins = Integer.valueOf(minsString);
+	    		System.out.println(result.substring(0, index));
+	    		int secs = Integer.valueOf(secsString);
+	    		System.out.println(result.substring(index+1));
+	    		int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+	    		data.getVideo().setStartFrameNum(startFrame);
+	    		jumpToFrame(data.getVideo().getStartFrameNum());
+	    	}
+    	}
     	
     }
 

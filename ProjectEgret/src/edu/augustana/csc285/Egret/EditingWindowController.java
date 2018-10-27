@@ -19,8 +19,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -41,7 +39,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class EditingWindowController {
@@ -98,11 +95,11 @@ public class EditingWindowController {
 	private static final int drawY = 5;
 	
 	// from calibration: random assignment at the moment
-	private int totalAmountOfAnimals = 2;
-	private int startFrame = 800;
-	private int endFrame = 7500;
+	private int totalAmountOfAnimals;
+	private int startFrame;
+	private int endFrame;
 	private int oldCurrentFrame = 0;
-	private int frameJumpModifier = 2;
+	private int frameJumpModifier;
 	
 	// Fields that make the program run faster rather
 	// than continuously calling for an int value. 
@@ -153,7 +150,6 @@ public class EditingWindowController {
 	 * @param numOfFrame - given frame number
 	 */
 	void jumpToFrame(int numOfFrame) {
-		System.out.println(canvas.getWidth());
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		currentFrameNumber = numOfFrame;
 		frameJumpHelper();
@@ -482,7 +478,7 @@ public class EditingWindowController {
 	 * Puts all of the AnimalTrack names into the AnimalTrack Combo Box
 	 */
 	public void initializeAnimalTrackObjectComboBox() {
-		for (int i = 0; i <= totalAmountOfAnimals; i++) {
+		for (int i = 0; i < totalAmountOfAnimals; i++) {
 			String name = data.getAnimalTracksList().get(i).getName();
 			animalTrackObjectComboBox.getItems().add(name);
 		}
@@ -632,8 +628,11 @@ public class EditingWindowController {
 	 */
 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
 		data = projectData;
+		totalAmountOfAnimals = data.getAnimalTracksList().size();
+		startFrame = data.getVideo().getStartFrameNum();
+		endFrame = data.getVideo().getEndFrameNum();
 		gc = canvas.getGraphicsContext2D();
-		// runSliderSeekBar();
+		frameJumpModifier = data.getVideo().getTimeStep();
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
@@ -648,15 +647,11 @@ public class EditingWindowController {
 	 */
 	protected void startVideo() {
 		totalNumFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
-
 		updateFrameView();
 		sliderSeekBar.setMax((int) totalNumFrame - 1);
 		sliderSeekBar.setMaxWidth((int) totalNumFrame - 1);
-
 		sliderSeekBar.setDisable(false);
-
 		updateTextAndSlider();
-
 		jumpToFrame(startFrame);
 	}
 
