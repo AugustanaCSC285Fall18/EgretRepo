@@ -6,6 +6,7 @@
     "endFrameNum": 7191,
     "xPixelsPerCm": 0.0,
     "yPixelsPerCm": 0.0,
+    "timeStep": 1,
     "arenaBounds": {
       "x": 0,
       "y": 0,

@@ -135,6 +135,7 @@ public class PreviewWindowController {
 		if (chosenFile != null) {
 			String fileName = chosenFile.toURI().toString();
 			data.setVideo(new Video(fileName));
+			data.getVideo().setTimeStep(1);
 			startVideo();
 		};
 		//runSliderSeekBar();
@@ -361,11 +362,9 @@ public class PreviewWindowController {
         	String secsString = result.substring(index+1);
 	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
 	    		int mins = Integer.valueOf(minsString);
-	    		System.out.println(result.substring(0, index));
 	    		int secs = Integer.valueOf(secsString);
-	    		System.out.println(result.substring(index+1));
 	    		int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
-	    		data.getVideo().setStartFrameNum(endFrame);
+	    		data.getVideo().setEndFrameNum(endFrame);
 	    		jumpToFrame(data.getVideo().getEndFrameNum());
 	    	}
     	}
@@ -388,9 +387,7 @@ public class PreviewWindowController {
         	String secsString = result.substring(index+1);
 	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
 	    		int mins = Integer.valueOf(minsString);
-	    		System.out.println(result.substring(0, index));
 	    		int secs = Integer.valueOf(secsString);
-	    		System.out.println(result.substring(index+1));
 	    		int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
 	    		data.getVideo().setStartFrameNum(startFrame);
 	    		jumpToFrame(data.getVideo().getStartFrameNum());

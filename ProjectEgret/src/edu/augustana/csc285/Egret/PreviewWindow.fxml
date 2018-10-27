@@ -158,7 +158,7 @@
                </HBox.margin>
                <children>
                   <Label text="End Time: " />
-                  <TextField fx:id="endField" layoutX="60.0" layoutY="-4.0" onKeyTyped="#handleEndTime" prefWidth="100.0" />
+                  <TextField fx:id="endField" layoutX="60.0" layoutY="-4.0" onAction="#handleEndTime" onKeyTyped="#handleEndTime" prefWidth="100.0" />
                </children>
             </Group>
             <Group>
