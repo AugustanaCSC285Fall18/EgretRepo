@@ -93,6 +93,8 @@ public class EditingWindowController {
 	// Constants for Drawing and Frame Changing
 	private static final int drawX = 5;
 	private static final int drawY = 5;
+	private static final int halfDrawX = drawX / 2;
+	private static final int halfDrawY = drawY / 2;
 	
 	// from calibration: random assignment at the moment
 	private int totalAmountOfAnimals;
@@ -105,27 +107,6 @@ public class EditingWindowController {
 	// than continuously calling for an int value. 
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
-
-	/**
-	 * 
-	 * @throws FileNotFoundException
-	 */
-	void loadData() throws FileNotFoundException {
-		File dataFile = new File("full_auto_tracker_data");
-		data = ProjectData.loadFromFile(dataFile);
-		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
-			if (data.getUnassignedSegments().get(i).getNumPoints() < frameRate * frameJumpModifier * 2) {
-				data.getUnassignedSegments().remove(i);
-				i--;
-			}
-		}
-		
-		// Prints out unassigned tracks
-		for (AnimalTrack track : data.getUnassignedSegments()) {
-			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: "
-					+ track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
-		}
-	}
 	
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
@@ -138,18 +119,18 @@ public class EditingWindowController {
 	 * animalTrack combo box. Currently does not work because the field immediately
 	 * has nothing in it, unsure how to fix. TODO: fix this too.
 	 */
-//	public void showSpecifiedAnimalTrack() {
-//		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
-//		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
-//		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
-//		gc.strokeOval(curAnimal.getTimePointAtTime(currentFrameNumber).getX() - (drawX * 3), curAnimal.getTimePointAtTime(currentFrameNumber).getY() - (drawY * 3), drawX * 3, drawY *3);
-//	}
+	public void showSpecifiedAnimalTrack() {
+		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
+		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
+		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
+		gc.strokeOval(curAnimal.getTimePointAtTime(currentFrameNumber).getX() - (drawX * 3), curAnimal.getTimePointAtTime(currentFrameNumber).getY() - (drawY * 3), drawX * 3, drawY *3);
+	}
 
 	/**
 	 * Updates the ImageView to the given frame number.
 	 * @param numOfFrame - given frame number
 	 */
-	void jumpToFrame(int numOfFrame) {
+	private void jumpToFrame(int numOfFrame) {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		currentFrameNumber = numOfFrame;
 		frameJumpHelper();
@@ -161,7 +142,7 @@ public class EditingWindowController {
 	 * Changes the current frame based on a given frame step. 
 	 * @param numOfFrameChange - how many frames to move
 	 */
-	void frameChanger(double numOfFrameChange) {
+	private void frameChanger(double numOfFrameChange) {
 		if (currentFrameNumber + numOfFrameChange > endFrame) {
 			animalCounter++;
 			if (animalCounter > totalAmountOfAnimals) {
@@ -182,7 +163,7 @@ public class EditingWindowController {
 	/**
 	 * Allows the user to review the chosen track with a click of a button. 
 	 */
-	void reviewTimeChanger() {
+	private void reviewTimeChanger() {
 		if (currentFrameNumber < endFrame - frameRate) {
 			currentFrameNumber += frameRate;
 			frameReviewJumpHelper();
@@ -201,10 +182,10 @@ public class EditingWindowController {
 		}
 	}
 	
-	/**
+	/*
 	 * Changes the frame back a static amount. 
 	 */
-	void frameStepBack() {
+	private void frameStepBack() {
 		frameChanger(-frameRate);
 
 	}
@@ -215,14 +196,14 @@ public class EditingWindowController {
 	 * @param event - click on the Previous Button
 	 */
 	@FXML
-	void frameStepBack(MouseEvent event) {
+	private void frameStepBack(MouseEvent event) {
 		frameStepBack();
 	}
 
-	/**
+	/*
 	 * Changes the frame forward a static amount. 
 	 */
-	void frameStepForward() {
+	private void frameStepForward() {
 		frameChanger(frameRate);
 	}
 
@@ -232,7 +213,7 @@ public class EditingWindowController {
 	 * @param event - click on the Next button
 	 */
 	@FXML
-	void frameStepForward(MouseEvent event) {
+	private void frameStepForward(MouseEvent event) {
 		frameStepForward();
 	}
 
@@ -245,16 +226,16 @@ public class EditingWindowController {
 		if (currentAnimal.hasTimePointAtTime(currentFrameNumber)) {
 			TimePoint curAnimalPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
 			gc.setStroke(Color.GREEN);
-			gc.fillOval(curAnimalPoint.getX(), curAnimalPoint.getY(), drawX, drawY);
+			gc.fillOval(curAnimalPoint.getX() - halfDrawX, curAnimalPoint.getY() - halfDrawY, drawX, drawY);
 		}
 	}
 	
-	/**
+	/*
 	 * Clears the canvas, sets the video to the new current frame number, and displays the current
 	 * points, and the past/future points within a certain interval. Also updates the Time Box and
 	 * slider bar to be the new time. 
 	 */
-	void frameJumpHelper() {
+	private void frameJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
 		updateFrameView();
@@ -264,12 +245,12 @@ public class EditingWindowController {
 		updateTextAndSlider();
 	}
 	
-	/**
+	/*
 	 * Clears the canvas, sets the video to the new current frame number, and displays the current
 	 * points, and the past points within a certain interval. Also updates the Time Box and
 	 * slider bar to be the new time. 
 	 */
-	void frameReviewJumpHelper() {
+	private void frameReviewJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
 		updateFrameView();
@@ -283,7 +264,7 @@ public class EditingWindowController {
 	 * @param event - mouse click on the modify event button
 	 */
 	@FXML
-	void toggleManualEdit(MouseEvent event) {
+	private void toggleManualEdit(MouseEvent event) {
 		modifyToggleActive = !modifyToggleActive;
 	}
 
@@ -293,7 +274,7 @@ public class EditingWindowController {
 	 * @param event - click on the canvas
 	 */
 	@FXML
-	void addOrModifyDataPoint(MouseEvent event) {
+	private void addOrModifyDataPoint(MouseEvent event) {
 		double xCord = event.getX();
 		double yCord = event.getY();
 		Point centerPoint = new Point(xCord, yCord);
@@ -303,7 +284,7 @@ public class EditingWindowController {
 			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
 				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
 				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
-				gc.fillOval(xCord, yCord, drawX, drawY);
+				gc.fillOval(xCord - halfDrawX, yCord  - halfDrawY, drawX, drawY);
 			} else {
 				setAnimalTrackObjectComboBox();
 				makeAlert("Modify Location Error", "No data point to modify");
@@ -313,14 +294,14 @@ public class EditingWindowController {
 			addDataPointHelper(currentAnimal, centerPoint);
 			frameStepForward();
 			gc.setFill(Color.DARKGREEN);
-			gc.fillOval(xCord, yCord, drawX, drawY);
+			gc.fillOval(xCord - halfDrawX, yCord - halfDrawY, drawX, drawY);
 		}
 	}
 
 	/*
 	 * Takes a new point and changes a previous point (Modifies the data) of the current AnimalTrack
 	 */
-	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
+	private void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
 		gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
 		currentAnimal.setTimePointAtTime(newPoint, currentFrameNumber);
 	}
@@ -328,7 +309,7 @@ public class EditingWindowController {
 	/*
 	 * Adds a new data point to the current AnimalTrack
 	 */
-	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
+	private void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, currentFrameNumber);
 	}
 	
@@ -338,7 +319,7 @@ public class EditingWindowController {
 	 * @param event - mouse click on the Choice box for unassigned tracks
 	 */
 	@FXML
-	void addTrack(MouseEvent event) {
+	private void addTrack(MouseEvent event) {
 		if (pickUnassignedAnimalTrackBtn.getValue() != null) {
 			String chosenValueByUser = new String(pickUnassignedAnimalTrackBtn.getValue());
 			String nameOfCurrentTrack = ("");
@@ -372,7 +353,7 @@ public class EditingWindowController {
 	/**
 	 * Displays the unassigned segments that are within a certain amount. 
 	 */
-	void displayFutureTracks() {
+	private void displayFutureTracks() {
 		int trackCounter = 1;
 		ObservableList<String> listOfTracksDisplayed = FXCollections.observableArrayList();
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
@@ -383,7 +364,7 @@ public class EditingWindowController {
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
 					gc.setFill(Color.BLACK);
-					gc.fillOval(currentTimePoint.getX(), currentTimePoint.getY(), drawX, drawY);
+					gc.fillOval(currentTimePoint.getX() - halfDrawX, currentTimePoint.getY() - halfDrawY, drawX, drawY);
 				}
 				gc.setFill(Color.DARKBLUE);
 				gc.fillText("Track " + trackCounter, currentTrack.getFirstTimePoint().getX() + 10,
@@ -400,13 +381,13 @@ public class EditingWindowController {
 	/**
 	 * Draws the past tracks of the current animal within a certain interval. 
 	 */
-	void displayPastTracks() {
+	private void displayPastTracks() {
 		setAnimalCounter();
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
 		if( currentTrack.getTimePointAtTime(currentFrameNumber) != null) {
 			TimePoint currentTP = currentTrack.getTimePointAtTime(currentFrameNumber);
 			gc.setFill(Color.AQUAMARINE);
-			gc.fillOval(currentTP.getX(), currentTP.getY(), drawX, drawY);
+			gc.fillOval(currentTP.getX() - halfDrawX, currentTP.getY() - halfDrawY, drawX, drawY);
 		}
 	}
 
@@ -415,12 +396,12 @@ public class EditingWindowController {
 	 * @param event
 	 */
 	@FXML
-	void closeWindow(ActionEvent event) {
+	private void closeWindow(ActionEvent event) {
 		Platform.exit();
 	}
 
 	@FXML
-	void redoEdit(MouseEvent event) {
+	private void redoEdit(MouseEvent event) {
 	}
 
 	/**
@@ -428,7 +409,7 @@ public class EditingWindowController {
 	 * @param event
 	 */
 	@FXML
-	void undoEdit(MouseEvent event) {
+	private void undoEdit(MouseEvent event) {
 		if(!modifyToggleActive) {
 			setAnimalCounter();
 			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
@@ -454,7 +435,7 @@ public class EditingWindowController {
 	 * @throws InterruptedException - if the thread that goes through the video ends. 
 	 */
 	@FXML 
-	void reviewTrack(MouseEvent event) throws InterruptedException {
+	private void reviewTrack(MouseEvent event) throws InterruptedException {
 		oldCurrentFrame = currentFrameNumber;
 		currentFrameNumber = startFrame;
 		reviewTimeChanger();
@@ -565,7 +546,12 @@ public class EditingWindowController {
 		int startTime = (int)(currentFrameNumber / data.getVideo().getFrameRate());
 		int startTimeMinutes = startTime / 60;
 		int startTimeSeconds = startTime % 60;
-		return startTimeMinutes + ":" + startTimeSeconds;
+		String time = startTimeMinutes + ":" + startTimeSeconds;
+		if (startTimeSeconds < 10) {
+			int index = time.indexOf(':');
+			time = time.substring(0, index) + "0" + time.substring(index + 1);
+		}
+		return time;
 	}
 	
 	/*
@@ -580,7 +566,7 @@ public class EditingWindowController {
 	/**
 	 * Saves the project when the finish button is pressed. 
 	 */
-	void saveFinishedProject() {
+	private void saveFinishedProject() {
 		File finalDataFile = new File(data.getVideo().getFilePathJustName());
 		try {
 			data.saveToFile(finalDataFile);
@@ -593,7 +579,7 @@ public class EditingWindowController {
 	 * Analyzes the project data
 	 */
 	@FXML
-	void analyzeProjectData() {
+	private void analyzeProjectData() {
 		try {
 			Analysis.runAnalysis(data);
 			makeAlert("Analysis Complete", "CSV Files and Analysis have been added to your computer.");

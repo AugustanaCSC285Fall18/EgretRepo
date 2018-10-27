@@ -1,7 +1,6 @@
 package datamodel;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.opencv.core.Point;

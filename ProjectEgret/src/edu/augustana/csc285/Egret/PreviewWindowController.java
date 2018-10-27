@@ -110,6 +110,7 @@ public class PreviewWindowController {
 
 //    private Button continueBtn;
 
+    private GraphicsContext gc;
   
 	
 	//private String fileName = null;
@@ -210,11 +211,12 @@ public class PreviewWindowController {
 	public void initialize() {
 		timeStepBox.setItems(items);
 		timeStepBox.getSelectionModel().select(0);
+		gc = canvas.getGraphicsContext2D();
 	}
     
 	//event handlers
     @FXML
-    void handleAddChickBtn(MouseEvent event) {
+   private void handleAddChickBtn(MouseEvent event) {
     	String suggestedInput = "Chick #" + (chicksComboBox.getItems().size() + 1);
 		TextInputDialog dialog = new TextInputDialog(suggestedInput);
 		dialog.setTitle("Add Chick:");
@@ -237,16 +239,18 @@ public class PreviewWindowController {
 	
 	@FXML
 	// handles first step of calibration, handleCanvasClick handles the rest
-    void handleCallibration(MouseEvent event) {
+	private void handleCallibration(MouseEvent event) {
 		if(step==0) {
 			step = 1;
 			instructLabel.setText("Please select the upper left corner of the box.");
 		}
+		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
     
     @FXML
-    void handleCanvasClick(MouseEvent event) throws InterruptedException {
+    private void handleCanvasClick(MouseEvent event) throws InterruptedException {
     	Rectangle rect = new Rectangle();
+    	gc.fillOval(event.getX() - (15/2), event.getY() - (15/2), 15, 15);
     	if (step==1) {
     		upperLeftCorner.setLocation(event.getX(), event.getY());
     		rect.add(upperLeftCorner);
@@ -310,7 +314,7 @@ public class PreviewWindowController {
     }
 
     @FXML
-    void handleClose(ActionEvent event) {
+    private void handleClose(ActionEvent event) {
     	Alert alert = new Alert(AlertType.CONFIRMATION);
     	alert.setTitle("Confirmation Dialog");
     	alert.setHeaderText("Close Window");
@@ -325,7 +329,7 @@ public class PreviewWindowController {
     }
     
     @FXML
-    void handleContinueBtn(MouseEvent event) throws IOException {
+    private void handleContinueBtn(MouseEvent event) throws IOException {
     	Alert alert = new Alert(AlertType.CONFIRMATION);
     	alert.setTitle("Continue");
     	alert.setHeaderText("You are about to leave the Preview Window");
@@ -334,9 +338,9 @@ public class PreviewWindowController {
 
     	Optional<ButtonType> result = alert.showAndWait();
     	if (result.get() == ButtonType.OK){
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("AutoTrackWindow.fxml"));
 			BorderPane root = (BorderPane)loader.load();
-			MainWindowController controller = loader.getController();
+			AutoTrackController controller = loader.getController();
 			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			Stage primary = (Stage) continueBtn.getScene().getWindow();
@@ -351,7 +355,7 @@ public class PreviewWindowController {
     
   //Avery... still working on it
     @FXML //throw exception if non number is entered.... or prevent it from being entered
-    void handleEndTime(KeyEvent event) {
+    private void handleEndTime(KeyEvent event) {
     	keyIgnore(event);
 
     	String result = endField.getText();
@@ -361,9 +365,7 @@ public class PreviewWindowController {
         	String secsString = result.substring(index+1);
 	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
 	    		int mins = Integer.valueOf(minsString);
-	    		System.out.println(result.substring(0, index));
 	    		int secs = Integer.valueOf(secsString);
-	    		System.out.println(result.substring(index+1));
 	    		int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
 	    		data.getVideo().setStartFrameNum(endFrame);
 	    		jumpToFrame(data.getVideo().getEndFrameNum());
@@ -373,12 +375,12 @@ public class PreviewWindowController {
 
     //replaces video in window... need to make sure 
     @FXML
-    void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
+    private void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
     	browseForVideoFile();
     }
     
     @FXML //throw exception if non number is entered... or prevent it from being entered
-    void handleStartTime(KeyEvent event) {
+    private void handleStartTime(KeyEvent event) {
     	keyIgnore(event);
     	
     	String result = startField.getText();
@@ -388,9 +390,7 @@ public class PreviewWindowController {
         	String secsString = result.substring(index+1);
 	    	if(!(minsString.equals("")) && minsString!=null && !(secsString.equals("")) && secsString!=null) {
 	    		int mins = Integer.valueOf(minsString);
-	    		System.out.println(result.substring(0, index));
 	    		int secs = Integer.valueOf(secsString);
-	    		System.out.println(result.substring(index+1));
 	    		int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
 	    		data.getVideo().setStartFrameNum(startFrame);
 	    		jumpToFrame(data.getVideo().getStartFrameNum());
@@ -400,12 +400,13 @@ public class PreviewWindowController {
     }
 
     @FXML
-    void handleSettings(ActionEvent event) {
+    private void handleSettings(ActionEvent event) {
 
     }
     
+    //For sample1.mp4: Height ~43 cm; Width ~ 71cm
     @FXML
-    void handleSetLengthsBtn(MouseEvent event) {
+    private void handleSetLengthsBtn(MouseEvent event) {
     	if(pointsCalibrated) {
     		openFirstDialog();
         	openSecondDialog();
@@ -455,7 +456,7 @@ public class PreviewWindowController {
     }
     
     @FXML
-    void handleRemoveChickBtn(MouseEvent event) {
+    private void handleRemoveChickBtn(MouseEvent event) {
     	TextInputDialog dialog = new TextInputDialog();
     	dialog.setHeaderText("Note: Names are case sensitive.");
     	
@@ -474,7 +475,7 @@ public class PreviewWindowController {
 		jumpToFrame(frameNum);
 	}
     
-	void jumpToFrame(int numOfFrame) {
+	private void jumpToFrame(int numOfFrame) {
 		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, numOfFrame);
 		updateFrameView();
 

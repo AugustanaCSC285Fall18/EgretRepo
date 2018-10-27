@@ -37,7 +37,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import edu.augustana.csc285.Egret.Utils;
 
-public class MainWindowController implements AutoTrackListener {
+public class AutoTrackController implements AutoTrackListener {
 
 	@FXML private Button btnBrowse;
 	@FXML private ImageView videoView;
@@ -76,7 +76,6 @@ public class MainWindowController implements AutoTrackListener {
 		video = project.getVideo();
 		sliderVideoTime.setMax(video.getTotalNumFrames()-1);
 		showFrameAt(0);
-		System.out.println("Main window" + data.getVideo().getTimeStep());
 	}
 	
 	public void showFrameAt(int frameNum) {

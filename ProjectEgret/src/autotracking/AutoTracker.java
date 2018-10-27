@@ -24,7 +24,7 @@ public class AutoTracker {
 	 // Note: I think the chicks might be about 50 sq. cm in area, from a top view?
 	private final double targetShapeArea = 50;
 	
-	private final double brightnessTheshold = 55; // must be between 0 to 255.
+	private final double brightnessThreshold = 55; // must be between 0 to 255.
 	
 	private final double maxTimeGapWithinSegment = 0.75; // end a segment after this many seconds with no point detected
 	private final double maxMovementSpeed = 80.0; // guess for chicks
@@ -61,7 +61,7 @@ public class AutoTracker {
 
 		double minShapePixelArea= 0.5*targetShapeArea*vid.getXPixelsPerCm()*vid.getYPixelsPerCm();
 		double maxShapePixelArea= 1.5*targetShapeArea*vid.getXPixelsPerCm()*vid.getYPixelsPerCm();
-		SingleFrameShapeFinder frameAnalyzer = new SingleFrameShapeFinder(emptyFrame, brightnessTheshold, minShapePixelArea, maxShapePixelArea);
+		SingleFrameShapeFinder frameAnalyzer = new SingleFrameShapeFinder(emptyFrame, brightnessThreshold, minShapePixelArea, maxShapePixelArea);
 		
 		vid.setCurrentFrameNum(vid.getStartFrameNum());
 		for (int fNum = vid.getStartFrameNum(); fNum <= vid.getEndFrameNum(); fNum++) {
