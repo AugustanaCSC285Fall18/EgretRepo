@@ -17,9 +17,9 @@ class AnimalTrackTester {
 	
 	AnimalTrack makeFakeTrack() throws FileNotFoundException {
 		AnimalTrack testTrack = new AnimalTrack("ChickenLittle");
-		testTrack.add(new TimePoint(100,100,0));		
-		testTrack.add(new TimePoint(110,110,1));		
-		testTrack.add(new TimePoint(150,200,5));
+		testTrack.addTimePoint(new TimePoint(100,100,0));		
+		testTrack.addTimePoint(new TimePoint(110,110,1));		
+		testTrack.addTimePoint(new TimePoint(150,200,5));
 		return testTrack;	
 	}
 	

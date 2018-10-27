@@ -12,7 +12,6 @@ import Analysis.Analysis;
 import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.TimePoint;
-import datamodel.Video;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -46,6 +45,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class EditingWindowController {
+	//FXML Objects
 	@FXML
 	private AnchorPane anchorPane;
 	@FXML
@@ -82,35 +82,42 @@ public class EditingWindowController {
 	private ChoiceBox<String> pickUnassignedAnimalTrackBtn = new ChoiceBox<>();
 	@FXML
 	private ComboBox<String> animalTrackObjectComboBox;
-
-	public double totalNumFrame;
-	ProjectData data;
-	private int animalCounter = 0;
+	@FXML 
+	private TextField timeStepField;
 	private GraphicsContext gc;
+	
+	//Data Fields 
+	public double totalNumFrame;
+	static ProjectData data;
+	private int animalCounter = 0;
+	private TimePoint previousPoint;
 	private boolean modifyToggleActive = false;
+	
+	// Constants for Drawing and Frame Changing
 	private static final int drawX = 5;
 	private static final int drawY = 5;
-	private TimePoint previousPoint;
-	private int frameJumpModifier;
 	
 	// from calibration: random assignment at the moment
 	private int totalAmountOfAnimals = 2;
 	private int startFrame = 800;
 	private int endFrame = 7500;
 	private int oldCurrentFrame = 0;
-
-	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, IT'S BULLSHIT
-	// BUT IT'S THE ONLY THING I FOUND FIXES THE MODIFY FUNCTION
-	// Also, setting current frame number and frame jump amount beforehand
-	// really reduces lag in the program
-	private int frameJumpAmount;
+	private int frameJumpModifier = 2;
+	
+	// Fields that make the program run faster rather
+	// than continuously calling for an int value. 
+	private static int frameRate;
 	private int currentFrameNumber = startFrame;
 
+	/**
+	 * 
+	 * @throws FileNotFoundException
+	 */
 	void loadData() throws FileNotFoundException {
 		File dataFile = new File("full_auto_tracker_data");
 		data = ProjectData.loadFromFile(dataFile);
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
-			if (data.getUnassignedSegments().get(i).getNumPoints() < frameJumpAmount * frameJumpModifier * 2) {
+			if (data.getUnassignedSegments().get(i).getNumPoints() < frameRate * frameJumpModifier * 2) {
 				data.getUnassignedSegments().remove(i);
 				i--;
 			}
@@ -140,7 +147,12 @@ public class EditingWindowController {
 //		gc.strokeOval(curAnimal.getTimePointAtTime(currentFrameNumber).getX() - (drawX * 3), curAnimal.getTimePointAtTime(currentFrameNumber).getY() - (drawY * 3), drawX * 3, drawY *3);
 //	}
 
+	/**
+	 * Updates the ImageView to the given frame number.
+	 * @param numOfFrame - given frame number
+	 */
 	void jumpToFrame(int numOfFrame) {
+		System.out.println(canvas.getWidth());
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		currentFrameNumber = numOfFrame;
 		frameJumpHelper();
@@ -148,6 +160,10 @@ public class EditingWindowController {
 
 	}
 
+	/**
+	 * Changes the current frame based on a given frame step. 
+	 * @param numOfFrameChange - how many frames to move
+	 */
 	void frameChanger(double numOfFrameChange) {
 		if (currentFrameNumber + numOfFrameChange > endFrame) {
 			animalCounter++;
@@ -166,9 +182,12 @@ public class EditingWindowController {
 		}
 	}
 	
+	/**
+	 * Allows the user to review the chosen track with a click of a button. 
+	 */
 	void reviewTimeChanger() {
-		if (currentFrameNumber < endFrame - frameJumpAmount) {
-			currentFrameNumber += frameJumpAmount;
+		if (currentFrameNumber < endFrame - frameRate) {
+			currentFrameNumber += frameRate;
 			frameReviewJumpHelper();
 			new java.util.Timer().schedule(
 				    new java.util.TimerTask() {
@@ -185,25 +204,44 @@ public class EditingWindowController {
 		}
 	}
 	
+	/**
+	 * Changes the frame back a static amount. 
+	 */
 	void frameStepBack() {
-		frameChanger(-frameJumpAmount);
+		frameChanger(-frameRate);
 
 	}
-
+	
+	/**
+	 * The FXML method to get a mouse click from the previous button
+	 * to go back in the video. 
+	 * @param event - click on the Previous Button
+	 */
 	@FXML
 	void frameStepBack(MouseEvent event) {
 		frameStepBack();
 	}
 
+	/**
+	 * Changes the frame forward a static amount. 
+	 */
 	void frameStepForward() {
-		frameChanger(frameJumpAmount);
+		frameChanger(frameRate);
 	}
 
+	/**
+	 * The FXML method to get a mouse click from the next button
+	 * to go back in the video. 
+	 * @param event - click on the Next button
+	 */
 	@FXML
 	void frameStepForward(MouseEvent event) {
 		frameStepForward();
 	}
 
+	/**
+	 * Draws the point of the current animal at the current frame. 
+	 */
 	protected void drawPointsAtCurrentFrame() {
 		setAnimalCounter();
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
@@ -214,6 +252,11 @@ public class EditingWindowController {
 		}
 	}
 	
+	/**
+	 * Clears the canvas, sets the video to the new current frame number, and displays the current
+	 * points, and the past/future points within a certain interval. Also updates the Time Box and
+	 * slider bar to be the new time. 
+	 */
 	void frameJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
@@ -224,6 +267,11 @@ public class EditingWindowController {
 		updateTextAndSlider();
 	}
 	
+	/**
+	 * Clears the canvas, sets the video to the new current frame number, and displays the current
+	 * points, and the past points within a certain interval. Also updates the Time Box and
+	 * slider bar to be the new time. 
+	 */
 	void frameReviewJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, currentFrameNumber);
@@ -233,11 +281,20 @@ public class EditingWindowController {
 		updateTextAndSlider();
 	}
 
+	/**
+	 * Checks for a click on the Manual Edit button.
+	 * @param event - mouse click on the modify event button
+	 */
 	@FXML
 	void toggleManualEdit(MouseEvent event) {
 		modifyToggleActive = !modifyToggleActive;
 	}
 
+	/**
+	 * Gets a click on the canvas and creates a point and adds it to the
+	 * current AnimalTrack
+	 * @param event - click on the canvas
+	 */
 	@FXML
 	void addOrModifyDataPoint(MouseEvent event) {
 		double xCord = event.getX();
@@ -263,17 +320,26 @@ public class EditingWindowController {
 		}
 	}
 
+	/*
+	 * Takes a new point and changes a previous point (Modifies the data) of the current AnimalTrack
+	 */
 	void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
 		gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
 		currentAnimal.setTimePointAtTime(newPoint, currentFrameNumber);
 	}
 
+	/*
+	 * Adds a new data point to the current AnimalTrack
+	 */
 	void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, currentFrameNumber);
 	}
 	
-	//
-
+	/**
+	 * Adds an unassigned segment to the current AnimalTrack. Gets the track value
+	 * from the unassigned Track Choice box and the AnimalTrack from the Chick Combo Box
+	 * @param event - mouse click on the Choice box for unassigned tracks
+	 */
 	@FXML
 	void addTrack(MouseEvent event) {
 		if (pickUnassignedAnimalTrackBtn.getValue() != null) {
@@ -287,7 +353,7 @@ public class EditingWindowController {
 			while (i < data.getUnassignedSegments().size() && !foundTrack) {
 				AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 				// displays a track that is within 10 times the frame rate
-				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameJumpAmount
+				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
 						* frameJumpModifier * 5) {
 					nameOfCurrentTrack = ("Track " + trackCounter);
 					trackCounter++;
@@ -298,7 +364,6 @@ public class EditingWindowController {
 					foundTrack = true;
 				}
 				i++;
-
 			}
 			setAnimalCounter();
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
@@ -307,13 +372,16 @@ public class EditingWindowController {
 		}
 	}
 
+	/**
+	 * Displays the unassigned segments that are within a certain amount. 
+	 */
 	void displayFutureTracks() {
 		int trackCounter = 1;
 		ObservableList<String> listOfTracksDisplayed = FXCollections.observableArrayList();
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
 			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 			// displays a track that is within x times the frame rate
-			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameJumpAmount
+			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
 					* frameJumpModifier * 5) {
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
@@ -332,6 +400,9 @@ public class EditingWindowController {
 		}
 	}
 
+	/**
+	 * Draws the past tracks of the current animal within a certain interval. 
+	 */
 	void displayPastTracks() {
 		setAnimalCounter();
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
@@ -342,6 +413,10 @@ public class EditingWindowController {
 		}
 	}
 
+	/**
+	 * Exits the program when the window is closed. 
+	 * @param event
+	 */
 	@FXML
 	void closeWindow(ActionEvent event) {
 		Platform.exit();
@@ -351,6 +426,10 @@ public class EditingWindowController {
 	void redoEdit(MouseEvent event) {
 	}
 
+	/**
+	 * Undos the most recent point. Only works during the adding points section. 
+	 * @param event
+	 */
 	@FXML
 	void undoEdit(MouseEvent event) {
 		if(!modifyToggleActive) {
@@ -371,24 +450,36 @@ public class EditingWindowController {
 		}
 	}
 	
+	/**
+	 * goes through the video displaying the points of the current animal track. Once it goes through the video,
+	 * it goes back to where the user first clicked the review button.
+	 * @param event - click on the Review button 
+	 * @throws InterruptedException - if the thread that goes through the video ends. 
+	 */
 	@FXML 
-	void reviewTrack(MouseEvent event) throws InterruptedException{
+	void reviewTrack(MouseEvent event) throws InterruptedException {
 		oldCurrentFrame = currentFrameNumber;
 		currentFrameNumber = startFrame;
 		reviewTimeChanger();
 	}
 
+	/**
+	 * Allows the user to change the frame view using the text field 
+	 */
 	@FXML
 	public void changeFrameWithTextField() {
-		int newTime = Integer.parseInt(timeField.getText());
-		int maxTime = (int) Math.floor((data.getVideo().getTotalNumFrames() / frameJumpAmount));
+		int newTime = getSecondsFromMinuteSeconds();
+		int maxTime = (int) Math.floor((data.getVideo().getTotalNumFrames() / frameRate));
 		if (newTime > maxTime) {
 			makeAlert("Time Change Error", "The video is between 0 and " + maxTime + " seconds long.");
 		}
-		int frameNumber = (int) Math.round((newTime * frameJumpAmount));
+		int frameNumber = (int) Math.round((newTime * frameRate));
 		jumpToFrame(frameNumber);
 	}
 
+	/**
+	 * Puts all of the AnimalTrack names into the AnimalTrack Combo Box
+	 */
 	public void initializeAnimalTrackObjectComboBox() {
 		for (int i = 0; i <= totalAmountOfAnimals; i++) {
 			String name = data.getAnimalTracksList().get(i).getName();
@@ -397,25 +488,42 @@ public class EditingWindowController {
 		animalTrackObjectComboBox.getSelectionModel().select(0);
 	}
 	
+	/**
+	 * Sets the animal counter to the current animal Track
+	 */
 	public void setAnimalCounter() {
 		animalCounter = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
 	}
+	
 	
 	public void setAnimalTrackObjectComboBox() {
 		animalTrackObjectComboBox.getSelectionModel().select(animalCounter);
 	}
 
+	/**
+	 * Allows the user to use the slider bar to change the image view. 
+	 */
 	@FXML
 	public void runSliderSeekBar() {
 		int frameNum = (int) sliderSeekBar.getValue();
 		jumpToFrame(frameNum);
 	}
 
+	/**
+	 * Updates the Text field with the time and the slider bar to the correct frame.
+	 */
 	public void updateTextAndSlider() {
-		timeField.setText("" + (int) (currentFrameNumber / frameJumpAmount));
+		timeField.setText("" + getTimeInMinuteSecond());
 		sliderSeekBar.setValue(currentFrameNumber);
 	}
 	
+	/**
+	 * Allows the user to have shortcuts when editing the data.
+	 * D - Presses the next button
+	 * A - Presses the previous button
+	 * Q - Presses the undo button
+	 * @param e - the key that was pressed
+	 */
     @FXML
     public void keyPressed(KeyEvent e) {
     	if(e.getCode() == KeyCode.D) {
@@ -427,6 +535,9 @@ public class EditingWindowController {
     	}
     }
     
+    /*
+     * Makes the alert with a given title and message. 
+     */
     private void makeAlert(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
@@ -449,7 +560,29 @@ public class EditingWindowController {
 //		}
 //
 //	}
-
+    
+    /*
+     * Gets the time from the current frame number in minutes and seconds MM:SS formate
+     */
+	private String getTimeInMinuteSecond() {
+		int startTime = (int)(currentFrameNumber / data.getVideo().getFrameRate());
+		int startTimeMinutes = startTime / 60;
+		int startTimeSeconds = startTime % 60;
+		return startTimeMinutes + ":" + startTimeSeconds;
+	}
+	
+	/*
+	 * Gets the seconds from MM:SS format.
+	 */
+	private int getSecondsFromMinuteSeconds() {
+		int colonIndex = timeField.getText().indexOf(':');
+		int timeInSeconds = (Integer.parseInt(timeField.getText().substring(0, colonIndex)) * 60) + Integer.parseInt(timeField.getText().substring(colonIndex + 1)); 
+		return timeInSeconds;
+	}
+	
+	/**
+	 * Saves the project when the finish button is pressed. 
+	 */
 	void saveFinishedProject() {
 		File finalDataFile = new File(data.getVideo().getFilePathJustName());
 		try {
@@ -459,6 +592,9 @@ public class EditingWindowController {
 		}
 	}
 	
+	/**
+	 * Analyzes the project data
+	 */
 	@FXML
 	void analyzeProjectData() {
 		try {
@@ -469,6 +605,10 @@ public class EditingWindowController {
 		}
 	}
 
+	/*
+	 * Saves the unfinished project data after the user has finished filling in the gaps from the 
+	 * auto tracker.  
+	 */
 	@FXML
 	private void saveUnfinishedProject() {
 		File tempDataFile = new File("Unfinished" + data.getVideo().getFilePathJustName());
@@ -484,32 +624,27 @@ public class EditingWindowController {
 	public void initialize() throws FileNotFoundException {
 	}
 
+	/**
+	 * Initializes the EditingWindow with the ProjectData
+	 * @param projectData - the project data of the current project
+	 * @throws FileNotFoundException if the video from project data was missing. 
+	 */
 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
 		data = projectData;
-		frameJumpAmount = (int) Math.floor(data.getVideo().getFrameRate());
 		gc = canvas.getGraphicsContext2D();
 		// runSliderSeekBar();
+		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
+		timeField.setText(getTimeInMinuteSecond());
+		timeStepField.setText("" + data.getVideo().getFrameRate());
 
 		startVideo();
 	}
 
-	@FXML
-	public void handleBrowse() throws FileNotFoundException {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Video File");
-		Window mainWindow = currentFrameImage.getScene().getWindow();
-		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-		if (chosenFile != null) {
-			String fileName = chosenFile.toURI().toString();
-			data.setVideo(new Video(fileName));
-			startVideo();
-		};
-		//runSliderSeekBar();
-		// changeFrameWithTextField();
-		// runJumpTo(); //prints out which frame you are at
-	}
-
+	/**
+	 * Starts the video by showing the start frame and setting the slider bar to the correct length and
+	 * enabling it. 
+	 */
 	protected void startVideo() {
 		totalNumFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
 
@@ -544,6 +679,9 @@ public class EditingWindowController {
 		return frame;
 	}
 
+	/**
+	 * Changes the image view to the current frame number. 
+	 */
 	public void updateFrameView() {
 		Platform.runLater(new Runnable() {
 			@Override
@@ -557,6 +695,9 @@ public class EditingWindowController {
 		});
 	}
 
+	/**
+	 * @return the current ImageView
+	 */
 	public ImageView getCurrentFrameImage() {
 		return currentFrameImage;
 	}

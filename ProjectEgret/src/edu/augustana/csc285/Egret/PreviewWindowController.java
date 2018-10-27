@@ -117,7 +117,7 @@ public class PreviewWindowController {
 	
 	ProjectData data = new ProjectData();
 	
-	boolean pointsCalibrated=false;
+	boolean pointsCalibrated = false;
 	Point upperLeftCorner = new Point();
 	Point lowerRightCorner = new Point();
 	Point lowerLeftCorner = new Point();
@@ -255,19 +255,19 @@ public class PreviewWindowController {
     		
     		step=2;
     		instructLabel.setText("Please select the lower right hand corner of the box");
-    	}else if (step==2) {
+    	} else if (step==2) {
     		lowerRightCorner.setLocation(event.getX(), event.getY());
     		rect.add(lowerRightCorner);
     		data.getVideo().setArenaBounds(rect);
     		
     		step=3;
     		instructLabel.setText("Please select the lower left hand corner of the box.");
-    	}else if (step==3) {
+    	} else if (step==3) {
     		lowerLeftCorner.setLocation(event.getX(), event.getY());
     		
     		step=4;
     		instructLabel.setText("Please select where you would like your origin to be located.");
-    	}else if (step==4) {
+    	} else if (step==4) {
     		pointsCalibrated=true;
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
