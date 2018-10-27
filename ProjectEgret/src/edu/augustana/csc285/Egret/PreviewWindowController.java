@@ -355,11 +355,17 @@ public class PreviewWindowController {
   //Avery... still working on it
     @FXML //throw exception if non number is entered.... or prevent it from being entered
     void handleEndTime(KeyEvent event) {
-//    	int i = key.getKeyCode();
-//        if (i >= 65 && i <= 90)
-//        {
-//           ((TextField)event.getSource()).cancelKey();
-//        }
+    	char character = event.getCharacter().charAt(0);
+    	if(Character.isAlphabetic(character)) {
+    		((TextField)event.getSource()).deletePreviousChar();
+    	}
+
+    	String result = event.getText();
+    	int index = result.indexOf(":");
+    	int mins = Integer.valueOf(result.substring(0, index));
+    	int secs = Integer.valueOf(result.substring(index));
+    	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
+    	data.getVideo().setStartFrameNum(endFrame);
     }
     
     @FXML
@@ -377,6 +383,11 @@ public class PreviewWindowController {
     
     @FXML //throw exception if non number is entered... or prevent it from being entered
     void handleStartTime(KeyEvent event) {
+    	char character = event.getCharacter().charAt(0);
+    	if(Character.isAlphabetic(character)) {
+    		((TextField)event.getSource()).deletePreviousChar();
+    	}
+    	
     	String result = event.getText();
     	int index = result.indexOf(":");
     	int mins = Integer.valueOf(result.substring(0, index));
