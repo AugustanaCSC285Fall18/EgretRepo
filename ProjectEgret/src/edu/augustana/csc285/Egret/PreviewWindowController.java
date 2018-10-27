@@ -110,18 +110,12 @@ public class PreviewWindowController {
 
 //    private Button continueBtn;
 
-    
-   private VideoCapture capture = new VideoCapture();
+  
 	
 	//private String fileName = null;
-	private int curFrameNum;
 	public double numFrame;
 	
-	private double xCord;
-	private double yCord;
 	ProjectData data = new ProjectData();
-	private int animalCounter = 0;
-	private GraphicsContext gc;
 	
 	boolean pointsCalibrated=false;
 	Point upperLeftCorner = new Point();
@@ -132,31 +126,7 @@ public class PreviewWindowController {
 
 	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
 	private ObservableList items = FXCollections.observableList(list);
-    
-	//various methods
-	private void runSliderSeekBar() {
-		
-	}
-	
-	//might use this
-//	private void runJumpTo() {
-//		
-//		jumpToFrameArea.textProperty().addListener(new ChangeListener<String>() {
-//			@Override
-//			public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-//				int realValue = Integer.parseInt(newValue);
-//				currentFrameArea.appendText("Current frame: " + (realValue) + "\n");
-//				sliderSeekBar.setValue(realValue);
-//				curFrameNum = realValue;
-//				capture.set(Videoio.CAP_PROP_POS_FRAMES, curFrameNum);
-//				updateFrameView();
-//			}
-//
 
-//		});
-//
-//	}
-	
 	public void browseForVideoFile() throws FileNotFoundException{
     	FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open Video File");
@@ -167,7 +137,7 @@ public class PreviewWindowController {
 			data.setVideo(new Video(fileName));
 			startVideo();
 		};
-		runSliderSeekBar();
+		//runSliderSeekBar();
 		
 		startField.setText("0:00");
 		int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
@@ -184,14 +154,15 @@ public class PreviewWindowController {
     
     protected void startVideo() {
 		// start the video capture
-		numFrame = this.capture.get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		numFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
+		updateFrameView();
 		//totalFrameArea.appendText("Total frames: " + (int) numFrame + "\n"); //prints total number of frames
-		sliderSeekBar.setDisable(false);
 		//this can be repurposed to allow the client to jump to specific time stamp
 		//jumpToFrameArea.setDisable(false); //allows client to jump to specific frame
-		updateFrameView();
 		sliderSeekBar.setMax((int) numFrame -1);
 		sliderSeekBar.setMaxWidth((int) numFrame -1);
+		sliderSeekBar.setDisable(false);
+		jumpToFrame(0);
 	}
     
     public ImageView getCurrentFrameImage() {
@@ -235,13 +206,8 @@ public class PreviewWindowController {
     	data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
     }
 
-//note for another time ProgressMonitor in JOption Pane
     @FXML
 	public void initialize() {
-		sliderSeekBar.setDisable(true);
-		gc = canvas.getGraphicsContext2D();
-		runSliderSeekBar();
-		
 		timeStepBox.setItems(items);
 	}
     
@@ -484,5 +450,18 @@ public class PreviewWindowController {
 			chicksComboBox.getSelectionModel().select(chickName);
 		}
     }
+    
+	@FXML
+	public void runSliderSeekBar() {
+		int frameNum = (int) sliderSeekBar.getValue();
+		jumpToFrame(frameNum);
+	}
+    
+	void jumpToFrame(int numOfFrame) {
+		data.getVideo().getVidCap().set(Videoio.CAP_PROP_POS_FRAMES, numOfFrame);
+		updateFrameView();
+
+	}
+	
 }
 

@@ -20,7 +20,13 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<<<<<<< HEAD
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
+=======
+<!--  -->
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
+>>>>>>> branch 'master' of https://github.com/AugustanaCSC285Fall18/EgretRepo.git
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -56,7 +62,7 @@
                      </StackPane.margin></Canvas>
                </children>
             </StackPane>
-            <Slider fx:id="sliderSeekBar" layoutX="65.0" layoutY="318.0" prefHeight="14.0" prefWidth="362.0" />
+            <Slider fx:id="sliderSeekBar" layoutX="65.0" layoutY="318.0" onDragDetected="#runSliderSeekBar" onDragDropped="#runSliderSeekBar" onMouseClicked="#runSliderSeekBar" prefHeight="14.0" prefWidth="362.0" />
             <StackPane layoutY="50.0" prefWidth="500.0">
                <children>
                   <Label fx:id="instructLabel">

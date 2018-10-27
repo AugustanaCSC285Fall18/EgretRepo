@@ -58,8 +58,8 @@ public class MainWindowController implements AutoTrackListener {
 		//       the settings in the GUI right now...
 		//loadVideo("/home/forrest/data/shara_chicks_tracking/sample1.mp4");
 		loadVideo("S:/class/cs/285/sample_videos/sample1.mp4");		
-		project.getVideo().setXPixelsPerCm(6.5); //  these are just rough estimates!
-		project.getVideo().setYPixelsPerCm(6.7);
+//		project.getVideo().setXPixelsPerCm(6.5); //  these are just rough estimates!
+//		project.getVideo().setYPixelsPerCm(6.7);
 
 //		loadVideo("/home/forrest/data/shara_chicks_tracking/lowres/lowres2.avi");
 		//loadVideo("S:/class/cs/285/sample_videos/lowres2.mp4");		
