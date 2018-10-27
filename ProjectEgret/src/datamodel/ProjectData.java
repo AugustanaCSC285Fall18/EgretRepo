@@ -30,14 +30,7 @@ public class ProjectData {
 	}
 
 	public ProjectData() {
-		AnimalTrack animal1 = new AnimalTrack("Chick1");
-		AnimalTrack animal2 = new AnimalTrack("Chick2");
-		AnimalTrack animal3 = new AnimalTrack("Chick3");
 		animalTracksList = new ArrayList<AnimalTrack>();
-		animalTracksList.add(animal1);
-		animalTracksList.add(animal2);
-		animalTracksList.add(animal3);
-		
 		unassignedSegments = new ArrayList<>();
 		
 	}

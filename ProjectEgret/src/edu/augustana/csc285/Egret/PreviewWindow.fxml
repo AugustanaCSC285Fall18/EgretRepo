@@ -146,7 +146,7 @@
             <Group>
                <children>
                   <Label text="Start Time: " />
-                  <TextField fx:id="startField" layoutX="65.0" layoutY="-4.0" onKeyTyped="#handleStartTime" prefWidth="100.0" />
+                  <TextField fx:id="startField" layoutX="65.0" layoutY="-4.0" onAction="#handleStartTime" onKeyTyped="#handleStartTime" prefWidth="100.0" />
                </children>
                <HBox.margin>
                   <Insets left="10.0" />

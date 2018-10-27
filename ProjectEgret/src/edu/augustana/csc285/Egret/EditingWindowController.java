@@ -20,8 +20,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
@@ -42,7 +40,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
-import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class EditingWindowController {
@@ -94,9 +91,9 @@ public class EditingWindowController {
 	private int frameJumpModifier;
 	
 	// from calibration: random assignment at the moment
-	private int totalAmountOfAnimals = 2;
-	private int startFrame = 800;
-	private int endFrame = 7500;
+	private int totalAmountOfAnimals;
+	private int startFrame;
+	private int endFrame;
 	private int oldCurrentFrame = 0;
 
 	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, IT'S BULLSHIT
@@ -390,7 +387,7 @@ public class EditingWindowController {
 	}
 
 	public void initializeAnimalTrackObjectComboBox() {
-		for (int i = 0; i <= totalAmountOfAnimals; i++) {
+		for (int i = 0; i < totalAmountOfAnimals; i++) {
 			String name = data.getAnimalTracksList().get(i).getName();
 			animalTrackObjectComboBox.getItems().add(name);
 		}
@@ -486,11 +483,16 @@ public class EditingWindowController {
 
 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
 		data = projectData;
+		totalAmountOfAnimals = data.getAnimalTracksList().size();
+		for(int i = 0; i < data.getAnimalTracksList().size(); i++) {
+			System.out.println(data.getAnimalTracksList().get(i).getName());
+		}
+		startFrame = data.getVideo().getStartFrameNum();
+		endFrame = data.getVideo().getEndFrameNum();
 		frameJumpAmount = (int) Math.floor(data.getVideo().getFrameRate());
 		gc = canvas.getGraphicsContext2D();
 		// runSliderSeekBar();
 		initializeAnimalTrackObjectComboBox();
-
 		startVideo();
 	}
 

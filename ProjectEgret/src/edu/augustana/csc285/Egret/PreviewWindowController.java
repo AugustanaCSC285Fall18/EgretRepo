@@ -209,6 +209,7 @@ public class PreviewWindowController {
     @FXML
 	public void initialize() {
 		timeStepBox.setItems(items);
+		//data.getVideo().setStartFrameNum();
 	}
     
 	//event handlers
@@ -219,8 +220,6 @@ public class PreviewWindowController {
 		dialog.setTitle("Add Chick:");
 		dialog.setHeaderText(null);
 		dialog.setContentText("Enter Chick Name:");
-
-		//
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			String chickName = result.get();

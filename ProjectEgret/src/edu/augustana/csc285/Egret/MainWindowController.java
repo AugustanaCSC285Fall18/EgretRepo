@@ -71,6 +71,8 @@ public class MainWindowController implements AutoTrackListener {
 	
 	public void loadVideo(String filePath, ProjectData data) {
 		project = data;
+		textfieldStartFrame.setText(""+ data.getVideo().getStartFrameNum());
+		textfieldEndFrame.setText(""+ data.getVideo().getEndFrameNum());
 		video = project.getVideo();
 		sliderVideoTime.setMax(video.getTotalNumFrames()-1);
 		showFrameAt(0);
@@ -108,7 +110,6 @@ public class MainWindowController implements AutoTrackListener {
 			// Use Observer Pattern to give autotracker a reference to this object, 
 			// and call back to methods in this class to update progress.
 			autotracker.addAutoTrackListener(this);
-			
 			// this method will start a new thread to run AutoTracker in the background
 			// so that we don't freeze up the main JavaFX UI thread.
 			autotracker.startAnalysis(video);
