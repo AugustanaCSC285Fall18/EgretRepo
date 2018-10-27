@@ -125,7 +125,7 @@ public class EditingWindowController {
 	
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
-		frameJumpModifier=timeStep;
+		frameJumpModifier=data.getVideo().getTimeStep();
 	}
 
 	/*

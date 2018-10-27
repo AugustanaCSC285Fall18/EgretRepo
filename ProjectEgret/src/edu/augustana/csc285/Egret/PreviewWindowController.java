@@ -209,6 +209,7 @@ public class PreviewWindowController {
     @FXML
 	public void initialize() {
 		timeStepBox.setItems(items);
+		timeStepBox.getSelectionModel().select(0);
 	}
     
 	//event handlers
@@ -355,10 +356,10 @@ public class PreviewWindowController {
     void handleEndTime(KeyEvent event) {
     	keyIgnore(event);
 
-    	String result = event.getText();
+    	String result = endField.getText();
     	int index = result.indexOf(":");
     	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
+    	int secs = Integer.valueOf(result.substring(index+1));
     	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
     	data.getVideo().setStartFrameNum(endFrame);
     }
@@ -373,10 +374,10 @@ public class PreviewWindowController {
     void handleStartTime(KeyEvent event) {
     	keyIgnore(event);
     	
-    	String result = event.getText();
-    	int index = result.indexOf(":");
+    	String result = startField.getText();
+    	int index = result.indexOf(':');
     	int mins = Integer.valueOf(result.substring(0, index));
-    	int secs = Integer.valueOf(result.substring(index));
+    	int secs = Integer.valueOf(result.substring(index+1));
     	int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
     	data.getVideo().setStartFrameNum(startFrame);
     	//sliderSeekBar.setValue();
