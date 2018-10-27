@@ -146,7 +146,7 @@ public class Video {
 
 	public void setXPixelsPerCm(double boxWidthCm, Point a, Point b) {
 		double distance = Point2D.distance(a.getX(), a.getY(), b.getX(), b.getY());
-		yPixelsPerCm = distance/boxWidthCm;
+		xPixelsPerCm = distance/boxWidthCm;
 	}
 
 	/**

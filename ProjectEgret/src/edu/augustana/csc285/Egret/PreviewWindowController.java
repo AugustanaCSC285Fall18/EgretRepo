@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.opencv.core.Mat;
 import org.opencv.videoio.VideoCapture;
@@ -117,6 +118,7 @@ public class PreviewWindowController {
 	private int animalCounter = 0;
 	private GraphicsContext gc;
 	
+	boolean pointsCalibrated=false;
 	Point upperLeftCorner = new Point();
 	Point lowerRightCorner = new Point();
 	Point lowerLeftCorner = new Point();
@@ -176,6 +178,13 @@ public class PreviewWindowController {
 		endField.setText(endTime/60 + ":" + endTime%60);
 		//runJumpTo(); //prints out which frame you are at
     }
+	
+	public void keyIgnore(KeyEvent event) {
+		char character = event.getCharacter().charAt(0);
+    	if(Character.isAlphabetic(character)) {
+    		((TextField)event.getSource()).deletePreviousChar();
+    	}
+	}
     
     protected void startVideo() {
 		// start the video capture
@@ -192,33 +201,6 @@ public class PreviewWindowController {
     public ImageView getCurrentFrameImage() {
     	return currentFrameImage;
     }
-    
-    //doesn't currently work
-// 	/**
-//	 * Get a frame from the opened video stream (if any)
-//	 *
-//	 * @return the {@link Mat} to show
-//	 */
-//	private Mat grabFrame() {
-//		// init everything
-//		Mat frame = new Mat();
-// 		// check if the capture is open
-//		System.out.println("Create new mat");
-//		if (this.capture.isOpened()) {
-//			System.out.println("Opened video");
-//			try {
-//				// read the current frame
-//				this.capture.read(frame);
-// 			} catch (Exception e) {
-//				// log the error
-//				System.err.println("Exception during the image elaboration: " + e);
-//			}
-//			
-//		} else {
-//			System.out.println("Failed to open video");
-//		}
-// 		return frame;
-//	}
 	
 	/**
 	 * Get a frame from the opened video stream (if any)
@@ -232,11 +214,6 @@ public class PreviewWindowController {
 			try {
 				// read the current frame
 				this.data.getVideo().getVidCap().read(frame);
- 				// if the frame is not empty, process it to black and white color
-				/*
-				 * if (!frame.empty()) { Imgproc.cvtColor(frame, frame, Imgproc.COLOR_BGR2GRAY);
-				 * }
-				 */
  			} catch (Exception e) {
 				// log the error
 				System.err.println("Exception during the image elaboration: " + e);
@@ -263,7 +240,13 @@ public class PreviewWindowController {
     }
 
 //note for another time ProgressMonitor in JOption Pane
-	
+    @FXML
+	public void initialize() {
+		sliderSeekBar.setDisable(true);
+		gc = canvas.getGraphicsContext2D();
+		runSliderSeekBar();
+	}
+    
 	//event handlers
     @FXML
     void handleAddChickBtn(MouseEvent event) {
@@ -320,6 +303,7 @@ public class PreviewWindowController {
     		step=4;
     		instructLabel.setText("Please select where you would like your origin to be located.");
     	}else if (step==4) {
+    		pointsCalibrated=true;
     		origin.setLocation(event.getX(), event.getY());
     		data.getVideo().setOriginPoint(origin);
     		
@@ -352,13 +336,23 @@ public class PreviewWindowController {
     	}
     }
     
+    @FXML
+    void handleContinueBtn(MouseEvent event) throws IOException {
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
+		BorderPane root = (BorderPane)loader.load();
+		EditingWindowController nextController = loader.getController();
+		
+		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		
+		//Stage primary = (Stage) continueBtn.getScene().getWindow();
+		//primary.setScene(nextScene);
+    }
+    
   //Avery... still working on it
     @FXML //throw exception if non number is entered.... or prevent it from being entered
     void handleEndTime(KeyEvent event) {
-    	char character = event.getCharacter().charAt(0);
-    	if(Character.isAlphabetic(character)) {
-    		((TextField)event.getSource()).deletePreviousChar();
-    	}
+    	keyIgnore(event);
 
     	String result = event.getText();
     	int index = result.indexOf(":");
@@ -367,13 +361,6 @@ public class PreviewWindowController {
     	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
     	data.getVideo().setStartFrameNum(endFrame);
     }
-    
-    @FXML
-	public void initialize() {
-		sliderSeekBar.setDisable(true);
-		gc = canvas.getGraphicsContext2D();
-		runSliderSeekBar();
-	}
 
     //replaces video in window... need to make sure 
     @FXML
@@ -383,10 +370,7 @@ public class PreviewWindowController {
     
     @FXML //throw exception if non number is entered... or prevent it from being entered
     void handleStartTime(KeyEvent event) {
-    	char character = event.getCharacter().charAt(0);
-    	if(Character.isAlphabetic(character)) {
-    		((TextField)event.getSource()).deletePreviousChar();
-    	}
+    	keyIgnore(event);
     	
     	String result = event.getText();
     	int index = result.indexOf(":");
@@ -394,6 +378,7 @@ public class PreviewWindowController {
     	int secs = Integer.valueOf(result.substring(index));
     	int startFrame = data.getVideo().getTimeInFrames(mins*60+secs);
     	data.getVideo().setStartFrameNum(startFrame);
+    	//sliderSeekBar.setValue();
     	
     }
 
@@ -404,10 +389,40 @@ public class PreviewWindowController {
     
     @FXML
     void handleSetLengthsBtn(MouseEvent event) {
+    	if(pointsCalibrated) {
+    		openFirstDialog();
+        	openSecondDialog();
+    	}
+    }
+    
+    public void openFirstDialog() {
     	TextInputDialog dialog = new TextInputDialog("0");
     	dialog.setTitle("Additional Callibration");
     	dialog.setHeaderText("Length Callibration");
     	dialog.setContentText("Please enter the height of the box in cm: ");
+//    	ButtonType buttonTypeNext = new ButtonType("Next", ButtonData.NEXT_FORWARD);
+//    	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+    	//dialog.getButtonTypes().setAll(buttonTypeNext, buttonTypeCancel);
+
+    	// Get the response value.
+    	Optional<String> result = dialog.showAndWait();
+//    	String text = dialog.getContentText();
+//    	if(! Pattern.matches("``^[a-zA-Z]+$`", result.get())) {
+//    		
+//    	}
+    	double length = Double.valueOf(result.get());
+    	if (result.isPresent()){
+    		data.getVideo().setYPixelsPerCm(length, upperLeftCorner, lowerLeftCorner);
+    	}
+    	//citation: 
+    }
+    
+    public void openSecondDialog() {
+    	TextInputDialog dialog = new TextInputDialog("0");
+    	dialog.setTitle("Additional Callibration");
+    	dialog.setHeaderText("Length Callibration");
+    	dialog.setContentText("Please enter the width of the box in cm: ");
     	ButtonType buttonTypeNext = new ButtonType("Next", ButtonData.NEXT_FORWARD);
     	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
 
@@ -415,17 +430,13 @@ public class PreviewWindowController {
 
     	// Get the response value.
     	Optional<String> result = dialog.showAndWait();
+//    	String text = dialog.getContentText();
+//    	if(! Pattern.matches("``^[a-zA-Z]+$`", result.get())) {
+//    		
+//    	}
     	double length = Double.valueOf(result.get());
     	if (result.isPresent()){
-    		data.getVideo().setYPixelsPerCm(length, upperLeftCorner, lowerLeftCorner);
-    		
-    		
-    			dialog.setContentText("Please enter the width of the box in cm: ");
-    			dialog.setResult("0");
-    			if(result.isPresent()) {
-    				data.getVideo().setXPixelsPerCm(length, lowerRightCorner, lowerLeftCorner);
-    			}
-    		
+    		data.getVideo().setXPixelsPerCm(length, lowerRightCorner, lowerLeftCorner);
     	}
     	//citation: 
     }
@@ -442,19 +453,6 @@ public class PreviewWindowController {
 			chicksComboBox.getItems().remove(chickName);
 			chicksComboBox.getSelectionModel().select(chickName);
 		}
-    }
-    
-    @FXML
-    void handleContinueBtn(MouseEvent event) throws IOException {
-    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
-		BorderPane root = (BorderPane)loader.load();
-		EditingWindowController nextController = loader.getController();
-		
-		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-		
-		//Stage primary = (Stage) continueBtn.getScene().getWindow();
-		//primary.setScene(nextScene);
     }
 }
 
