@@ -95,8 +95,8 @@ public class EditingWindowController {
 	
 	// from calibration: random assignment at the moment
 	private int totalAmountOfAnimals = 2;
-	private int startFrame = 850;
-	private int endFrame = 1500;
+	private int startFrame = 800;
+	private int endFrame = 7500;
 	private int oldCurrentFrame = 0;
 
 	// THIS EXISTS SO THE FRAME JUMPS A CONSISTANT AMOUNT, IT'S BULLSHIT

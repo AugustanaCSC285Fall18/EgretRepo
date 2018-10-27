@@ -26,7 +26,7 @@ public class AutoTracker {
 	
 	private final double brightnessTheshold = 55; // must be between 0 to 255.
 	
-	private final double maxTimeGapWithinSegment = 0.5; // end a segment after this many seconds with no point detected
+	private final double maxTimeGapWithinSegment = 0.75; // end a segment after this many seconds with no point detected
 	private final double maxMovementSpeed = 80.0; // guess for chicks
 
 	public AutoTracker() {
@@ -115,10 +115,6 @@ public class AutoTracker {
 		for (AnimalTrack track: currentSegments) {
 			TimePoint maybePredecessor = track.getFinalTimePoint();
 			double estimatedSpeed = pt.getDistanceTo(maybePredecessor) / pt.getTimeDiffAfter(maybePredecessor);
-//          TODO: delete this debugging code later
-//			if (estimatedSpeed >= 0 && estimatedSpeed < Double.POSITIVE_INFINITY) {
-//				System.out.printf("%s  est: %.2f  max: %.2f\n", pt, estimatedSpeed, maxPixelMovementPerFrame);
-//			}
 			if (estimatedSpeed < maxPixelMovementPerFrame && estimatedSpeed < slowestSpeed) {
 				slowestSpeed = estimatedSpeed;
 				bestMatch = track;

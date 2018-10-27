@@ -326,15 +326,17 @@ public class PreviewWindowController {
 
     	Optional<ButtonType> result = alert.showAndWait();
     	if (result.get() == ButtonType.OK){
-    		FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
-    		BorderPane root = (BorderPane)loader.load();
-    		EditingWindowController nextController = loader.getController();
     		
-    		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-    		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-    		
-    		Stage primary = (Stage) continueBtn.getScene().getWindow();
-    		primary.setScene(nextScene);
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+			BorderPane root = (BorderPane)loader.load();
+			MainWindowController controller = loader.getController();
+			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			Stage primary = (Stage) continueBtn.getScene().getWindow();
+			primary.setScene(scene);
+			controller.initializeWithStage(primary);
+			controller.loadVideo(data.getVideo().getFilePath(), data);
+			primary.show();
     	} else {
     	    alert.close();
     	}

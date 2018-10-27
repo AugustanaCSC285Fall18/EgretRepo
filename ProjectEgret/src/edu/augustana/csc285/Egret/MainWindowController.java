@@ -3,6 +3,7 @@ package edu.augustana.csc285.Egret;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,8 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -27,6 +30,7 @@ import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -44,6 +48,7 @@ public class MainWindowController implements AutoTrackListener {
 	@FXML private TextField textfieldEndFrame;
 	@FXML private Button btnAutotrack;
 	@FXML private ProgressBar progressAutoTrack;
+	@FXML private Button continueBtn;
 
 	
 	private AutoTracker autotracker;
@@ -56,10 +61,7 @@ public class MainWindowController implements AutoTrackListener {
 		//FIXME: this quick loading of a specific file and specific settings 
 		//       is for debugging purposes only, since there's no way to specify
 		//       the settings in the GUI right now...
-		//loadVideo("/home/forrest/data/shara_chicks_tracking/sample1.mp4");
-		loadVideo("S:/class/cs/285/sample_videos/sample1.mp4");		
-		project.getVideo().setXPixelsPerCm(6.5); //  these are just rough estimates!
-		project.getVideo().setYPixelsPerCm(6.7);
+		//loadVideo("/home/forrest/data/shara_chicks_tracking/sample1.mp4");	
 
 //		loadVideo("/home/forrest/data/shara_chicks_tracking/lowres/lowres2.avi");
 		//loadVideo("S:/class/cs/285/sample_videos/lowres2.mp4");		
@@ -77,26 +79,11 @@ public class MainWindowController implements AutoTrackListener {
 		videoView.fitWidthProperty().bind(videoView.getScene().widthProperty());  
 	}
 	
-	@FXML
-	public void handleBrowse()  {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Video File");
-		File chosenFile = fileChooser.showOpenDialog(stage);
-		if (chosenFile != null) {
-			loadVideo(chosenFile.getPath());
-		}		
-	}
-	
-	public void loadVideo(String filePath) {
-		try {
-			project = new ProjectData(filePath);
-			video = project.getVideo();
-			sliderVideoTime.setMax(video.getTotalNumFrames()-1);
-			showFrameAt(0);
-		} catch (FileNotFoundException e) {			
-			e.printStackTrace();
-		}
-
+	public void loadVideo(String filePath, ProjectData data) {
+		project = data;
+		video = project.getVideo();
+		sliderVideoTime.setMax(video.getTotalNumFrames()-1);
+		showFrameAt(0);
 	}
 	
 	public void showFrameAt(int frameNum) {
@@ -107,6 +94,18 @@ public class MainWindowController implements AutoTrackListener {
 			textFieldCurFrameNum.setText(String.format("%05d",frameNum));
 			
 		}		
+	}
+	
+	@FXML
+	public void continueToEditingWindow() throws IOException {
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("EditingWindow.fxml"));
+		BorderPane root = (BorderPane)loader.load();
+		Scene nextScene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		Stage primary = (Stage) continueBtn.getScene().getWindow();
+		primary.setScene(nextScene);
+		EditingWindowController nextController = loader.getController();
+		nextController.initializeWithProjectData(project);
 	}
 	
 	@FXML
@@ -150,10 +149,6 @@ public class MainWindowController implements AutoTrackListener {
 		project.getUnassignedSegments().clear();
 		project.getUnassignedSegments().addAll(trackedSegments);
 
-		for (AnimalTrack track: trackedSegments) {
-			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
-//			System.out.println("  " + track.getPositions());
-		}
 		Platform.runLater(() -> { 
 			progressAutoTrack.setProgress(1.0);
 			btnAutotrack.setText("Start auto-tracking");
@@ -164,63 +159,7 @@ public class MainWindowController implements AutoTrackListener {
 			project.saveToFile(autoTrackData);
 		} catch (FileNotFoundException e) {
 		}
-		
-		//mergeTrackObjects(trackedSegments);
-		
+				
 	}
-	
-	
-//	public void mergeTrackObjects(List<AnimalTrack> trackedSegments) {
-//		int startFrame = video.getStartFrameNum();
-//		List<AnimalTrack> finalAnimalList = new ArrayList<AnimalTrack>();
-//		for(int i = 0; i < trackedSegments.size(); i++) {
-//			if(trackedSegments.get(i).getFirstFrame() == startFrame) {
-//				AnimalTrack tempAnimalTrack = trackedSegments.get(i); 
-//				finalAnimalList.add(tempAnimalTrack);
-//				trackedSegments.remove(i);
-//			}
-//		}
-////		for(int i = 0; i < trackedSegments.size(); i++) {
-////			if(trackedSegments.get(i).getFirstFrame() == startFrame) {
-////				trackedSegments.remove(i);
-////			}
-////		}
-//		for (AnimalTrack track: finalAnimalList) {
-//			System.out.println("final: " + track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
-//		}
-//		
-//		for (AnimalTrack track: trackedSegments) {
-//			System.out.println("unknown: " + track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
-//		}
-//		for(int i = 0; i<finalAnimalList.size(); i++) {
-//			//int trackedSegmentsSize = trackedSegments.size();
-//			int j = 0;
-//			boolean foundData = false;
-//			while(!foundData ||  j > trackedSegments.size()) {
-//				System.out.println(j);
-//				AnimalTrack currentFinalAnimal = finalAnimalList.get(i);
-//				AnimalTrack currentUnknownTrack = trackedSegments.get(j);
-//				System.out.println(currentFinalAnimal.getName() + currentFinalAnimal.getFirstFrame());
-//				System.out.println(currentUnknownTrack.getName() + currentUnknownTrack.getFirstFrame());
-//				if(currentUnknownTrack.getFirstFrame() - currentFinalAnimal.getLastFrame() < 50) {
-//					System.out.println("hi");
-//					if(Math.sqrt(Math.pow(currentFinalAnimal.getTimePointAtIndex(currentFinalAnimal.getNumPoints()).getX()- currentUnknownTrack.getTimePointAtIndex(0).getX(), 2) + 
-//							Math.pow(currentFinalAnimal.getTimePointAtIndex(currentFinalAnimal.getNumPoints()).getY()- currentUnknownTrack.getTimePointAtIndex(0).getY(), 2)) < 40) {
-//						currentFinalAnimal.addTrackSegment(currentUnknownTrack);
-//						//trackedSegments.remove(j);
-//						foundData = true;
-//					}
-//				}
-//				j++;
-//			}
-//		}
-//		for (AnimalTrack track: finalAnimalList) {
-//			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: " + track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
-//		}
-//		
-//		
-//	}
-	
-	
 	
 }

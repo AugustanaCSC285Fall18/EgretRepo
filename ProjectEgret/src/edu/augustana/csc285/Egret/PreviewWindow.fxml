@@ -22,7 +22,7 @@
 
 <!--  -->
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="666.0" prefWidth="958.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.PreviewWindowController">
    <top>
       <MenuBar BorderPane.alignment="CENTER">
         <menus>
@@ -51,14 +51,14 @@
 
             <StackPane layoutX="75.0" layoutY="80.0">
                <children>
-                  <ImageView fx:id="currentFrameImage" fitHeight="234.0" fitWidth="340.0" pickOnBounds="true" preserveRatio="true" />
-                  <Canvas fx:id="canvas" height="232.0" onMouseClicked="#handleCanvasClick" width="341.0">
+                  <ImageView fx:id="currentFrameImage" fitHeight="487.0" fitWidth="666.0" pickOnBounds="true" preserveRatio="true" />
+                  <Canvas fx:id="canvas" height="492.0" onMouseClicked="#handleCanvasClick" width="641.0">
                      <StackPane.margin>
                         <Insets />
                      </StackPane.margin></Canvas>
                </children>
             </StackPane>
-            <Slider fx:id="sliderSeekBar" layoutX="65.0" layoutY="318.0" onDragDetected="#runSliderSeekBar" onDragDropped="#runSliderSeekBar" onMouseClicked="#runSliderSeekBar" prefHeight="14.0" prefWidth="362.0" />
+            <Slider fx:id="sliderSeekBar" layoutX="14.0" layoutY="584.0" onDragDetected="#runSliderSeekBar" onDragDropped="#runSliderSeekBar" onMouseClicked="#runSliderSeekBar" prefHeight="14.0" prefWidth="735.0" />
             <StackPane layoutY="50.0" prefWidth="500.0">
                <children>
                   <Label fx:id="instructLabel">

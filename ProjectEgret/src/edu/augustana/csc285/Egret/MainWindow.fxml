@@ -11,7 +11,6 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-
 <BorderPane prefHeight="671.0" prefWidth="761.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.MainWindowController">
    <bottom>
       <FlowPane columnHalignment="CENTER" BorderPane.alignment="TOP_CENTER">
@@ -30,14 +29,19 @@
                </FlowPane.margin>
             </Label>
             <ProgressBar fx:id="progressAutoTrack" prefWidth="200.0" progress="0.0" />
+            <Button fx:id="continueBtn" mnemonicParsing="false" onAction="#continueToEditingWindow" text="Continue">
+               <opaqueInsets>
+                  <Insets />
+               </opaqueInsets>
+               <FlowPane.margin>
+                  <Insets left="2.0" />
+               </FlowPane.margin>
+            </Button>
          </children>
       </FlowPane>
    </bottom>
    <top>
       <BorderPane BorderPane.alignment="CENTER">
-         <left>
-            <Button mnemonicParsing="false" onAction="#handleBrowse" text="Browse" BorderPane.alignment="CENTER" />
-         </left>
          <right>
             <TextField fx:id="textFieldCurFrameNum" editable="false" prefWidth="100.0" promptText="(frame #)" BorderPane.alignment="CENTER" />
          </right>
@@ -52,6 +56,9 @@
             <ImageView fx:id="videoView" pickOnBounds="true" preserveRatio="true" />
             <Slider fx:id="sliderVideoTime" />
          </children>
+         <BorderPane.margin>
+            <Insets left="3.0" />
+         </BorderPane.margin>
       </VBox>
    </center>
 </BorderPane>
