@@ -115,7 +115,7 @@ public class PreviewWindowController {
 	//private String fileName = null;
 	public double numFrame;
 	
-	ProjectData data = new ProjectData();
+	ProjectData data;
 	
 	boolean pointsCalibrated = false;
 	Point upperLeftCorner = new Point();
@@ -134,7 +134,7 @@ public class PreviewWindowController {
 		File chosenFile = fileChooser.showOpenDialog(mainWindow);
 		if (chosenFile != null) {
 			String fileName = chosenFile.toURI().toString();
-			data.setVideo(new Video(fileName));
+			data = new ProjectData(fileName);
 			data.getVideo().setTimeStep(1);
 			startVideo();
 		};

@@ -106,22 +106,13 @@ public class EditingWindowController {
 	private static int frameRate;
 	private int currentFrameNumber;
 
-	/**
-	 * 
-	 * @throws FileNotFoundException
-	 */
 
-	/*
-	 * Aims to draw a circle around the track that is currently being focused by the
-	 * animalTrack combo box. Currently does not work because the field immediately
-	 * has nothing in it, unsure how to fix. TODO: fix this too.
-	 */
-//	public void showSpecifiedAnimalTrack() {
-//		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
-//		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
-//		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
-//		gc.strokeOval(curAnimal.getTimePointAtTime(currentFrameNumber).getX() - (drawX * 3), curAnimal.getTimePointAtTime(currentFrameNumber).getY() - (drawY * 3), drawX * 3, drawY *3);
-//	}
+	//frameJumpModifier=1 is a timeStep of one second
+	public void setFrameJumpModifier(int timeStep){
+		frameJumpModifier=timeStep;
+		timeStepField.setText("" + frameJumpModifier);
+	}
+
 
 	/**
 	 * Updates the ImageView to the given frame number.
@@ -615,7 +606,8 @@ public class EditingWindowController {
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
-		timeStepField.setText("" + frameJumpModifier);
+		timeStepField.setText("" + data.getVideo().getTimeStep());
+
 		startVideo();
 	}
 
