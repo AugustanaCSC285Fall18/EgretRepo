@@ -87,7 +87,7 @@ public class AutoTracker {
 				if (vid.getArenaBounds().contains(tpt.getX(),tpt.getY())) {
 					double maxPixelMovementPerFrame = maxMovementSpeed * vid.getAvgPixelsPerCm() / vid.getFrameRate();
 					AnimalTrack track = getMatchOrCreateAnimalTrackForPoint(tpt, currentlyTrackingSegments, maxPixelMovementPerFrame);
-					track.add(tpt);
+					track.addTimePoint(tpt);
 				}
 			}
 			

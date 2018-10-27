@@ -12,8 +12,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.ImageView;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.AnchorPane;
@@ -41,7 +43,7 @@ public class WelcomeWindowController {
     
     @FXML
     private AnchorPane currentFrameImage;
-   
+    
     private Stage stage;
 
     
@@ -93,16 +95,22 @@ public class WelcomeWindowController {
 			primary.setScene(nextScene);
 			EditingWindowController nextController = loader.getController();
 			nextController.initializeWithProjectData(chosenProject);
-
-
 		}
-		
-
-
-    
     }
-
-
-
+    
+    @FXML
+    void showAboutMessage() {
+    	Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("About Message");
+		alert.setHeaderText(null);
+		String names = "Team Egret: Kathryn Clark, Brent Pierce, Avery Vanopdorp\nProject SuperVisor: Dr. Forrest Stonedahl";
+		String className = "Project for CSC 285 at Augustana College";
+		String acknowledgements = "Thanks to all of the teams that we conversed with about the project, the Q&A site to help get "
+				+ "stuff sorted out, Luigi De Russis for a way to start the project from Lab 3, and everything else that may need a "
+				+ "mention that I have left out. ";
+		String usedLibraries = "Credit to the libraries: OpenCV, JavaFX, GSON, JSON";
+		alert.setContentText(names + "\n" + className + "\n\n" + acknowledgements + "\n\n" + usedLibraries);
+		alert.showAndWait();
+    }
 }
 

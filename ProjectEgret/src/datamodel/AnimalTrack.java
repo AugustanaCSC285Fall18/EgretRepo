@@ -9,17 +9,22 @@ import org.opencv.core.Point;
 
 public class AnimalTrack {
 
+	//Data Fields
 	private Point centerPoint;
 	private ArrayList<TimePoint> positions;
 	private String animalId;
 
+	//Constructor
 	public AnimalTrack(String name) {
 		this.animalId = name;
 		positions = new ArrayList<TimePoint>();
 	}
 
-	public void setLocations(ArrayList<TimePoint> position) {
-		this.positions = position;
+	/**
+	 * @param positions - the list of TimePoints to set the position to. 
+	 */
+	public void setLocations(ArrayList<TimePoint> positions) {
+		this.positions = positions;
 	}
 
 	/**
@@ -76,14 +81,26 @@ public class AnimalTrack {
 		positions.add(new TimePoint(newCenterPoint, frameNum));
 	}
 
-	public void add(TimePoint pt) {
+	/**
+	 * Allows the user to add a TimePoint to the list of locations. 
+	 * @param pt - the point to add
+	 */
+	public void addTimePoint(TimePoint pt) {
 		positions.add(pt);
 	}
 
+	/**
+	 * Allows the user to remove a location at a given index. 
+	 * @param index
+	 */
 	public void removeLocation(int index) {
 		positions.remove(index);
 	}
 
+	/**
+	 * @param index - index of TimePoint to get
+	 * @return a TimePoint at a specified index
+	 */
 	public TimePoint getTimePointAtIndex(int index) {
 		if (positions.size()<= index || index < 0) {
 			return null;
@@ -93,6 +110,10 @@ public class AnimalTrack {
 		
 	}
 
+	/**
+	 * @param frameNum - the frame number to search for
+	 * @return the TimePoint at a given frame number
+	 */
 	public TimePoint getTimePointAtTime(int frameNum) {
 		// TODO: This method's implementation is inefficient [linear search is O(N)]
 		// Replace this with binary search (O(log n)] or use a Map for fast access
@@ -104,12 +125,20 @@ public class AnimalTrack {
 		return null;
 	}
 
+	/**
+	 * @param frameNum - the frame number of the given time
+	 * @return true if there is a TimePoint at a given time
+	 */
 	public boolean hasTimePointAtTime(int frameNum) {
 		// TODO: This method's implementation is inefficient [linear search is O(N)]
 		// Replace this with binary search (O(log n)] or use a Map for fast access
 		return getTimePointAtTime(frameNum) != null;
 	}
 	
+	/**
+	 * @param index - the index of the TimePoint to look for
+	 * @return True if there is a TimePoint at that index
+	 */
 	public boolean hasTimePointAtIndex(int index) {
 		// TODO: This method's implementation is inefficient [linear search is O(N)]
 		// Replace this with binary search (O(log n)] or use a Map for fast access
@@ -132,6 +161,11 @@ public class AnimalTrack {
 		return null;
 	}
 	
+	/**
+	 * @param startFrameNum - the start of the interval
+	 * @param endFrameNum - the end of the interval
+	 * @return A list of time points within a given interval
+	 */
 	public List<TimePoint> getTimePointsWithinInterval(double startFrameNum, double endFrameNum) {
 		List<TimePoint> pointsInInterval = new ArrayList<>(); 
 		for (TimePoint pt : positions) {
@@ -142,14 +176,21 @@ public class AnimalTrack {
 		return pointsInInterval;
 	}
 	
-	
-
-	public void setTimePointAtTime(Point curPoint, int frameNum) {
+	/**
+	 * Sets a time point at a given time. 
+	 * @param newPoint - The new point to set the current time point to
+	 * @param frameNum - the frame number that will get a new point
+	 */
+	public void setTimePointAtTime(Point newPoint, int frameNum) {
 		TimePoint currentTimePoint = getTimePointAtTime(frameNum);
-		currentTimePoint.setX(curPoint.x);
-		currentTimePoint.setY(curPoint.y);
+		currentTimePoint.setX(newPoint.x);
+		currentTimePoint.setY(newPoint.y);
 	}
 	
+	/**
+	 * Gets a list of TimePoints to be added to the current AnimalTrack.
+	 * @param newList - the other AnimalTrack to get the list from
+	 */
 	public void addTrackSegment(AnimalTrack newList) {
 		for (int i = 0; i < newList.getNumPoints(); i++) {
 		    positions.add(newList.getTimePointAtIndex(i)); 
@@ -157,40 +198,62 @@ public class AnimalTrack {
 		//positions.addAll((Collection<? extends TimePoint>) newList);
 	}
 
+	/**
+	 * @return the most recently added time point in the list of locations
+	 */
 	public TimePoint getFinalTimePoint() {
-		if(positions.size() <= 0) { 
+		if (positions.size() <= 0) { 
 			return null;
-		}else {
+		} else {
 			return positions.get(positions.size() - 1);
 		}
 	}
 	
+	/**
+	 * @return the first TimePoint in the list of locations
+	 */
 	public TimePoint getFirstTimePoint() {
-		if(positions.size() <= 0) {
+		if (positions.size() <= 0) {
 			return null;
-		}else {
-		
+		} else {
 			return positions.get(0);
-	
 		}
 	}
+	
+	/**
+	 * @return X coordinate of the current center point
+	 */
 	public double getX() {
 		return centerPoint.x;
 	}
 
+	/**
+	 * @return Y coordinate of the current center point
+	 */
 	public double getY() {
 		return centerPoint.y;
 	}
 	
+	/**
+	 * @return the frame number of the first TimePoint in positions. 
+	 */
 	public int getFirstFrame() {
 		return positions.get(0).getFrameNum();
 	}
 	
+	/**
+	 * @return the frame number of the last TimePoint in positions. 
+	 */
 	public int getLastFrame() {
 		return positions.get(positions.size()-1).getFrameNum();
 	}
 
-
+	/**
+	 * Compares two points to see if they are equal.
+	 * @param tp1 - the first TimePoint to compare
+	 * @param tp2 - the first TimePoint to compare
+	 * @return True if the two points are equal 
+	 */
 	public static boolean comparePoint(TimePoint tp1, TimePoint tp2) {
 		if (!(tp1.getX() == tp2.getX())) {
 			return false;
@@ -202,6 +265,4 @@ public class AnimalTrack {
 			return true;
 		}
 	}
-
-	
 }
