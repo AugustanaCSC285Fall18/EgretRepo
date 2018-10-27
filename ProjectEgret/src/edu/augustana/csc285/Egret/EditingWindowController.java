@@ -91,7 +91,7 @@ public class EditingWindowController {
 	private static final int drawX = 5;
 	private static final int drawY = 5;
 	private TimePoint previousPoint;
-	private int frameJumpModifier = 2;
+	private int frameJumpModifier;
 	
 	// from calibration: random assignment at the moment
 	private int totalAmountOfAnimals = 2;
@@ -121,6 +121,11 @@ public class EditingWindowController {
 			System.out.println(track.getName() + "Num of Points " + track.getNumPoints() + " first point: "
 					+ track.getFirstTimePoint() + " last point: " + track.getFinalTimePoint());
 		}
+	}
+	
+	//frameJumpModifier=1 is a timeStep of one second
+	public void setFrameJumpModifier(int timeStep){
+		frameJumpModifier=timeStep;
 	}
 
 	/*
