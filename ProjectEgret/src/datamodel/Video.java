@@ -23,6 +23,7 @@ public class Video {
 	private Point origin;
 	
 	private int timeStep;
+	private int timeStepIndex;
 
 	public Video(String filePath) throws FileNotFoundException {
 		this.filePath = filePath;
@@ -181,6 +182,14 @@ public class Video {
 	
 	public void setTimeStep(int timeStep) {
 		this.timeStep=timeStep;
+	}
+	
+	public int getTimeStepIndex() {
+		return timeStepIndex;
+	}
+	
+	public void setTimeStepIndex(int index) {
+		timeStepIndex = index;
 	}
 
 	//same as get time in seconds

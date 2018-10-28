@@ -187,6 +187,7 @@ public class PreviewWindowController {
     
     public void setTimeStep() {
     	data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
+    	data.getVideo().setTimeStepIndex(timeStepBox.getSelectionModel().getSelectedIndex());
     }
 
     @FXML
@@ -267,8 +268,6 @@ public class PreviewWindowController {
 				upperLeftCorner.setLocation(event.getX(), event.getY());
 				rect.add(upperLeftCorner);
 				changeStepAndInstructLabel("Please select the lower right hand corner of the box");
-//				step=2;
-//				instructLabel.setText("Please select the lower right hand corner of the box");
 			} else if (step==2) {
 				lowerRightCorner.setLocation(event.getX(), event.getY());
 				rect.add(lowerRightCorner);
@@ -280,13 +279,12 @@ public class PreviewWindowController {
 				lowerLeftCorner.setLocation(event.getX(), event.getY());
 				changeStepAndInstructLabel("Please select where you would like your origin to be located.");
 				gc.setFill(Color.AQUA);
-//				step=4;
-//				instructLabel.setText("Please select where you would like your origin to be located.");
 			} else if (step==4) {
 				pointsCalibrated=true;
 				origin.setLocation(event.getX(), event.getY());
 				data.getVideo().setOriginPoint(origin);
 				openEmptyFrameDialog();
+				step=0;
 				endCalibration();
 			}
 			
@@ -306,10 +304,6 @@ public class PreviewWindowController {
     	dialog.setContentText("Please enter a time in which the box has no chickens: ");
     	
     	Optional<String> result = dialog.showAndWait();
-//    	String text = dialog.getContentText();
-//    	if(! Pattern.matches("``^[a-zA-Z]+$`", result.get())) {
-//    		
-//    	}
     	if (result.isPresent()){
     		String string = result.get();
     		int index = string.indexOf(":");

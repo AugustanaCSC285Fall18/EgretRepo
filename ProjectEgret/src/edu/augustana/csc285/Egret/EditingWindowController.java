@@ -3,6 +3,8 @@ package edu.augustana.csc285.Egret;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -82,6 +84,8 @@ public class EditingWindowController {
 	@FXML 
 	private TextField timeStepField;
 	private GraphicsContext gc;
+	@FXML
+	private ChoiceBox<Integer> timeStepBox;
 	
 	//Data Fields 
 	public double totalNumFrame;
@@ -107,6 +111,9 @@ public class EditingWindowController {
 	// than continuously calling for an int value. 
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
+	
+	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+	private ObservableList items = FXCollections.observableList(list);
 
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
@@ -609,6 +616,9 @@ public class EditingWindowController {
 
 	@FXML
 	public void initialize() throws FileNotFoundException {
+		timeStepBox.setItems(items);
+		//timeStepBox.getSelectionModel().select(data.getVideo().getTimeStepIndex());
+		//timeStepBox.getSelectionModel().select(0); use this when testing just this window
 	}
 
 	/**
