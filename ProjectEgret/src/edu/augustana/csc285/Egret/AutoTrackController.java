@@ -56,8 +56,6 @@ public class AutoTrackController implements AutoTrackListener {
 	private Stage stage;
 	private Video video;
 	
-	//
-	
 	@FXML public void initialize() {
 		
 		sliderVideoTime.valueProperty().addListener((obs, oldV, newV) -> showFrameAt(newV.intValue())); 
@@ -98,8 +96,6 @@ public class AutoTrackController implements AutoTrackListener {
 		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		Stage primary = (Stage) continueBtn.getScene().getWindow();
 		primary.setScene(nextScene);
-		primary.centerOnScreen();
-		primary.setResizable(false);
 		EditingWindowController nextController = loader.getController();
 		nextController.initializeWithProjectData(project);
 	}

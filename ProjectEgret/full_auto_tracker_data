@@ -4,19 +4,20 @@
     "emptyFrameNum": 0,
     "startFrameNum": 0,
     "endFrameNum": 7191,
-    "xPixelsPerCm": 5.945600012160042,
-    "yPixelsPerCm": 6.891416189022333,
+    "xPixelsPerCm": 6.09935256462827,
+    "yPixelsPerCm": 6.8449963565868615,
     "arenaBounds": {
       "x": 0,
       "y": 0,
-      "width": 512,
-      "height": 350
+      "width": 524,
+      "height": 339
     },
     "origin": {
-      "x": 58,
+      "x": 47,
       "y": 60
     },
-    "timeStep": 1
+    "timeStep": 1,
+    "timeStepIndex": 0
   },
   "animalTracksList": [
     {
@@ -141,6 +142,26 @@
     {
       "positions": [
         {
+          "x": 413.0481626828398,
+          "y": 204.97621595909143,
+          "frameNum": 513
+        },
+        {
+          "x": 421.70654171260566,
+          "y": 205.74558985667034,
+          "frameNum": 514
+        },
+        {
+          "x": 432.24150541924325,
+          "y": 207.0072478223286,
+          "frameNum": 515
+        }
+      ],
+      "animalId": "\u003cAuto-6\u003e"
+    },
+    {
+      "positions": [
+        {
           "x": 399.0423772609819,
           "y": 133.11511627906978,
           "frameNum": 515
@@ -156,19 +177,9 @@
     {
       "positions": [
         {
-          "x": 413.0481626828398,
-          "y": 204.97621595909143,
-          "frameNum": 513
-        },
-        {
-          "x": 421.70654171260566,
-          "y": 205.74558985667034,
-          "frameNum": 514
-        },
-        {
-          "x": 432.24150541924325,
-          "y": 207.0072478223286,
-          "frameNum": 515
+          "x": 514.0341099436577,
+          "y": 87.31544084056647,
+          "frameNum": 519
         },
         {
           "x": 386.227385377943,
@@ -176,17 +187,7 @@
           "frameNum": 531
         }
       ],
-      "animalId": "\u003cAuto-6\u003e"
-    },
-    {
-      "positions": [
-        {
-          "x": 479.5382698881743,
-          "y": 347.79796048438493,
-          "frameNum": 778
-        }
-      ],
-      "animalId": "\u003cAuto-11\u003e"
+      "animalId": "\u003cAuto-8\u003e"
     },
     {
       "positions": [
@@ -671,16 +672,6 @@
           "frameNum": 668
         },
         {
-          "x": 385.5495539334955,
-          "y": 313.3291159772911,
-          "frameNum": 669
-        },
-        {
-          "x": 382.14782468057575,
-          "y": 315.016335112405,
-          "frameNum": 671
-        },
-        {
           "x": 380.47294082664285,
           "y": 315.68168302111206,
           "frameNum": 673
@@ -1021,11 +1012,6 @@
           "frameNum": 743
         },
         {
-          "x": 382.59016658579975,
-          "y": 315.0012938702895,
-          "frameNum": 744
-        },
-        {
           "x": 383.64848218213814,
           "y": 315.8774013785012,
           "frameNum": 745
@@ -1044,16 +1030,6 @@
           "x": 382.2651217023757,
           "y": 314.714327357528,
           "frameNum": 749
-        },
-        {
-          "x": 383.8983601233966,
-          "y": 314.9142717973697,
-          "frameNum": 750
-        },
-        {
-          "x": 377.31587455544775,
-          "y": 314.73520853540253,
-          "frameNum": 764
         },
         {
           "x": 376.58560193587414,
@@ -1094,16 +1070,6 @@
           "x": 380.80065207265955,
           "y": 312.09470579102623,
           "frameNum": 772
-        },
-        {
-          "x": 381.0671474358974,
-          "y": 312.69983974358973,
-          "frameNum": 773
-        },
-        {
-          "x": 381.5094066570188,
-          "y": 314.04936484965424,
-          "frameNum": 775
         },
         {
           "x": 382.9590075512405,
@@ -1196,7 +1162,7 @@
           "frameNum": 795
         }
       ],
-      "animalId": "\u003cAuto-8\u003e"
+      "animalId": "\u003cAuto-9\u003e"
     },
     {
       "positions": [
@@ -1264,11 +1230,6 @@
           "x": 458.214295705693,
           "y": 208.66862498251504,
           "frameNum": 665
-        },
-        {
-          "x": 458.65275756105444,
-          "y": 209.60391395762574,
-          "frameNum": 666
         },
         {
           "x": 426.84063615709186,
@@ -1876,7 +1837,17 @@
           "frameNum": 795
         }
       ],
-      "animalId": "\u003cAuto-9\u003e"
+      "animalId": "\u003cAuto-10\u003e"
+    },
+    {
+      "positions": [
+        {
+          "x": 365.3972199946538,
+          "y": 271.9545041432772,
+          "frameNum": 796
+        }
+      ],
+      "animalId": "\u003cAuto-12\u003e"
     },
     {
       "positions": [
@@ -5596,7 +5567,7 @@
           "frameNum": 2674
         }
       ],
-      "animalId": "\u003cAuto-12\u003e"
+      "animalId": "\u003cAuto-13\u003e"
     },
     {
       "positions": [
@@ -9316,7 +9287,7 @@
           "frameNum": 2674
         }
       ],
-      "animalId": "\u003cAuto-13\u003e"
+      "animalId": "\u003cAuto-14\u003e"
     },
     {
       "positions": [
@@ -9466,7 +9437,7 @@
           "frameNum": 2746
         }
       ],
-      "animalId": "\u003cAuto-14\u003e"
+      "animalId": "\u003cAuto-15\u003e"
     },
     {
       "positions": [
@@ -19531,7 +19502,7 @@
           "frameNum": 2803
         }
       ],
-      "animalId": "\u003cAuto-10\u003e"
+      "animalId": "\u003cAuto-11\u003e"
     },
     {
       "positions": [
@@ -19876,7 +19847,7 @@
           "frameNum": 2803
         }
       ],
-      "animalId": "\u003cAuto-15\u003e"
+      "animalId": "\u003cAuto-16\u003e"
     },
     {
       "positions": [
@@ -19916,7 +19887,7 @@
           "frameNum": 2859
         }
       ],
-      "animalId": "\u003cAuto-17\u003e"
+      "animalId": "\u003cAuto-18\u003e"
     },
     {
       "positions": [
@@ -19956,7 +19927,7 @@
           "frameNum": 2859
         }
       ],
-      "animalId": "\u003cAuto-18\u003e"
+      "animalId": "\u003cAuto-19\u003e"
     },
     {
       "positions": [
@@ -23901,7 +23872,7 @@
           "frameNum": 3571
         }
       ],
-      "animalId": "\u003cAuto-16\u003e"
+      "animalId": "\u003cAuto-17\u003e"
     },
     {
       "positions": [
@@ -23921,7 +23892,7 @@
           "frameNum": 3962
         }
       ],
-      "animalId": "\u003cAuto-20\u003e"
+      "animalId": "\u003cAuto-21\u003e"
     },
     {
       "positions": [
@@ -23941,7 +23912,7 @@
           "frameNum": 3962
         }
       ],
-      "animalId": "\u003cAuto-21\u003e"
+      "animalId": "\u003cAuto-22\u003e"
     },
     {
       "positions": [
@@ -24006,7 +23977,7 @@
           "frameNum": 4010
         }
       ],
-      "animalId": "\u003cAuto-23\u003e"
+      "animalId": "\u003cAuto-24\u003e"
     },
     {
       "positions": [
@@ -25251,7 +25222,7 @@
           "frameNum": 4022
         }
       ],
-      "animalId": "\u003cAuto-19\u003e"
+      "animalId": "\u003cAuto-20\u003e"
     },
     {
       "positions": [
@@ -25361,7 +25332,7 @@
           "frameNum": 4061
         }
       ],
-      "animalId": "\u003cAuto-22\u003e"
+      "animalId": "\u003cAuto-23\u003e"
     },
     {
       "positions": [
@@ -25441,7 +25412,7 @@
           "frameNum": 4112
         }
       ],
-      "animalId": "\u003cAuto-25\u003e"
+      "animalId": "\u003cAuto-26\u003e"
     },
     {
       "positions": [
@@ -25521,7 +25492,7 @@
           "frameNum": 4112
         }
       ],
-      "animalId": "\u003cAuto-26\u003e"
+      "animalId": "\u003cAuto-27\u003e"
     },
     {
       "positions": [
@@ -25706,7 +25677,7 @@
           "frameNum": 4139
         }
       ],
-      "animalId": "\u003cAuto-24\u003e"
+      "animalId": "\u003cAuto-25\u003e"
     },
     {
       "positions": [
@@ -26086,7 +26057,7 @@
           "frameNum": 4462
         }
       ],
-      "animalId": "\u003cAuto-28\u003e"
+      "animalId": "\u003cAuto-29\u003e"
     },
     {
       "positions": [
@@ -26466,7 +26437,7 @@
           "frameNum": 4462
         }
       ],
-      "animalId": "\u003cAuto-29\u003e"
+      "animalId": "\u003cAuto-30\u003e"
     },
     {
       "positions": [
@@ -26581,7 +26552,7 @@
           "frameNum": 4817
         }
       ],
-      "animalId": "\u003cAuto-30\u003e"
+      "animalId": "\u003cAuto-31\u003e"
     },
     {
       "positions": [
@@ -26696,7 +26667,7 @@
           "frameNum": 4817
         }
       ],
-      "animalId": "\u003cAuto-31\u003e"
+      "animalId": "\u003cAuto-32\u003e"
     },
     {
       "positions": [
@@ -26826,7 +26797,7 @@
           "frameNum": 5003
         }
       ],
-      "animalId": "\u003cAuto-32\u003e"
+      "animalId": "\u003cAuto-33\u003e"
     },
     {
       "positions": [
@@ -26956,7 +26927,7 @@
           "frameNum": 5003
         }
       ],
-      "animalId": "\u003cAuto-33\u003e"
+      "animalId": "\u003cAuto-34\u003e"
     },
     {
       "positions": [
@@ -27226,7 +27197,7 @@
           "frameNum": 5102
         }
       ],
-      "animalId": "\u003cAuto-34\u003e"
+      "animalId": "\u003cAuto-35\u003e"
     },
     {
       "positions": [
@@ -27496,7 +27467,7 @@
           "frameNum": 5102
         }
       ],
-      "animalId": "\u003cAuto-35\u003e"
+      "animalId": "\u003cAuto-36\u003e"
     },
     {
       "positions": [
@@ -33646,7 +33617,7 @@
           "frameNum": 5399
         }
       ],
-      "animalId": "\u003cAuto-27\u003e"
+      "animalId": "\u003cAuto-28\u003e"
     },
     {
       "positions": [
@@ -34446,7 +34417,7 @@
           "frameNum": 5399
         }
       ],
-      "animalId": "\u003cAuto-37\u003e"
+      "animalId": "\u003cAuto-38\u003e"
     },
     {
       "positions": [
@@ -36971,7 +36942,7 @@
           "frameNum": 5739
         }
       ],
-      "animalId": "\u003cAuto-36\u003e"
+      "animalId": "\u003cAuto-37\u003e"
     },
     {
       "positions": [
@@ -38521,7 +38492,7 @@
           "frameNum": 5739
         }
       ],
-      "animalId": "\u003cAuto-38\u003e"
+      "animalId": "\u003cAuto-39\u003e"
     },
     {
       "positions": [
@@ -41826,7 +41797,7 @@
           "frameNum": 6090
         }
       ],
-      "animalId": "\u003cAuto-39\u003e"
+      "animalId": "\u003cAuto-40\u003e"
     },
     {
       "positions": [
@@ -43381,7 +43352,7 @@
           "frameNum": 6090
         }
       ],
-      "animalId": "\u003cAuto-41\u003e"
+      "animalId": "\u003cAuto-42\u003e"
     },
     {
       "positions": [
@@ -43391,7 +43362,7 @@
           "frameNum": 6205
         }
       ],
-      "animalId": "\u003cAuto-42\u003e"
+      "animalId": "\u003cAuto-43\u003e"
     },
     {
       "positions": [
@@ -43401,7 +43372,7 @@
           "frameNum": 6205
         }
       ],
-      "animalId": "\u003cAuto-43\u003e"
+      "animalId": "\u003cAuto-44\u003e"
     },
     {
       "positions": [
@@ -44431,7 +44402,7 @@
           "frameNum": 6443
         }
       ],
-      "animalId": "\u003cAuto-44\u003e"
+      "animalId": "\u003cAuto-45\u003e"
     },
     {
       "positions": [
@@ -45466,7 +45437,7 @@
           "frameNum": 6443
         }
       ],
-      "animalId": "\u003cAuto-45\u003e"
+      "animalId": "\u003cAuto-46\u003e"
     },
     {
       "positions": [
@@ -50016,7 +49987,7 @@
           "frameNum": 6708
         }
       ],
-      "animalId": "\u003cAuto-40\u003e"
+      "animalId": "\u003cAuto-41\u003e"
     },
     {
       "positions": [
@@ -50946,7 +50917,7 @@
           "frameNum": 6708
         }
       ],
-      "animalId": "\u003cAuto-47\u003e"
+      "animalId": "\u003cAuto-48\u003e"
     },
     {
       "positions": [
@@ -54336,7 +54307,7 @@
           "frameNum": 7191
         }
       ],
-      "animalId": "\u003cAuto-46\u003e"
+      "animalId": "\u003cAuto-47\u003e"
     },
     {
       "positions": [
@@ -56261,7 +56232,7 @@
           "frameNum": 7191
         }
       ],
-      "animalId": "\u003cAuto-48\u003e"
+      "animalId": "\u003cAuto-49\u003e"
     },
     {
       "positions": [
@@ -58136,7 +58107,7 @@
           "frameNum": 7191
         }
       ],
-      "animalId": "\u003cAuto-49\u003e"
+      "animalId": "\u003cAuto-50\u003e"
     }
   ],
   "colorArrayForAnimalTracks": [
