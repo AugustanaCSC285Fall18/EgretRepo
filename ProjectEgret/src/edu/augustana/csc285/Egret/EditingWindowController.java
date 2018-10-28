@@ -48,12 +48,6 @@ public class EditingWindowController {
 	@FXML
 	private AnchorPane anchorPane;
 	@FXML
-	private MenuItem closeOption;
-	@FXML
-	private MenuItem saveOption;
-	@FXML
-	private MenuItem undoOption;
-	@FXML
 	private ToggleButton modifyToggleBtn;
 	@FXML
 	private Button undoBtn;
@@ -84,7 +78,7 @@ public class EditingWindowController {
 	@FXML 
 	private TextField timeStepField;
 	@FXML
-	private ComboBox<String> timeStepBox;
+	private ChoiceBox<Integer> timeStepBox;
 	private GraphicsContext gc;
 	
 	//Data Fields 
@@ -112,13 +106,16 @@ public class EditingWindowController {
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
 	
+//<<<<<<< HEAD
+//=======
+//	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+//	private ObservableList items = FXCollections.observableList(list);
+//>>>>>>> branch 'master' of https://github.com/AugustanaCSC285Fall18/EgretRepo.git
 
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
 		frameJumpModifier=timeStep;
-		List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
-		ObservableList items = FXCollections.observableList(list);
-		timeStepBox.setItems(items);
+		
 	}
 
 	/*
@@ -532,8 +529,7 @@ public class EditingWindowController {
 	}
 	 
 	public void setTimeStep() {
-		String timeStep = timeStepBox.getSelectionModel().getSelectedItem();
-	    data.getVideo().setTimeStep(Integer.parseInt(timeStep));
+	    data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
     }
 	 
 	/**
@@ -655,7 +651,9 @@ public class EditingWindowController {
 
 	@FXML
 	public void initialize() throws FileNotFoundException {
-			
+		List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+		ObservableList items = FXCollections.observableList(list);
+		timeStepBox.setItems(items);
 	}
 
 	/**

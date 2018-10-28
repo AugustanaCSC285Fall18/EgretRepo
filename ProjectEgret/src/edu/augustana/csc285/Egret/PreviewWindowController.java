@@ -56,14 +56,8 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-//
+
 public class PreviewWindowController {
-
-    @FXML
-    private MenuItem advancedSettings;
-
-    @FXML
-    private MenuItem closeOption;
     
     @FXML
     private ComboBox<String> chicksComboBox;
@@ -187,6 +181,7 @@ public class PreviewWindowController {
     
     public void setTimeStep() {
     	data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
+    	data.getVideo().setTimeStepIndex(timeStepBox.getSelectionModel().getSelectedIndex());
     }
 
     @FXML
@@ -272,15 +267,9 @@ public class PreviewWindowController {
 				changeStepAndInstructLabel("Please select the lower LEFT hand corner of the box");
 			} else if (step==2) {
 				lowerLeftCorner.setLocation(event.getX(), event.getY());
-				
 				changeStepAndInstructLabel("Please select the lower RIGHT hand corner of the box.");
 			} else if (step==3) {
-				
-				
-				lowerRightCorner.setLocation(event.getX(), event.getY());
-				rect.add(lowerRightCorner);
-				data.getVideo().setArenaBounds(rect);
-				System.out.println(rect);
+				lowerLeftCorner.setLocation(event.getX(), event.getY());
 				changeStepAndInstructLabel("Please select where you would like your origin to be located.");
 				gc.setFill(Color.AQUA);
 			} else if (step==4) {
@@ -289,6 +278,7 @@ public class PreviewWindowController {
 				data.getVideo().setOriginPoint(origin);
 				System.out.println(origin);
 				openEmptyFrameDialog();
+				step=0;
 				endCalibration();
 			}
 		}
@@ -306,10 +296,6 @@ public class PreviewWindowController {
     	dialog.setContentText("Please enter a time in which the box has no chickens: ");
     	
     	Optional<String> result = dialog.showAndWait();
-//    	String text = dialog.getContentText();
-//    	if(! Pattern.matches("``^[a-zA-Z]+$`", result.get())) {
-//    		
-//    	}
     	if (result.isPresent()){
     		String string = result.get();
     		int index = string.indexOf(":");
@@ -378,6 +364,8 @@ public class PreviewWindowController {
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		Stage primary = (Stage) continueBtn.getScene().getWindow();
 		primary.setScene(scene);
+		primary.centerOnScreen();
+		primary.setResizable(false);
 		controller.initializeWithStage(primary);
 		controller.loadVideo(data.getVideo().getFilePath(), data);
 		primary.show();
@@ -432,7 +420,6 @@ public class PreviewWindowController {
 	    		jumpToFrame(data.getVideo().getStartFrameNum());
 	    	}
     	}
-    	
     }
 
     @FXML
