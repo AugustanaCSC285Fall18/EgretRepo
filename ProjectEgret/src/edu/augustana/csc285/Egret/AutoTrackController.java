@@ -56,6 +56,8 @@ public class AutoTrackController implements AutoTrackListener {
 	private Stage stage;
 	private Video video;
 	
+	//
+	
 	@FXML public void initialize() {
 		
 		sliderVideoTime.valueProperty().addListener((obs, oldV, newV) -> showFrameAt(newV.intValue())); 
