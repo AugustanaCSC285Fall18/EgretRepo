@@ -12,13 +12,13 @@ import javafx.scene.layout.Pane;
 import javafx.fxml.FXMLLoader;
 
 
-public class Main extends Application {
+public class AutoTrackWindow extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainWindow.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("AutoTrackWindow.fxml"));
 			BorderPane root = (BorderPane)loader.load();
-			MainWindowController controller = loader.getController();
+			AutoTrackController controller = loader.getController();
 			
 			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());

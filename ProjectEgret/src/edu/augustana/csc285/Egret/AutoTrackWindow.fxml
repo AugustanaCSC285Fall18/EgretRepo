@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="671.0" prefWidth="761.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.MainWindowController">
+<BorderPane prefHeight="671.0" prefWidth="761.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.AutoTrackController">
    <bottom>
       <FlowPane columnHalignment="CENTER" BorderPane.alignment="TOP_CENTER">
          <BorderPane.margin>
@@ -19,9 +19,9 @@
          </BorderPane.margin>
          <children>
             <Label text="Start frame:" />
-            <TextField fx:id="textfieldStartFrame" prefWidth="100.0" promptText="Frame#" text="5500" />
+            <TextField fx:id="textfieldStartFrame" prefWidth="100.0" promptText="Frame#" />
             <Label layoutX="10.0" layoutY="15.0" text="End:" />
-            <TextField fx:id="textfieldEndFrame" layoutX="47.0" layoutY="10.0" prefWidth="100.0" promptText="Frame#" text="5800" />
+            <TextField fx:id="textfieldEndFrame" layoutX="47.0" layoutY="10.0" prefWidth="100.0" promptText="Frame#" />
             <Button fx:id="btnAutotrack" mnemonicParsing="false" onAction="#handleStartAutotracking" text="Start Auto-Tracking" />
             <Label text="Progress: ">
                <FlowPane.margin>
