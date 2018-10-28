@@ -19,23 +19,43 @@ import datamodel.AnimalTrack;
 import datamodel.ProjectData;
 import datamodel.TimePoint;
 import datamodel.Video;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import javafx.stage.Window;
 
 public class Analysis {
 
 	private static ProjectData data;
-
-
-	//
+	private static ImageView currentFrameImage;
 	
-	public static void runAnalysis(ProjectData dataInformation) throws IOException {
+	/**
+	 * Runs all of the analysis; makes a CSV file for each type of analysis (Total Distance/Average Distance and 
+	 * list of points)
+	 * @param dataInformation - ProjectData object to get the information from
+	 * @param curFrameImage - the imageview so that they can have a save dialog box
+	 * @throws IOException if the user gives a file that cannot be read to
+	 */
+	public static void runAnalysis(ProjectData dataInformation, ImageView curFrameImage) throws IOException {
 		System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
 		data = dataInformation;
+		currentFrameImage = curFrameImage;
 		exportToCSV();
 		averageDistanceBetweenPointsAndTotalDistanceToCSV();
 	}
 
+	/**
+	 * Exports the tracks data (TimePoints of each AnimalTrack object in the ProjectData object, data)
+	 * @throws IOException if the user gives a file that cannot be read to
+	 */
 	public static void exportToCSV() throws IOException {
-		FileWriter fileWriter = new FileWriter(new File(data.getVideo().getFilePathJustName() + ".csv"));
+		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Video File");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showSaveDialog(mainWindow);
+
+		FileWriter fileWriter = new FileWriter(chosenFile);
+		
 		StringBuilder s = new StringBuilder();
 		int maxNumTimePoints = 0;
 
@@ -52,26 +72,22 @@ public class Analysis {
 		s.append('\n');
 
 		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
-			s.append("Time");
-			s.append(",");
-			s.append("X-Position");
-			s.append(",");
-			s.append("Y-Position");
-			s.append(",,");
+			s.append("Time,X-Position,Y-Position,,");
 		}
 		s.append('\n');
 
-		for (int i = 0; i < maxNumTimePoints; i++) {
+		//for (int i = 0; i < maxNumTimePoints; i++) {
+		int maxSeconds = (int) (data.getVideo().getEndFrameNum() / data.getVideo().getFrameRate());
+		for (int i = 0; i < maxSeconds; i++) {
 			for (int j = 0; j < data.getAnimalTracksList().size(); j++) {
 				AnimalTrack currentTrack = data.getAnimalTracksList().get(j);
 				if (currentTrack.hasTimePointAtIndex(i)) {
-					TimePoint currentTP = currentTrack.getTimePointAtIndex(i);
-					s.append(currentTP.getFrameNum());
-					s.append(",");
-					s.append(currentTP.getX());
-					s.append(",");
-					s.append(currentTP.getY());
-					s.append(",,");
+					//TimePoint currentTP = currentTrack.getTimePointAtIndex(i);
+					TimePoint currentTP = getPointAtSpecificSecond(currentTrack, i);
+					//s.append(currentTP.getFrameNum() + ",");
+					s.append(i + ",");
+					s.append(currentTP.getX()+ ",");
+					s.append(currentTP.getY()+ ",");
 				} else {
 					s.append(",,,,");
 				}
@@ -80,6 +96,15 @@ public class Analysis {
 		}
 		fileWriter.append(s);
 		fileWriter.close();
+	}
+	
+	private static TimePoint getPointAtSpecificSecond(AnimalTrack animal, int second) {
+		for (TimePoint pt : animal.getLocations()) {
+			if (pt.getFrameNum() == second * data.getVideo().getFrameRate()) {
+				return pt;
+			}
+		}
+		return null;
 	}
 
 	public static double[] totalDistanceTraveled() {

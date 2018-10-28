@@ -581,7 +581,7 @@ public class EditingWindowController {
 	@FXML
 	private void analyzeProjectData() {
 		try {
-			Analysis.runAnalysis(data);
+			Analysis.runAnalysis(data, currentFrameImage);
 			makeAlert("Analysis Complete", "CSV Files and Analysis have been added to your computer.");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -594,9 +594,13 @@ public class EditingWindowController {
 	 */
 	@FXML
 	private void saveUnfinishedProject() {
-		File tempDataFile = new File("Unfinished" + data.getVideo().getFilePathJustName());
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save Project File");
+		fileChooser.setInitialFileName(data.getVideo().getFilePathJustName() + ".txt");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showSaveDialog(mainWindow);
 		try {
-			data.saveToFile(tempDataFile);
+			data.saveToFile(chosenFile);
 			makeAlert("Tracking Saved","You have saved your project! Your file has been saved as \"Unfinished " + data.getVideo().getFilePathJustName() + "\". Hit the finish button to recieve CSV files and analysis");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
