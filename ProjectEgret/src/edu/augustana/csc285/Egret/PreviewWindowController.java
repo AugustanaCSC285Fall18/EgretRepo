@@ -58,12 +58,6 @@ import javafx.stage.Window;
 
 
 public class PreviewWindowController {
-
-    @FXML
-    private MenuItem advancedSettings;
-
-    @FXML
-    private MenuItem closeOption;
     
     @FXML
     private ComboBox<String> chicksComboBox;
@@ -273,8 +267,6 @@ public class PreviewWindowController {
 				rect.add(lowerRightCorner);
 				data.getVideo().setArenaBounds(rect);
 				changeStepAndInstructLabel("Please select the lower left hand corner of the box.");
-//				step=3;
-//				instructLabel.setText("Please select the lower left hand corner of the box.");
 			} else if (step==3) {
 				lowerLeftCorner.setLocation(event.getX(), event.getY());
 				changeStepAndInstructLabel("Please select where you would like your origin to be located.");
@@ -287,8 +279,6 @@ public class PreviewWindowController {
 				step=0;
 				endCalibration();
 			}
-			
-			
 		}
     }
 	
@@ -372,6 +362,8 @@ public class PreviewWindowController {
 		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		Stage primary = (Stage) continueBtn.getScene().getWindow();
 		primary.setScene(scene);
+		primary.centerOnScreen();
+		primary.setResizable(false);
 		controller.initializeWithStage(primary);
 		controller.loadVideo(data.getVideo().getFilePath(), data);
 		primary.show();

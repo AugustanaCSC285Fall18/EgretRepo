@@ -96,6 +96,8 @@ public class AutoTrackController implements AutoTrackListener {
 		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		Stage primary = (Stage) continueBtn.getScene().getWindow();
 		primary.setScene(nextScene);
+		primary.centerOnScreen();
+		primary.setResizable(false);
 		EditingWindowController nextController = loader.getController();
 		nextController.initializeWithProjectData(project);
 	}

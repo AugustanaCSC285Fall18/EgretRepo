@@ -48,12 +48,6 @@ public class EditingWindowController {
 	@FXML
 	private AnchorPane anchorPane;
 	@FXML
-	private MenuItem closeOption;
-	@FXML
-	private MenuItem saveOption;
-	@FXML
-	private MenuItem undoOption;
-	@FXML
 	private ToggleButton modifyToggleBtn;
 	@FXML
 	private Button undoBtn;
@@ -83,7 +77,6 @@ public class EditingWindowController {
 	private ComboBox<String> animalTrackObjectComboBox;
 	@FXML 
 	private TextField timeStepField;
-	private GraphicsContext gc;
 	@FXML
 	private ChoiceBox<Integer> timeStepBox;
 	
@@ -93,6 +86,7 @@ public class EditingWindowController {
 	private int animalCounter = 0;
 	private TimePoint previousPoint;
 	private boolean modifyToggleActive = false;
+	private GraphicsContext gc;
 	
 	// Constants for Drawing and Frame Changing
 	private static final int drawX = 5;
