@@ -3,6 +3,8 @@ package edu.augustana.csc285.Egret;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
@@ -81,6 +83,8 @@ public class EditingWindowController {
 	private ComboBox<String> animalTrackObjectComboBox;
 	@FXML 
 	private TextField timeStepField;
+	@FXML
+	private ComboBox<String> timeStepBox;
 	private GraphicsContext gc;
 	
 	//Data Fields 
@@ -107,11 +111,14 @@ public class EditingWindowController {
 	// than continuously calling for an int value. 
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
+	
 
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
 		frameJumpModifier=timeStep;
-		timeStepField.setText("" + frameJumpModifier);
+		List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
+		ObservableList items = FXCollections.observableList(list);
+		timeStepBox.setItems(items);
 	}
 
 	/*
@@ -284,6 +291,7 @@ public class EditingWindowController {
 			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
 				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
 				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
+				gc.setFill(data.getColorArrayForAnimalTracks().get(animalCounter));
 				gc.fillOval(xCord - halfDrawX, yCord  - halfDrawY, drawX, drawY);
 			} else {
 				setAnimalTrackObjectComboBox();
@@ -343,6 +351,11 @@ public class EditingWindowController {
 				}
 				i++;
 			}
+			gc.setFill(Color.ALICEBLUE);
+			for (TimePoint pt : chosenTrack.getLocations()) {
+				gc.fillOval(pt.getX() - halfDrawX, pt.getY() - halfDrawY, drawX, drawY);
+			}
+			gc.setFill(Color.BLACK);
 			setAnimalCounter();
 			data.getAnimalTracksList().get(animalCounter).addTrackSegment(chosenTrack);
 			data.removeUnassignedSegment(chosenTrackNumber);
@@ -351,7 +364,7 @@ public class EditingWindowController {
 	}
 
 	/**
-	 * Displays the unassigned segments that are within a certain amount. 
+	 * Displays the unassigned segments that are within a certain time frame. 
 	 */
 	private void displayFutureTracks() {
 		int trackCounter = 1;
@@ -361,9 +374,10 @@ public class EditingWindowController {
 			// displays a track that is within x times the frame rate
 			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) <  frameRate
 					* frameJumpModifier * 5) {
+//				changeSelectedTrackColor();
+				gc.setFill(Color.BLACK);
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
-					gc.setFill(Color.BLACK);
 					gc.fillOval(currentTimePoint.getX() - halfDrawX, currentTimePoint.getY() - halfDrawY, drawX, drawY);
 				}
 				gc.setFill(Color.DARKBLUE);
@@ -377,13 +391,33 @@ public class EditingWindowController {
 			pickUnassignedAnimalTrackBtn.setItems(listOfTracksDisplayed);
 		}
 	}
-
+	
+	private void changeSelectedTrackColor() {
+		String chosenValueByUser = pickUnassignedAnimalTrackBtn.getValue();
+		System.out.println(chosenValueByUser);
+		if (chosenValueByUser != null) {
+			gc.setFill(Color.ALICEBLUE);
+		} else {
+			gc.setFill(Color.BLACK);
+		}
+	}
+	
 	/**
 	 * Draws the past tracks of the current animal within a certain interval. 
 	 */
 	private void displayPastTracks() {
 		setAnimalCounter();
 		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
+		for (AnimalTrack track : data.getAnimalTracksList()) {
+			int i = 0;
+			if(track.getTimePointAtTime(currentFrameNumber) != null) {
+				TimePoint currentTP = track.getTimePointAtTime(currentFrameNumber);
+				gc.setFill(data.getColorArrayForAnimalTracks().get(i));
+				gc.fillOval(currentTP.getX() - halfDrawX, currentTP.getY() - halfDrawY, drawX, drawY);
+			}
+		i++;
+		}
+		
 		if( currentTrack.getTimePointAtTime(currentFrameNumber) != null) {
 			TimePoint currentTP = currentTrack.getTimePointAtTime(currentFrameNumber);
 			gc.setFill(Color.AQUAMARINE);
@@ -438,6 +472,7 @@ public class EditingWindowController {
 	private void reviewTrack(MouseEvent event) throws InterruptedException {
 		oldCurrentFrame = currentFrameNumber;
 		currentFrameNumber = startFrame;
+		
 		reviewTimeChanger();
 	}
 
@@ -451,7 +486,8 @@ public class EditingWindowController {
 		if (newTime > maxTime) {
 			makeAlert("Time Change Error", "The video is between 0 and " + maxTime + " seconds long.");
 		}
-		int frameNumber = (int) Math.round((newTime * frameRate));
+		int frameNumber2 = (int) Math.round((newTime * frameRate));
+		int frameNumber = getFrameFromSeconds(newTime);
 		jumpToFrame(frameNumber);
 	}
 
@@ -494,7 +530,12 @@ public class EditingWindowController {
 		timeField.setText("" + getTimeInMinuteSecond());
 		sliderSeekBar.setValue(currentFrameNumber);
 	}
-	
+	 
+	public void setTimeStep() {
+		String timeStep = timeStepBox.getSelectionModel().getSelectedItem();
+	    data.getVideo().setTimeStep(Integer.parseInt(timeStep));
+    }
+	 
 	/**
 	 * Allows the user to have shortcuts when editing the data.
 	 * D - Presses the next button
@@ -540,16 +581,16 @@ public class EditingWindowController {
 //	}
     
     /*
-     * Gets the time from the current frame number in minutes and seconds MM:SS formate
+     * Gets the time from the current frame number in minutes and seconds MM:SS format
      */
 	private String getTimeInMinuteSecond() {
-		int startTime = (int)(currentFrameNumber / data.getVideo().getFrameRate());
+		int startTime = (int)(currentFrameNumber / frameRate);
 		int startTimeMinutes = startTime / 60;
 		int startTimeSeconds = startTime % 60;
 		String time = startTimeMinutes + ":" + startTimeSeconds;
 		if (startTimeSeconds < 10) {
 			int index = time.indexOf(':');
-			time = time.substring(0, index) + "0" + time.substring(index + 1);
+			time = time.substring(0, index + 1) + "0" + time.substring(index + 1);
 		}
 		return time;
 	}
@@ -559,8 +600,13 @@ public class EditingWindowController {
 	 */
 	private int getSecondsFromMinuteSeconds() {
 		int colonIndex = timeField.getText().indexOf(':');
-		int timeInSeconds = (Integer.parseInt(timeField.getText().substring(0, colonIndex)) * 60) + Integer.parseInt(timeField.getText().substring(colonIndex + 1)); 
+		int timeInSeconds = (Integer.parseInt(timeField.getText().substring(0, colonIndex)) * 60) + Integer.parseInt(timeField.getText().substring(colonIndex + 1));
 		return timeInSeconds;
+		
+	}
+	
+	private int getFrameFromSeconds(int seconds) {
+		return seconds * frameRate;
 	}
 	
 	/**
@@ -596,7 +642,7 @@ public class EditingWindowController {
 	private void saveUnfinishedProject() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save Project File");
-		fileChooser.setInitialFileName(data.getVideo().getFilePathJustName() + ".txt");
+		fileChooser.setInitialFileName("Unfinished " + data.getVideo().getFilePathJustName() + ".project");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showSaveDialog(mainWindow);
 		try {
@@ -609,6 +655,7 @@ public class EditingWindowController {
 
 	@FXML
 	public void initialize() throws FileNotFoundException {
+			
 	}
 
 	/**
@@ -621,14 +668,16 @@ public class EditingWindowController {
 		totalAmountOfAnimals = data.getAnimalTracksList().size();
 		startFrame = data.getVideo().getStartFrameNum();
 		endFrame = data.getVideo().getEndFrameNum();
-		currentFrameNumber = startFrame;
+//		currentFrameImage.fitWidthProperty().bind(currentFrameImage.getScene().widthProperty());
+//		canvas.setWidth(currentFrameImage.getFitWidth());
+//		canvas.setHeight(currentFrameImage.getFitHeight());
+//		currentFrameNumber = startFrame;
 		gc = canvas.getGraphicsContext2D();
 		frameJumpModifier = data.getVideo().getTimeStep();
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
-		timeStepField.setText("" + data.getVideo().getTimeStep());
-
+		timeStepBox.getSelectionModel().select(data.getVideo().getTimeStep());
 		startVideo();
 	}
 

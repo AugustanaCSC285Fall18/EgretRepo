@@ -235,11 +235,14 @@ public class PreviewWindowController {
 			data = new ProjectData(fileName);
 			data.getVideo().setTimeStep(1);
 			startVideo();
-		};
-		startField.setText("0:00");
-		int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
-		endField.setText(endTime/60 + ":" + endTime%60);
-		enableButtons();
+			startField.setText("0:00");
+			int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
+			endField.setText(endTime/60 + ":" + endTime%60);
+			enableButtons();
+		} else {
+			makeAlert(AlertType.INFORMATION, "Choose Video", null, "Please Select a video.");
+		}
+		
     }
 	
 	@FXML
@@ -247,7 +250,7 @@ public class PreviewWindowController {
 	private void handleCalibration(MouseEvent event) {
 		if(step==0) {
 			step = 1;
-			instructLabel.setText("Please select the upper left corner of the box.");
+			instructLabel.setText("Please select the upper LEFT corner of the box.");
 		}
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		gc.setFill(Color.BLUEVIOLET);
@@ -266,31 +269,28 @@ public class PreviewWindowController {
 			if (step==1) {
 				upperLeftCorner.setLocation(event.getX(), event.getY());
 				rect.add(upperLeftCorner);
-				changeStepAndInstructLabel("Please select the lower right hand corner of the box");
-//				step=2;
-//				instructLabel.setText("Please select the lower right hand corner of the box");
+				changeStepAndInstructLabel("Please select the lower LEFT hand corner of the box");
 			} else if (step==2) {
+				lowerLeftCorner.setLocation(event.getX(), event.getY());
+				
+				changeStepAndInstructLabel("Please select the lower RIGHT hand corner of the box.");
+			} else if (step==3) {
+				
+				
 				lowerRightCorner.setLocation(event.getX(), event.getY());
 				rect.add(lowerRightCorner);
 				data.getVideo().setArenaBounds(rect);
-				changeStepAndInstructLabel("Please select the lower left hand corner of the box.");
-//				step=3;
-//				instructLabel.setText("Please select the lower left hand corner of the box.");
-			} else if (step==3) {
-				lowerLeftCorner.setLocation(event.getX(), event.getY());
+				System.out.println(rect);
 				changeStepAndInstructLabel("Please select where you would like your origin to be located.");
 				gc.setFill(Color.AQUA);
-//				step=4;
-//				instructLabel.setText("Please select where you would like your origin to be located.");
 			} else if (step==4) {
 				pointsCalibrated=true;
 				origin.setLocation(event.getX(), event.getY());
 				data.getVideo().setOriginPoint(origin);
+				System.out.println(origin);
 				openEmptyFrameDialog();
 				endCalibration();
 			}
-			
-			
 		}
     }
 	
@@ -352,11 +352,11 @@ public class PreviewWindowController {
     @FXML
     private void handleContinueBtn(MouseEvent event) throws IOException {
     	if (data.getVideo().getArenaBounds() == null) {
-    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Arena Bounds First (Press Calibration button)");
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Arena Bounds before continuing (Press Calibration button)");
     	} else if (data.getVideo().getYPixelsPerCm() == 0) {
-    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Box Width and Height first (Press Set Box Lengths)");
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Box Width and Height before continuing (Press Set Box Lengths)");
     	} else if (data.getAnimalTracksList().size() == 0) {
-    		makeAlert(AlertType.INFORMATION, "Continue", null, "Add Chicks first (Press Add Chicken)");
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Add Chicks before continuing (Press Add Chicken)");
     	} else {
     		Alert alert = makeAlert(AlertType.CONFIRMATION,"Continue", "You are about to leave the Preview Window", "Please review your calibration.\n"
 	    			+ "Once you continue you will not be able to make any changes.\n Would you like to continue?");
@@ -447,7 +447,7 @@ public class PreviewWindowController {
     		openFirstDialog();
         	openSecondDialog();
     	} else {
-    		makeAlert(AlertType.INFORMATION, "Calibration", null, "Set Calibration first (Press Calibrate");
+    		makeAlert(AlertType.INFORMATION, "Calibration", null, "Set Calibration before setting the lengths (Press Calibrate");
     	}
     }
     
@@ -513,7 +513,7 @@ public class PreviewWindowController {
     @FXML
     private void handleRemoveChickBtn(MouseEvent event) {
     	if (chicksComboBox.getItems().size() == 0) {
-    		makeAlert(AlertType.INFORMATION, "Remove Chick", null, "You must add a chick before removing. (Press Add Chick)");
+    		makeAlert(AlertType.INFORMATION, "Remove Chick", null, "You must add a chick before attempting to remove a chick. (Press Add Chick)");
     	} else {
 			ChoiceDialog<String> dialog = new ChoiceDialog<String>(chicksComboBox.getItems().get(0), chicksComboBox.getItems());
 			dialog.setTitle("Remove Chick");

@@ -82,7 +82,7 @@
                   <Insets left="10.0" />
                </HBox.margin>
             </Label>
-            <TextField fx:id="timeStepField" prefHeight="25.0" prefWidth="83.0" promptText="timeStepField" />
+            <ComboBox fx:id="timeStepBox" prefWidth="150.0" />
             <Button fx:id="saveBtn" mnemonicParsing="false" onAction="#saveUnfinishedProject" prefHeight="150.0" prefWidth="200.0" text="Save">
                <HBox.margin>
                   <Insets left="25.0" />
