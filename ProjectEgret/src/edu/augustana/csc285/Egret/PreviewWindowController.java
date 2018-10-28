@@ -54,7 +54,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 
-//
+
 public class PreviewWindowController {
 
     @FXML
@@ -358,7 +358,7 @@ public class PreviewWindowController {
 
     	String result = endField.getText();
     	int index = result.indexOf(":");
-    	int mins = Integer.valueOf(result.substring(0, index));
+       	int mins = Integer.valueOf(result.substring(0, index));
     	int secs = Integer.valueOf(result.substring(index+1));
     	int endFrame = data.getVideo().getTimeInFrames(mins*60+secs);
     	data.getVideo().setStartFrameNum(endFrame);
