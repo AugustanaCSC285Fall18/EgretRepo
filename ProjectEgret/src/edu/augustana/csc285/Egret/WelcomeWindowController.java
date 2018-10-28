@@ -27,9 +27,6 @@ import javafx.stage.Window;
 public class WelcomeWindowController {
 
     @FXML
-    private MenuItem closeOption;
-
-    @FXML
     private Button openProjectBtn;
 
     @FXML
@@ -61,11 +58,8 @@ public class WelcomeWindowController {
 		nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		Stage primary = (Stage) openProjectBtn.getScene().getWindow();
 		primary.setScene(nextScene);
-    }
-
-    @FXML
-    void exitWindow(ActionEvent event) {
-
+		primary.centerOnScreen();
+		primary.setResizable(false);
     }
    
     @FXML
@@ -81,6 +75,8 @@ public class WelcomeWindowController {
 			nextScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			Stage primary = (Stage) openProjectBtn.getScene().getWindow();
 			primary.setScene(nextScene);
+			primary.centerOnScreen();
+			primary.setResizable(false);
 			EditingWindowController nextController = loader.getController();
 			nextController.initializeWithProjectData(chosenProject);
 		}
