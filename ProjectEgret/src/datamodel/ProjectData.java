@@ -33,7 +33,7 @@ public class ProjectData {
 	 * Adds a list of colors to the ColorArray for displaying different colors
 	 */
 	private void addColorsToColorArray() {
-		colorArrayForAnimalTracks.add(Color.BLACK);
+		colorArrayForAnimalTracks.add(Color.BLUEVIOLET);
 		colorArrayForAnimalTracks.add(Color.RED);
 		colorArrayForAnimalTracks.add(Color.BLUE);
 		colorArrayForAnimalTracks.add(Color.ORANGE);

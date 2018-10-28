@@ -94,8 +94,8 @@ public class WelcomeWindowController {
 		String names = "Team Egret: Kathryn Clark, Brent Pierce, Avery Vanopdorp\nProject Supervisor: Dr. Forrest Stonedahl";
 		String className = "Project for CSC 285 at Augustana College";
 		String acknowledgements = "Thanks to all of the teams that we conversed with about the project, the Q&A site to help get "
-				+ "stuff sorted out, Luigi De Russis for a way to start the project from Lab 3, and everything else that may need a "
-				+ "mention that I have left out. ";
+				+ "stuff sorted out, Luigi De Russis for a way to start the project from Lab 3, Code.Makery for help with the "
+				+ "alert messages, and everything else that may need a mention that we have left out. ";
 		String usedLibraries = "Credit to the libraries: OpenCV, JavaFX, GSON, JSON";
 		alert.setContentText(names + "\n" + className + "\n\n" + acknowledgements + "\n\n" + usedLibraries);
 		alert.showAndWait();

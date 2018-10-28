@@ -36,6 +36,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
@@ -47,6 +48,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.paint.Color;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
@@ -79,8 +81,6 @@ public class PreviewWindowController {
   //this was also added with continueBtn but unlike the button this will not conflict with my edits
     private Canvas canvas;
 
-    private Button browseBtn;
-
     @FXML
     private Slider sliderSeekBar;
     
@@ -91,7 +91,7 @@ public class PreviewWindowController {
     private Button loadBtn;
 
     @FXML
-    private Button callibrateBtn;
+    private Button calibrateBtn;
     
     @FXML
     private Button setLengthsBtn;
@@ -127,25 +127,6 @@ public class PreviewWindowController {
 
 	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
 	private ObservableList items = FXCollections.observableList(list);
-
-	public void browseForVideoFile() throws FileNotFoundException{
-    	FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Video File");
-		Window mainWindow = currentFrameImage.getScene().getWindow();
-		File chosenFile = fileChooser.showOpenDialog(mainWindow);
-		if (chosenFile != null) {
-			String fileName = chosenFile.toURI().toString();
-			data = new ProjectData(fileName);
-			data.getVideo().setTimeStep(1);
-			startVideo();
-		};
-		//runSliderSeekBar();
-		
-		startField.setText("0:00");
-		int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
-		endField.setText(endTime/60 + ":" + endTime%60);
-		//runJumpTo(); //prints out which frame you are at
-    }
 	
 	public void keyIgnore(KeyEvent event) {
 		char character = event.getCharacter().charAt(0);
@@ -213,34 +194,57 @@ public class PreviewWindowController {
 		timeStepBox.setItems(items);
 		timeStepBox.getSelectionModel().select(0);
 		gc = canvas.getGraphicsContext2D();
+		disableButtons();
 	}
     
-	//event handlers
-    @FXML
-   private void handleAddChickBtn(MouseEvent event) {
-    	String suggestedInput = "Chick #" + (chicksComboBox.getItems().size() + 1);
-		TextInputDialog dialog = new TextInputDialog(suggestedInput);
-		dialog.setTitle("Add Chick:");
-		dialog.setHeaderText(null);
-		dialog.setContentText("Enter Chick Name:");
-		Optional<String> result = dialog.showAndWait();
-		if (result.isPresent()) {
-			String chickName = result.get();
-			data.getAnimalTracksList().add(new AnimalTrack(chickName));
-			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
-			chicksComboBox.getItems().add(chickName);
-			chicksComboBox.getSelectionModel().select(chickName);
-		}
+    /*
+     * Disables all of the buttons and boxes and slider
+     */
+    private void disableButtons() {
+    	addChickBtn.setDisable(true);
+    	removeChickBtn.setDisable(true);
+    	calibrateBtn.setDisable(true);
+    	setLengthsBtn.setDisable(true);
+    	continueBtn.setDisable(true);
+    	sliderSeekBar.setDisable(true);
+    	chicksComboBox.setDisable(true);
+    }
+
+    /*
+     * Enables all of the buttons and boxes and slider
+     */
+    private void enableButtons() {
+    	addChickBtn.setDisable(false);
+    	removeChickBtn.setDisable(false);
+    	calibrateBtn.setDisable(false);
+    	setLengthsBtn.setDisable(false);
+    	continueBtn.setDisable(false);
+    	sliderSeekBar.setDisable(false);
+    	chicksComboBox.setDisable(false);
     }
     
     @FXML
-    private void handleBrowse(MouseEvent event) throws FileNotFoundException {
-    	browseForVideoFile();
+    private void handleBrowse() throws FileNotFoundException {
+    	loadBtn.setText("Load Different Video");
+    	FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open Video File");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showOpenDialog(mainWindow);
+		if (chosenFile != null) {
+			String fileName = chosenFile.toURI().toString();
+			data = new ProjectData(fileName);
+			data.getVideo().setTimeStep(1);
+			startVideo();
+		};
+		startField.setText("0:00");
+		int endTime = data.getVideo().getTimeInSeconds(data.getVideo().getEndFrameNum());
+		endField.setText(endTime/60 + ":" + endTime%60);
+		enableButtons();
     }
 	
 	@FXML
 	// handles first step of calibration, handleCanvasClick handles the rest
-	private void handleCallibration(MouseEvent event) {
+	private void handleCalibration(MouseEvent event) {
 		if(step==0) {
 			step = 1;
 			instructLabel.setText("Please select the upper left corner of the box.");
@@ -251,9 +255,16 @@ public class PreviewWindowController {
     @FXML
     private void handleCanvasClick(MouseEvent event) throws InterruptedException {
     	Rectangle rect = new Rectangle();
-    	gc.fillOval(event.getX() - (15/2), event.getY() - (15/2), 15, 15);
+    	if (data == null) {
+    		makeAlert(AlertType.INFORMATION, "Calibrate", null, "Select a video before attempting to calibrate.");
+    	} else if (step == 0) {
+    		makeAlert(AlertType.INFORMATION, "Calibrate", null, "Press Calibrate first.");
+    	} else {
+    		gc.fillOval(event.getX() - (15/2), event.getY() - (15/2), 15, 15);	
+    	}
     	if (step==1) {
     		upperLeftCorner.setLocation(event.getX(), event.getY());
+    		gc.setFill(Color.BLACK);
     		rect.add(upperLeftCorner);
     		
     		step=2;
@@ -270,6 +281,7 @@ public class PreviewWindowController {
     		
     		step=4;
     		instructLabel.setText("Please select where you would like your origin to be located.");
+    		gc.setFill(Color.AQUA);
     	} else if (step==4) {
     		pointsCalibrated=true;
     		origin.setLocation(event.getX(), event.getY());
@@ -281,8 +293,8 @@ public class PreviewWindowController {
     
     public void openEmptyFrameDialog() {
     	TextInputDialog dialog = new TextInputDialog("0:00");
-    	dialog.setTitle("Callibration");
-    	dialog.setHeaderText("Empty Box Callibration");
+    	dialog.setTitle("Calibration");
+    	dialog.setHeaderText("Empty Box Calibration");
     	dialog.setContentText("Please enter a time in which the box has no chickens: ");
     	
     	Optional<String> result = dialog.showAndWait();
@@ -331,27 +343,37 @@ public class PreviewWindowController {
     
     @FXML
     private void handleContinueBtn(MouseEvent event) throws IOException {
-    	Alert alert = new Alert(AlertType.CONFIRMATION);
-    	alert.setTitle("Continue");
-    	alert.setHeaderText("You are about to leave the Preview Window");
-    	alert.setContentText("Please review your calibration.\n"
-    			+ "Once you continue you will not be able to make any changes.\n Would you like to continue?");
-
-    	Optional<ButtonType> result = alert.showAndWait();
-    	if (result.get() == ButtonType.OK){
-			FXMLLoader loader = new FXMLLoader(getClass().getResource("AutoTrackWindow.fxml"));
-			BorderPane root = (BorderPane)loader.load();
-			AutoTrackController controller = loader.getController();
-			Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			Stage primary = (Stage) continueBtn.getScene().getWindow();
-			primary.setScene(scene);
-			controller.initializeWithStage(primary);
-			controller.loadVideo(data.getVideo().getFilePath(), data);
-			primary.show();
+    	if (data.getVideo().getArenaBounds() == null) {
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Arena Bounds First (Press Calibration button)");
+    	} else if (data.getVideo().getYPixelsPerCm() == 0) {
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Set Box Width and Height first (Press Set Box Lengths)");
+    	} else if (data.getAnimalTracksList().size() == 0) {
+    		makeAlert(AlertType.INFORMATION, "Continue", null, "Add Chicks first (Press Add Chicken)");
     	} else {
-    	    alert.close();
+    		makeAlert(AlertType.CONFIRMATION,"Continue", "You are about to leave the Preview Window", "Please review your calibration.\n"
+	    			+ "Once you continue you will not be able to make any changes.\n Would you like to continue?");
     	}
+    }
+    
+    private void showAutoTrackWindow() throws IOException {
+    	FXMLLoader loader = new FXMLLoader(getClass().getResource("AutoTrackWindow.fxml"));
+		BorderPane root = (BorderPane)loader.load();
+		AutoTrackController controller = loader.getController();
+		Scene scene = new Scene(root,root.getPrefWidth(),root.getPrefHeight());
+		scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		Stage primary = (Stage) continueBtn.getScene().getWindow();
+		primary.setScene(scene);
+		controller.initializeWithStage(primary);
+		controller.loadVideo(data.getVideo().getFilePath(), data);
+		primary.show();
+    }
+    
+    private void makeAlert(AlertType alertType, String title, String header, String text) {
+    	Alert alert = new Alert(alertType);
+		alert.setTitle(title);
+		alert.setHeaderText(header);
+		alert.setContentText(text);
+		alert.showAndWait();
     }
     
   //Avery... still working on it
@@ -372,12 +394,6 @@ public class PreviewWindowController {
 	    		jumpToFrame(data.getVideo().getEndFrameNum());
 	    	}
     	}
-    }
-
-    //replaces video in window... need to make sure 
-    @FXML
-    private void handleLoadVideo(MouseEvent event) throws FileNotFoundException {
-    	browseForVideoFile();
     }
     
     @FXML //throw exception if non number is entered... or prevent it from being entered
@@ -411,13 +427,15 @@ public class PreviewWindowController {
     	if(pointsCalibrated) {
     		openFirstDialog();
         	openSecondDialog();
+    	} else {
+    		makeAlert(AlertType.INFORMATION, "Calibration", null, "Set Calibration first (Press Calibrate");
     	}
     }
     
     public void openFirstDialog() {
     	TextInputDialog dialog = new TextInputDialog("0");
-    	dialog.setTitle("Additional Callibration");
-    	dialog.setHeaderText("Length Callibration");
+    	dialog.setTitle("Additional Calibration");
+    	dialog.setHeaderText("Length Calibration");
     	dialog.setContentText("Please enter the height of the box in cm: ");
 
     	// Get the response value.
@@ -435,8 +453,8 @@ public class PreviewWindowController {
     
     public void openSecondDialog() {
     	TextInputDialog dialog = new TextInputDialog("0");
-    	dialog.setTitle("Additional Callibration");
-    	dialog.setHeaderText("Length Callibration");
+    	dialog.setTitle("Additional Calibration");
+    	dialog.setHeaderText("Length Calibration");
     	dialog.setContentText("Please enter the width of the box in cm: ");
     	ButtonType buttonTypeNext = new ButtonType("Next", ButtonData.NEXT_FORWARD);
     	ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
@@ -457,17 +475,39 @@ public class PreviewWindowController {
     }
     
     @FXML
-    private void handleRemoveChickBtn(MouseEvent event) {
-    	TextInputDialog dialog = new TextInputDialog();
-    	dialog.setHeaderText("Note: Names are case sensitive.");
-    	
+   private void handleAddChickBtn(MouseEvent event) {
+    	String suggestedInput = "Chick #" + (chicksComboBox.getItems().size() + 1);
+		TextInputDialog dialog = new TextInputDialog(suggestedInput);
+		dialog.setTitle("Add Chick:");
+		dialog.setHeaderText(null);
+		dialog.setContentText("Enter Chick Name:");
 		Optional<String> result = dialog.showAndWait();
 		if (result.isPresent()) {
 			String chickName = result.get();
-			data.getAnimalTracksList().remove(new AnimalTrack(chickName));
-			chicksComboBox.getItems().remove(chickName);
+			data.getAnimalTracksList().add(new AnimalTrack(chickName));
+			int index = chicksComboBox.getSelectionModel().getSelectedIndex();
+			chicksComboBox.getItems().add(chickName);
 			chicksComboBox.getSelectionModel().select(chickName);
 		}
+    }
+    
+    @FXML
+    private void handleRemoveChickBtn(MouseEvent event) {
+    	if (chicksComboBox.getItems().size() == 0) {
+    		makeAlert(AlertType.INFORMATION, "Remove Chick", null, "You must add a chick before removing. (Press Add Chick)");
+    	} else {
+			ChoiceDialog<String> dialog = new ChoiceDialog<String>(chicksComboBox.getItems().get(0), chicksComboBox.getItems());
+			dialog.setTitle("Remove Chick");
+			dialog.setHeaderText("What chick do you want to remove?");
+			dialog.setContentText("Choose Chick Name:");
+			Optional<String> result = dialog.showAndWait();
+			if (result.isPresent()) {
+				String chickName = result.get();
+				data.getAnimalTracksList().remove(new AnimalTrack(chickName));
+				chicksComboBox.getItems().remove(chickName);
+			}	
+			//credit: https://code.makery.ch/blog/javafx-dialogs-official/
+    	}
     }
     
 	@FXML
