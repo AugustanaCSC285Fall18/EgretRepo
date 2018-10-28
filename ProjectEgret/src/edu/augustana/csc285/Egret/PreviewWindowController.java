@@ -250,46 +250,54 @@ public class PreviewWindowController {
 			instructLabel.setText("Please select the upper left corner of the box.");
 		}
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		gc.setFill(Color.BLUEVIOLET);
     }
     
-    @FXML
-    private void handleCanvasClick(MouseEvent event) throws InterruptedException {
-    	Rectangle rect = new Rectangle();
-    	if (data == null) {
-    		makeAlert(AlertType.INFORMATION, "Calibrate", null, "Select a video before attempting to calibrate.");
-    	} else if (step == 0) {
-    		makeAlert(AlertType.INFORMATION, "Calibrate", null, "Press Calibrate first.");
-    	} else {
-    		gc.fillOval(event.getX() - (15/2), event.getY() - (15/2), 15, 15);	
-    	}
-    	if (step==1) {
-    		upperLeftCorner.setLocation(event.getX(), event.getY());
-    		gc.setFill(Color.BLACK);
-    		rect.add(upperLeftCorner);
-    		
-    		step=2;
-    		instructLabel.setText("Please select the lower right hand corner of the box");
-    	} else if (step==2) {
-    		lowerRightCorner.setLocation(event.getX(), event.getY());
-    		rect.add(lowerRightCorner);
-    		data.getVideo().setArenaBounds(rect);
-    		
-    		step=3;
-    		instructLabel.setText("Please select the lower left hand corner of the box.");
-    	} else if (step==3) {
-    		lowerLeftCorner.setLocation(event.getX(), event.getY());
-    		
-    		step=4;
-    		instructLabel.setText("Please select where you would like your origin to be located.");
-    		gc.setFill(Color.AQUA);
-    	} else if (step==4) {
-    		pointsCalibrated=true;
-    		origin.setLocation(event.getX(), event.getY());
-    		data.getVideo().setOriginPoint(origin);
-    		openEmptyFrameDialog();
-    		endCalibration();
-    	}
+	@FXML
+	private void handleCanvasClick(MouseEvent event) throws InterruptedException {
+		Rectangle rect = new Rectangle();
+		if (data == null) {
+			makeAlert(AlertType.INFORMATION, "Calibrate", null, "Select a video before attempting to calibrate.");
+		} else if (step == 0) {
+			makeAlert(AlertType.INFORMATION, "Calibrate", null, "Press Calibrate first.");
+		} else {
+			gc.fillOval(event.getX() - (15/2), event.getY() - (15/2), 15, 15);	
+			System.out.println(step);
+			if (step==1) {
+				upperLeftCorner.setLocation(event.getX(), event.getY());
+				rect.add(upperLeftCorner);
+				changeStepAndInstructLabel("Please select the lower right hand corner of the box");
+//				step=2;
+//				instructLabel.setText("Please select the lower right hand corner of the box");
+			} else if (step==2) {
+				lowerRightCorner.setLocation(event.getX(), event.getY());
+				rect.add(lowerRightCorner);
+				data.getVideo().setArenaBounds(rect);
+				changeStepAndInstructLabel("Please select the lower left hand corner of the box.");
+//				step=3;
+//				instructLabel.setText("Please select the lower left hand corner of the box.");
+			} else if (step==3) {
+				lowerLeftCorner.setLocation(event.getX(), event.getY());
+				changeStepAndInstructLabel("Please select where you would like your origin to be located.");
+				gc.setFill(Color.AQUA);
+//				step=4;
+//				instructLabel.setText("Please select where you would like your origin to be located.");
+			} else if (step==4) {
+				pointsCalibrated=true;
+				origin.setLocation(event.getX(), event.getY());
+				data.getVideo().setOriginPoint(origin);
+				openEmptyFrameDialog();
+				endCalibration();
+			}
+			
+			
+		}
     }
+	
+	private void changeStepAndInstructLabel(String instructions) {
+		step++;
+		instructLabel.setText(instructions);
+	}
     
     public void openEmptyFrameDialog() {
     	TextInputDialog dialog = new TextInputDialog("0:00");
@@ -350,8 +358,15 @@ public class PreviewWindowController {
     	} else if (data.getAnimalTracksList().size() == 0) {
     		makeAlert(AlertType.INFORMATION, "Continue", null, "Add Chicks first (Press Add Chicken)");
     	} else {
-    		makeAlert(AlertType.CONFIRMATION,"Continue", "You are about to leave the Preview Window", "Please review your calibration.\n"
+    		Alert alert = makeAlert(AlertType.CONFIRMATION,"Continue", "You are about to leave the Preview Window", "Please review your calibration.\n"
 	    			+ "Once you continue you will not be able to make any changes.\n Would you like to continue?");
+    		
+    		Optional<ButtonType> result = alert.showAndWait();
+        	if (result.get() == ButtonType.OK){
+    			showAutoTrackWindow();
+        	} else {
+        	    alert.close();
+        	}
     	}
     }
     
@@ -368,12 +383,16 @@ public class PreviewWindowController {
 		primary.show();
     }
     
-    private void makeAlert(AlertType alertType, String title, String header, String text) {
+    @SuppressWarnings("static-access")
+	private Alert makeAlert(AlertType alertType, String title, String header, String text) {
     	Alert alert = new Alert(alertType);
 		alert.setTitle(title);
 		alert.setHeaderText(header);
 		alert.setContentText(text);
-		alert.showAndWait();
+		if (!alertType.equals(alertType.CONFIRMATION)) {
+			alert.showAndWait();
+		}
+		return alert;
     }
     
   //Avery... still working on it

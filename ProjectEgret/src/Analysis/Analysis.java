@@ -50,10 +50,13 @@ public class Analysis {
 	public static void exportToCSV() throws IOException {
 		
 		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open Video File");
+		fileChooser.setTitle("Save Data CSV");
+		fileChooser.setInitialFileName(data.getVideo().getFilePathJustName() + ".csv");
 		Window mainWindow = currentFrameImage.getScene().getWindow();
 		File chosenFile = fileChooser.showSaveDialog(mainWindow);
-
+		if (!chosenFile.getPath().contains(".csv")) {
+			chosenFile = new File(chosenFile.getPath() + ".csv");
+		}
 		FileWriter fileWriter = new FileWriter(chosenFile);
 		
 		StringBuilder s = new StringBuilder();
@@ -76,18 +79,22 @@ public class Analysis {
 		}
 		s.append('\n');
 
-		//for (int i = 0; i < maxNumTimePoints; i++) {
-		int maxSeconds = (int) (data.getVideo().getEndFrameNum() / data.getVideo().getFrameRate());
-		for (int i = 0; i < maxSeconds; i++) {
+		//attempting to get point only at the second	
+		//int maxSeconds = (int) (data.getVideo().getEndFrameNum() / data.getVideo().getFrameRate());
+		//for (int i = 0; i < maxSeconds; i++) {
+		for (int i = 0; i < maxNumTimePoints; i++) {
 			for (int j = 0; j < data.getAnimalTracksList().size(); j++) {
 				AnimalTrack currentTrack = data.getAnimalTracksList().get(j);
 				if (currentTrack.hasTimePointAtIndex(i)) {
-					//TimePoint currentTP = currentTrack.getTimePointAtIndex(i);
-					TimePoint currentTP = getPointAtSpecificSecond(currentTrack, i);
-					//s.append(currentTP.getFrameNum() + ",");
-					s.append(i + ",");
+					TimePoint currentTP = currentTrack.getTimePointAtIndex(i);
+					//attempting to get point only at the second
+					//TimePoint currentTP = getPointAtSpecificSecond(currentTrack, i);
+					//s.append(i + ",");
+					
+					//use NumberFormat = new DecimalFormat(#0.000) to make the coordinates print at 3 decimal places
+					s.append(currentTP.getFrameNum() + ",");
 					s.append(currentTP.getX()+ ",");
-					s.append(currentTP.getY()+ ",");
+					s.append(currentTP.getY()+ ",,");
 				} else {
 					s.append(",,,,");
 				}
@@ -98,6 +105,9 @@ public class Analysis {
 		fileWriter.close();
 	}
 	
+	/*
+	 * Attempts to get the point at a specific second rather than any frame number
+	 */
 	private static TimePoint getPointAtSpecificSecond(AnimalTrack animal, int second) {
 		for (TimePoint pt : animal.getLocations()) {
 			if (pt.getFrameNum() == second * data.getVideo().getFrameRate()) {
@@ -107,6 +117,9 @@ public class Analysis {
 		return null;
 	}
 
+	/**
+	 * @return an array containing the total distance traveled for each AnimalTrack object in data (ProjectData)
+	 */
 	public static double[] totalDistanceTraveled() {
 		double[] distanceTraveledList = new double[data.getAnimalTracksList().size()];
 		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
@@ -120,9 +133,21 @@ public class Analysis {
 		return distanceTraveledList;
 	}
 
+	/**
+	 * 
+	 * @throws IOException
+	 */
 	public static void averageDistanceBetweenPointsAndTotalDistanceToCSV() throws IOException {	
 		double[] distanceTraveledList = totalDistanceTraveled();
-		FileWriter fileWriter = new FileWriter(new File("Total Distance and Average Distance " + data.getVideo().getFilePathJustName() + ".csv"));
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save Other Analysis CSV");
+		fileChooser.setInitialFileName("Total Distance and Average Distance " + data.getVideo().getFilePathJustName() + ".csv");
+		Window mainWindow = currentFrameImage.getScene().getWindow();
+		File chosenFile = fileChooser.showSaveDialog(mainWindow);
+		if (!chosenFile.getPath().contains(".csv")) {
+			chosenFile = new File(chosenFile.getPath() + ".csv");
+		}
+		FileWriter fileWriter = new FileWriter(chosenFile);
 		StringBuilder s = new StringBuilder();
 		
 		int numOfTracks = data.getAnimalTracksList().size();
