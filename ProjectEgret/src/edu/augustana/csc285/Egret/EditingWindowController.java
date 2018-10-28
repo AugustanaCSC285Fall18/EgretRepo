@@ -105,12 +105,6 @@ public class EditingWindowController {
 	// than continuously calling for an int value. 
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
-	
-//<<<<<<< HEAD
-//=======
-//	private List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
-//	private ObservableList items = FXCollections.observableList(list);
-//>>>>>>> branch 'master' of https://github.com/AugustanaCSC285Fall18/EgretRepo.git
 
 	//frameJumpModifier=1 is a timeStep of one second
 	public void setFrameJumpModifier(int timeStep){
@@ -483,7 +477,6 @@ public class EditingWindowController {
 		if (newTime > maxTime) {
 			makeAlert("Time Change Error", "The video is between 0 and " + maxTime + " seconds long.");
 		}
-		int frameNumber2 = (int) Math.round((newTime * frameRate));
 		int frameNumber = getFrameFromSeconds(newTime);
 		jumpToFrame(frameNumber);
 	}
@@ -529,7 +522,9 @@ public class EditingWindowController {
 	}
 	 
 	public void setTimeStep() {
-	    data.getVideo().setTimeStep(timeStepBox.getSelectionModel().getSelectedItem());
+		int timeStep = timeStepBox.getSelectionModel().getSelectedItem() + 1;
+	    data.getVideo().setTimeStep(timeStep);
+	    setFrameJumpModifier(timeStep);
     }
 	 
 	/**
@@ -561,20 +556,6 @@ public class EditingWindowController {
 		alert.showAndWait();
 		// Cited https://code.makery.ch/blog/javafx-dialogs-official/
     }
-
-//	private void loadWelcomeWindow() {
-//		FXMLLoader loader = new FXMLLoader(getClass().getResource("WelcomeWindow.fxml"));
-//		try {
-//			AnchorPane root = (AnchorPane) loader.load();
-//			Scene scene = new Scene(root, root.getPrefWidth(), root.getPrefHeight());
-//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-//			Stage primary = (Stage) saveBtn.getScene().getWindow();
-//			primary.setScene(scene);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//
-//	}
     
     /*
      * Gets the time from the current frame number in minutes and seconds MM:SS format
@@ -675,7 +656,7 @@ public class EditingWindowController {
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
-		timeStepBox.getSelectionModel().select(data.getVideo().getTimeStep());
+		timeStepBox.getSelectionModel().select(data.getVideo().getTimeStep() - 1);
 		startVideo();
 	}
 
