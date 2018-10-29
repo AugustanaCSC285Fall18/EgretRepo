@@ -10,5 +10,6 @@ import datamodel.AnimalTrack;
 public interface AutoTrackListener {
 
 	public void handleTrackedFrame(Mat frame, int frameNumber, double percentTrackingComplete);
+
 	public void trackingComplete(List<AnimalTrack> trackedSegments);
 }

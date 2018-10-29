@@ -1,5 +1,9 @@
+/**
+ * Description: Houses the manual editor. Allows the user to save and export the data. 
+ */
 package edu.augustana.csc285.Egret;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -7,7 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 import org.opencv.core.Point;
+import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.videoio.Videoio;
 
 import Analysis.Analysis;
@@ -29,7 +35,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -39,14 +44,18 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import javafx.stage.Window;
 
 public class EditingWindowController {
-	//FXML Objects
+	// FXML GUI Data Fields
 	@FXML
 	private AnchorPane anchorPane;
+	@FXML
+	private StackPane stackPane;
 	@FXML
 	private ToggleButton modifyToggleBtn;
 	@FXML
@@ -75,69 +84,62 @@ public class EditingWindowController {
 	private ChoiceBox<String> pickUnassignedAnimalTrackBtn = new ChoiceBox<>();
 	@FXML
 	private ComboBox<String> animalTrackObjectComboBox;
-	@FXML 
+	@FXML
 	private TextField timeStepField;
 	@FXML
 	private ChoiceBox<Integer> timeStepBox;
 	private GraphicsContext gc;
-	
-	//Data Fields 
+
+	// Data Fields
 	public double totalNumFrame;
 	static ProjectData data;
 	private int animalCounter = 0;
 	private TimePoint previousPoint;
 	private boolean modifyToggleActive = false;
-	
+
 	// Constants for Drawing and Frame Changing
 	private static final int drawX = 5;
 	private static final int drawY = 5;
 	private static final int halfDrawX = drawX / 2;
 	private static final int halfDrawY = drawY / 2;
-	
+
 	// from calibration: random assignment at the moment
 	private int totalAmountOfAnimals;
 	private int startFrame;
 	private int endFrame;
 	private int oldCurrentFrame = 0;
 	private int frameJumpModifier;
-	
+
 	// Fields that make the program run faster rather
-	// than continuously calling for an int value. 
+	// than continuously calling for an int value.
 	private static int frameRate;
 	private int currentFrameNumber = startFrame;
 
-	//frameJumpModifier=1 is a timeStep of one second
-	public void setFrameJumpModifier(int timeStep){
-		frameJumpModifier=timeStep;
-		
-	}
+	public static final Color[] TRACK_COLORS = new Color[] { Color.RED, Color.BLUE, Color.GREEN, Color.CYAN,
+			Color.MAGENTA, Color.BLUEVIOLET, Color.ORANGE };
 
-	/*
-	 * Aims to draw a circle around the track that is currently being focused by the
-	 * animalTrack combo box. Currently does not work because the field immediately
-	 * has nothing in it, unsure how to fix. TODO: fix this too.
+	/**
+	 * @param timeStep - what to set FrameJumpModifier to
 	 */
-	public void showSpecifiedAnimalTrack() {
-		int curAnimalIndex = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
-		AnimalTrack curAnimal = data.getAnimalTracksList().get(curAnimalIndex);
-		gc.setFill(data.getColorArrayForAnimalTracks().get(curAnimalIndex));
-		gc.strokeOval(curAnimal.getTimePointAtTime(currentFrameNumber).getX() - (drawX * 3), curAnimal.getTimePointAtTime(currentFrameNumber).getY() - (drawY * 3), drawX * 3, drawY *3);
+	public void setFrameJumpModifier(int timeStep) {
+		frameJumpModifier = timeStep;
+
 	}
 
 	/**
 	 * Updates the ImageView to the given frame number.
+	 * 
 	 * @param numOfFrame - given frame number
 	 */
 	private void jumpToFrame(int numOfFrame) {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 		currentFrameNumber = numOfFrame;
 		frameJumpHelper();
-		//showSpecifiedAnimalTrack();
-
 	}
 
 	/**
-	 * Changes the current frame based on a given frame step. 
+	 * Changes the current frame based on a given frame step.
+	 * 
 	 * @param numOfFrameChange - how many frames to move
 	 */
 	private void frameChanger(double numOfFrameChange) {
@@ -145,10 +147,14 @@ public class EditingWindowController {
 			animalCounter++;
 			if (animalCounter >= totalAmountOfAnimals) {
 				saveFinishedProject();
-				makeAlert("Tracking Complete","You have completed the tracking! Your file has been saved as \"" + data.getVideo().getFilePathJustName() + "\" Hit the finish button to recieve csv files and analysis");
+				makeAlert("Tracking Complete",
+						"You have completed the tracking! Your file has been saved as \""
+								+ data.getVideo().getFilePathJustName()
+								+ "\" Hit the finish button to recieve csv files and analysis");
 			} else {
 				setAnimalTrackObjectComboBox();
-				makeAlert("Tracking New Chicken","You are now adding data for chicken " + data.getAnimalTracksList().get(animalCounter).getName());
+				makeAlert("Tracking New Chicken", "You are now adding data for chicken "
+						+ data.getAnimalTracksList().get(animalCounter).getName());
 				jumpToFrame(startFrame);
 			}
 		} else {
@@ -157,40 +163,38 @@ public class EditingWindowController {
 			frameJumpHelper();
 		}
 	}
-	
+
 	/**
-	 * Allows the user to review the chosen track with a click of a button. 
+	 * Allows the user to review the chosen track with a click of a button.
 	 */
 	private void reviewTimeChanger() {
 		if (currentFrameNumber < endFrame - frameRate) {
 			currentFrameNumber += frameRate;
 			frameReviewJumpHelper();
-			new java.util.Timer().schedule(
-				    new java.util.TimerTask() {
-				        @Override
-				        public void run() {
-				            Platform.runLater(() -> reviewTimeChanger());
-				        }
-				    }, 
-				    50);   // the delay time in milliseconds
+			new java.util.Timer().schedule(new java.util.TimerTask() {
+				@Override
+				public void run() {
+					Platform.runLater(() -> reviewTimeChanger());
+				}
+			}, 50); // the delay time in milliseconds
 		} else {
 			jumpToFrame(oldCurrentFrame);
 			makeAlert("Review Complete", "Reviewing process is finished");
-	
 		}
 	}
-	
-	/*
-	 * Changes the frame back a static amount. 
+
+	/**
+	 * Changes the frame back a static amount.
 	 */
 	private void frameStepBack() {
 		frameChanger(-frameRate);
 
 	}
-	
+
 	/**
-	 * The FXML method to get a mouse click from the previous button
-	 * to go back in the video. 
+	 * The FXML method to get a mouse click from the previous button to go back in
+	 * the video.
+	 * 
 	 * @param event - click on the Previous Button
 	 */
 	@FXML
@@ -198,16 +202,17 @@ public class EditingWindowController {
 		frameStepBack();
 	}
 
-	/*
-	 * Changes the frame forward a static amount. 
+	/**
+	 * Changes the frame forward a static amount.
 	 */
 	private void frameStepForward() {
 		frameChanger(frameRate);
 	}
 
 	/**
-	 * The FXML method to get a mouse click from the next button
-	 * to go back in the video. 
+	 * The FXML method to get a mouse click from the next button to go back in the
+	 * video.
+	 * 
 	 * @param event - click on the Next button
 	 */
 	@FXML
@@ -216,22 +221,33 @@ public class EditingWindowController {
 	}
 
 	/**
-	 * Draws the point of the current animal at the current frame. 
+	 * Draws the point of the current animal at the current frame.
 	 */
 	protected void drawPointsAtCurrentFrame() {
 		setAnimalCounter();
-		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
-		if (currentAnimal.hasTimePointAtTime(currentFrameNumber)) {
-			TimePoint curAnimalPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
-			gc.setStroke(Color.GREEN);
-			gc.fillOval(curAnimalPoint.getX() - halfDrawX, curAnimalPoint.getY() - halfDrawY, drawX, drawY);
+		double scalingRatio = getRatio();
+		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+			AnimalTrack currentAnimal = data.getAnimalTracksList().get(i);
+
+			Color trackColor = TRACK_COLORS[i % TRACK_COLORS.length];
+			Color trackPrevColor = trackColor.deriveColor(0, 0.5, 1.5, 1.0);
+
+			if (currentAnimal.hasTimePointAtTime(currentFrameNumber)) {
+				TimePoint curAnimalPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
+				gc.setFill(trackColor);
+				gc.fillOval(curAnimalPoint.getX() * scalingRatio - halfDrawX,
+						curAnimalPoint.getY() * scalingRatio - halfDrawY, drawX, drawY);
+			}
+
 		}
+		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
+
 	}
-	
-	/*
-	 * Clears the canvas, sets the video to the new current frame number, and displays the current
-	 * points, and the past/future points within a certain interval. Also updates the Time Box and
-	 * slider bar to be the new time. 
+
+	/**
+	 * Clears the canvas, sets the video to the new current frame number, and
+	 * displays the current points, and the past/future points within a certain
+	 * interval. Also updates the Time Box and slider bar to be the new time.
 	 */
 	private void frameJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -242,11 +258,11 @@ public class EditingWindowController {
 		displayPastTracks();
 		updateTextAndSlider();
 	}
-	
-	/*
-	 * Clears the canvas, sets the video to the new current frame number, and displays the current
-	 * points, and the past points within a certain interval. Also updates the Time Box and
-	 * slider bar to be the new time. 
+
+	/**
+	 * Clears the canvas, sets the video to the new current frame number, and
+	 * displays the current points, and the past points within a certain interval.
+	 * Also updates the Time Box and slider bar to be the new time.
 	 */
 	private void frameReviewJumpHelper() {
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -259,6 +275,7 @@ public class EditingWindowController {
 
 	/**
 	 * Checks for a click on the Manual Edit button.
+	 * 
 	 * @param event - mouse click on the modify event button
 	 */
 	@FXML
@@ -267,54 +284,62 @@ public class EditingWindowController {
 	}
 
 	/**
-	 * Gets a click on the canvas and creates a point and adds it to the
-	 * current AnimalTrack
+	 * Gets a click on the canvas and creates a point and adds it to the current
+	 * AnimalTrack
+	 * 
 	 * @param event - click on the canvas
 	 */
 	@FXML
 	private void addOrModifyDataPoint(MouseEvent event) {
-		double xCord = event.getX();
-		double yCord = event.getY();
-		Point centerPoint = new Point(xCord, yCord);
+		double unscaledxCord = event.getX();
+		double unscaledyCord = event.getY();
+		double scalingRatio = getRatio();
+		Point centerPoint = new Point(unscaledxCord / scalingRatio, unscaledyCord / scalingRatio);
 		setAnimalCounter();
 		AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 		if (modifyToggleActive) {
-			if(currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
+			if (currentAnimal.getTimePointAtTime(currentFrameNumber) != null) {
 				previousPoint = currentAnimal.getTimePointAtTime(currentFrameNumber);
 				modifyDataPointHelper(currentAnimal, centerPoint, previousPoint);
-				gc.setFill(data.getColorArrayForAnimalTracks().get(animalCounter));
-				gc.fillOval(xCord - halfDrawX, yCord  - halfDrawY, drawX, drawY);
+
+				gc.setFill(TRACK_COLORS[animalCounter % TRACK_COLORS.length]);
+				gc.fillOval(unscaledxCord - halfDrawX, unscaledyCord - halfDrawY, drawX, drawY);
 			} else {
 				setAnimalTrackObjectComboBox();
 				makeAlert("Modify Location Error", "No data point to modify");
 			}
-			
+
 		} else {
 			addDataPointHelper(currentAnimal, centerPoint);
 			frameStepForward();
-			gc.setFill(Color.DARKGREEN);
-			gc.fillOval(xCord - halfDrawX, yCord - halfDrawY, drawX, drawY);
+			gc.setFill(TRACK_COLORS[animalCounter % TRACK_COLORS.length]);
+			gc.fillOval(unscaledxCord - halfDrawX, unscaledyCord - halfDrawY, drawX, drawY);
 		}
 	}
 
-	/*
-	 * Takes a new point and changes a previous point (Modifies the data) of the current AnimalTrack
+	/**
+	 * Takes a new point and changes a previous point (Modifies the data) of the
+	 * current AnimalTrack
 	 */
 	private void modifyDataPointHelper(AnimalTrack currentAnimal, Point newPoint, TimePoint undoPoint) {
-		gc.clearRect(previousPoint.getX(), previousPoint.getY(), drawX, drawY);
+		double scalingRatio = getRatio();
+		gc.clearRect(previousPoint.getX() * scalingRatio - halfDrawX, previousPoint.getY() * scalingRatio - halfDrawY,
+				drawX, drawY);
 		currentAnimal.setTimePointAtTime(newPoint, currentFrameNumber);
 	}
 
-	/*
+	/**
 	 * Adds a new data point to the current AnimalTrack
 	 */
 	private void addDataPointHelper(AnimalTrack currentAnimal, Point newPoint) {
 		currentAnimal.addLocation(newPoint, currentFrameNumber);
 	}
-	
+
 	/**
 	 * Adds an unassigned segment to the current AnimalTrack. Gets the track value
-	 * from the unassigned Track Choice box and the AnimalTrack from the Chick Combo Box
+	 * from the unassigned Track Choice box and the AnimalTrack from the Chick Combo
+	 * Box
+	 * 
 	 * @param event - mouse click on the Choice box for unassigned tracks
 	 */
 	@FXML
@@ -323,6 +348,7 @@ public class EditingWindowController {
 			String chosenValueByUser = new String(pickUnassignedAnimalTrackBtn.getValue());
 			String nameOfCurrentTrack = ("");
 			AnimalTrack chosenTrack = null;
+			double scalingRatio = getRatio();
 			boolean foundTrack = false;
 			int trackCounter = 1;
 			int i = 0;
@@ -330,7 +356,7 @@ public class EditingWindowController {
 			while (i < data.getUnassignedSegments().size() && !foundTrack) {
 				AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 				// displays a track that is within 10 times the frame rate
-				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) <  frameRate
+				if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
 						* frameJumpModifier * 5) {
 					nameOfCurrentTrack = ("Track " + trackCounter);
 					trackCounter++;
@@ -344,7 +370,7 @@ public class EditingWindowController {
 			}
 			gc.setFill(Color.ALICEBLUE);
 			for (TimePoint pt : chosenTrack.getLocations()) {
-				gc.fillOval(pt.getX() - halfDrawX, pt.getY() - halfDrawY, drawX, drawY);
+				gc.fillOval(pt.getX() * scalingRatio - halfDrawX, pt.getY() * scalingRatio - halfDrawY, drawX, drawY);
 			}
 			gc.setFill(Color.BLACK);
 			setAnimalCounter();
@@ -355,25 +381,27 @@ public class EditingWindowController {
 	}
 
 	/**
-	 * Displays the unassigned segments that are within a certain time frame. 
+	 * Displays the unassigned segments that are within a certain time frame.
 	 */
 	private void displayFutureTracks() {
 		int trackCounter = 1;
+		double scalingRatio = getRatio();
 		ObservableList<String> listOfTracksDisplayed = FXCollections.observableArrayList();
 		for (int i = 0; i < data.getUnassignedSegments().size(); i++) {
 			AnimalTrack currentTrack = data.getUnassignedSegments().get(i);
 			// displays a track that is within x times the frame rate
-			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) <  frameRate
+			if (Math.abs(currentTrack.getFirstTimePoint().getFrameNum() - currentFrameNumber) < frameRate
 					* frameJumpModifier * 5) {
 //				changeSelectedTrackColor();
 				gc.setFill(Color.BLACK);
 				for (int j = 0; j < currentTrack.getNumPoints(); j++) {
 					TimePoint currentTimePoint = currentTrack.getTimePointAtIndex(j);
-					gc.fillOval(currentTimePoint.getX() - halfDrawX, currentTimePoint.getY() - halfDrawY, drawX, drawY);
+					gc.fillOval(currentTimePoint.getX() * scalingRatio - halfDrawX,
+							currentTimePoint.getY() * scalingRatio - halfDrawY, drawX, drawY);
 				}
 				gc.setFill(Color.DARKBLUE);
-				gc.fillText("Track " + trackCounter, currentTrack.getFirstTimePoint().getX() + 10,
-						currentTrack.getFirstTimePoint().getY() + 10);
+				gc.fillText("Track " + trackCounter, currentTrack.getFirstTimePoint().getX() * scalingRatio + 10,
+						currentTrack.getFirstTimePoint().getY() * scalingRatio + 10);
 				listOfTracksDisplayed.add("Track " + trackCounter);
 				trackCounter++;
 			}
@@ -382,7 +410,10 @@ public class EditingWindowController {
 			pickUnassignedAnimalTrackBtn.setItems(listOfTracksDisplayed);
 		}
 	}
-	
+
+	/**
+	 * Attempts to change the color of the selected AutoTrack.
+	 */
 	private void changeSelectedTrackColor() {
 		String chosenValueByUser = pickUnassignedAnimalTrackBtn.getValue();
 		System.out.println(chosenValueByUser);
@@ -392,32 +423,35 @@ public class EditingWindowController {
 			gc.setFill(Color.BLACK);
 		}
 	}
-	
+
 	/**
-	 * Draws the past tracks of the current animal within a certain interval. 
+	 * Draws the past tracks of the current animal within a certain interval.
 	 */
 	private void displayPastTracks() {
 		setAnimalCounter();
-		AnimalTrack currentTrack = data.getAnimalTracksList().get(animalCounter);
-		for (AnimalTrack track : data.getAnimalTracksList()) {
-			int i = 0;
-			if(track.getTimePointAtTime(currentFrameNumber) != null) {
-				TimePoint currentTP = track.getTimePointAtTime(currentFrameNumber);
-				gc.setFill(data.getColorArrayForAnimalTracks().get(i));
-				gc.fillOval(currentTP.getX() - halfDrawX, currentTP.getY() - halfDrawY, drawX, drawY);
+		double scalingRatio = getRatio();
+		for (int i = 0; i < data.getAnimalTracksList().size(); i++) {
+			Color trackColor = TRACK_COLORS[i];
+			Color trackPrevColor = trackColor.deriveColor(0, 0.5, 1.5, 1.0);
+			gc.setFill(trackPrevColor);
+			for (TimePoint prevPt : data.getAnimalTracksList().get(i)
+					.getTimePointsWithinInterval(currentFrameNumber - (frameRate * 3), currentFrameNumber - 1)) {
+				gc.fillOval(prevPt.getX() * scalingRatio - halfDrawX, prevPt.getY() * scalingRatio - halfDrawY, drawX,
+						drawY);
 			}
-		i++;
-		}
-		
-		if( currentTrack.getTimePointAtTime(currentFrameNumber) != null) {
-			TimePoint currentTP = currentTrack.getTimePointAtTime(currentFrameNumber);
-			gc.setFill(Color.AQUAMARINE);
-			gc.fillOval(currentTP.getX() - halfDrawX, currentTP.getY() - halfDrawY, drawX, drawY);
+			// draw the current point (if any) as a larger dot
+			TimePoint currPt = data.getAnimalTracksList().get(i).getTimePointAtTime(currentFrameNumber);
+			if (currPt != null) {
+				gc.setFill(trackPrevColor);
+				gc.fillOval(currPt.getX() * scalingRatio - drawX, currPt.getY() * scalingRatio - drawY, drawX * 2,
+						drawY * 2);
+			}
 		}
 	}
 
 	/**
-	 * Exits the program when the window is closed. 
+	 * Exits the program when the window is closed.
+	 * 
 	 * @param event
 	 */
 	@FXML
@@ -425,50 +459,52 @@ public class EditingWindowController {
 		Platform.exit();
 	}
 
-	@FXML
-	private void redoEdit(MouseEvent event) {
-	}
-
 	/**
-	 * Undos the most recent point. Only works during the adding points section. 
+	 * Undos the most recent point. Only works during the adding points section.
+	 * 
 	 * @param event
 	 */
 	@FXML
 	private void undoEdit(MouseEvent event) {
-		if(!modifyToggleActive) {
+		if (!modifyToggleActive) {
 			setAnimalCounter();
+			double scalingRatio = getRatio();
 			AnimalTrack currentAnimal = data.getAnimalTracksList().get(animalCounter);
 			if (currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1) != null) {
 				TimePoint previousTP = currentAnimal.getTimePointAtIndex(currentAnimal.getNumPoints() - 1);
-				gc.clearRect(previousTP.getX(), previousTP.getY(), drawX, drawY);
+				gc.clearRect(previousTP.getX() * scalingRatio - halfDrawX, previousTP.getY() * scalingRatio - halfDrawY,
+						drawX, drawY);
 				currentAnimal.removeLocation(currentAnimal.getNumPoints() - 1);
-				if(currentAnimal.getFinalTimePoint() != null) {
+				if (currentAnimal.getFinalTimePoint() != null) {
 					jumpToFrame(currentAnimal.getFinalTimePoint().getFrameNum());
 				}
 			} else {
-				makeAlert("Undo Error", "No more points to undo for this chicken." );
+				makeAlert("Undo Error", "No more points to undo for this chicken.");
 			}
-		}else {
-			makeAlert("Undo Error", "Undo Does Not Work in Modify Mode" );
+		} else {
+			makeAlert("Undo Error", "Undo Does Not Work in Modify Mode");
 		}
 	}
-	
+
 	/**
-	 * goes through the video displaying the points of the current animal track. Once it goes through the video,
-	 * it goes back to where the user first clicked the review button.
-	 * @param event - click on the Review button 
-	 * @throws InterruptedException - if the thread that goes through the video ends. 
+	 * goes through the video displaying the points of the current animal track.
+	 * Once it goes through the video, it goes back to where the user first clicked
+	 * the review button.
+	 * 
+	 * @param event - click on the Review button
+	 * @throws InterruptedException - if the thread that goes through the video
+	 *                              ends.
 	 */
-	@FXML 
+	@FXML
 	private void reviewTrack(MouseEvent event) throws InterruptedException {
 		oldCurrentFrame = currentFrameNumber;
 		currentFrameNumber = startFrame;
-		
+
 		reviewTimeChanger();
 	}
 
 	/**
-	 * Allows the user to change the frame view using the text field 
+	 * Allows the user to change the frame view using the text field
 	 */
 	@FXML
 	public void changeFrameWithTextField() {
@@ -491,21 +527,24 @@ public class EditingWindowController {
 		}
 		animalTrackObjectComboBox.getSelectionModel().select(0);
 	}
-	
+
 	/**
 	 * Sets the animal counter to the current animal Track
 	 */
 	public void setAnimalCounter() {
 		animalCounter = animalTrackObjectComboBox.getSelectionModel().getSelectedIndex();
 	}
-	
-	
+
+	/**
+	 * Sets the combo box to the appropriate chick when doing the automatic manual
+	 * edit section.
+	 */
 	public void setAnimalTrackObjectComboBox() {
 		animalTrackObjectComboBox.getSelectionModel().select(animalCounter);
 	}
 
 	/**
-	 * Allows the user to use the slider bar to change the image view. 
+	 * Allows the user to use the slider bar to change the image view.
 	 */
 	@FXML
 	public void runSliderSeekBar() {
@@ -520,48 +559,81 @@ public class EditingWindowController {
 		timeField.setText("" + getTimeInMinuteSecond());
 		sliderSeekBar.setValue(currentFrameNumber);
 	}
-	 
+
+	/**
+	 * Sets the time step of the ProjectData video object and frameJumpModifier
+	 */
 	public void setTimeStep() {
 		int timeStep = timeStepBox.getSelectionModel().getSelectedItem() + 1;
-	    data.getVideo().setTimeStep(timeStep);
-	    setFrameJumpModifier(timeStep);
-    }
-	 
+		data.getVideo().setTimeStep(timeStep);
+		setFrameJumpModifier(timeStep);
+	}
+
 	/**
-	 * Allows the user to have shortcuts when editing the data.
-	 * D - Presses the next button
-	 * A - Presses the previous button
-	 * Q - Presses the undo button
+	 * Allows the user to have shortcuts when editing the data. D - Presses the next
+	 * button A - Presses the previous button Q - Presses the undo button
+	 * 
 	 * @param e - the key that was pressed
 	 */
-    @FXML
-    public void keyPressed(KeyEvent e) {
-    	if(e.getCode() == KeyCode.D) {
-    		frameStepForward();
-    	}else if(e.getCode() == KeyCode.A) {
-    		frameStepBack();
-    	}else if(e.getCode() == KeyCode.Q) {
-    		undoEdit(null);
-    	}
-    }
-    
-    /*
-     * Makes the alert with a given title and message. 
-     */
-    private void makeAlert(String title, String message) {
+	@FXML
+	public void keyPressed(KeyEvent e) {
+		if (e.getCode() == KeyCode.D) {
+			frameStepForward();
+		} else if (e.getCode() == KeyCode.A) {
+			frameStepBack();
+		} else if (e.getCode() == KeyCode.Q) {
+			undoEdit(null);
+		}
+	}
+
+	/**
+	 * Makes the imageView the same size as the video dimensions
+	 */
+	public void sizeCenterPanel() {
+		Mat matImage = data.getVideo().readFrame();
+		MatOfByte buffer = new MatOfByte();
+		Imgcodecs.imencode(".png", matImage, buffer);
+		Image blankImage = new Image(new ByteArrayInputStream(buffer.toArray()));
+		double aspectRatio = blankImage.getWidth() / blankImage.getHeight();
+
+		double newHeight = blankImage.getHeight() * aspectRatio;
+		double newWidth = blankImage.getWidth() * aspectRatio;
+
+		if (stackPane.getHeight() < newHeight) {
+			currentFrameImage.setFitHeight(blankImage.getHeight());
+		} else {
+			currentFrameImage.setFitHeight(blankImage.getHeight() * aspectRatio);
+		}
+		if (stackPane.getWidth() < newWidth) {
+			currentFrameImage.setFitWidth(blankImage.getWidth());
+		} else {
+			currentFrameImage.setFitWidth(blankImage.getWidth() * aspectRatio);
+		}
+
+		canvas.setWidth(currentFrameImage.getFitWidth());
+		canvas.setHeight(currentFrameImage.getFitHeight());
+
+		// Citation: Team Curlew - Chris Baker and Q&A board.
+	}
+
+	/**
+	 * Makes the alert with a given title and message.
+	 */
+	private void makeAlert(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(null);
 		alert.setContentText(message);
 		alert.showAndWait();
 		// Cited https://code.makery.ch/blog/javafx-dialogs-official/
-    }
-    
-    /*
-     * Gets the time from the current frame number in minutes and seconds MM:SS format
-     */
+	}
+
+	/**
+	 * Gets the time from the current frame number in minutes and seconds MM:SS
+	 * format
+	 */
 	private String getTimeInMinuteSecond() {
-		int startTime = (int)(currentFrameNumber / frameRate);
+		int startTime = (int) (currentFrameNumber / frameRate);
 		int startTimeMinutes = startTime / 60;
 		int startTimeSeconds = startTime % 60;
 		String time = startTimeMinutes + ":" + startTimeSeconds;
@@ -571,49 +643,54 @@ public class EditingWindowController {
 		}
 		return time;
 	}
-	
-	/*
+
+	/**
 	 * Gets the seconds from MM:SS format.
 	 */
 	private int getSecondsFromMinuteSeconds() {
 		int colonIndex = timeField.getText().indexOf(':');
-		int timeInSeconds = (Integer.parseInt(timeField.getText().substring(0, colonIndex)) * 60) + Integer.parseInt(timeField.getText().substring(colonIndex + 1));
+		int timeInSeconds = (Integer.parseInt(timeField.getText().substring(0, colonIndex)) * 60)
+				+ Integer.parseInt(timeField.getText().substring(colonIndex + 1));
 		return timeInSeconds;
-		
+
 	}
-	
+
+	/**
+	 * @param seconds - the seconds to get the frame number from
+	 * @return frame number
+	 */
 	private int getFrameFromSeconds(int seconds) {
 		return seconds * frameRate;
 	}
-	
+
 	/**
-	 * Saves the project when the finish button is pressed. 
+	 * Saves the project when the finish button is pressed.
 	 */
 	private void saveFinishedProject() {
 		File finalDataFile = new File(data.getVideo().getFilePathJustName());
 		try {
 			data.saveToFile(finalDataFile);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();	
+			e.printStackTrace();
 		}
 	}
-	
+
 	/**
-	 * Analyzes the project data
+	 * Calls the analysis class on the project data
 	 */
 	@FXML
 	private void analyzeProjectData() {
 		try {
-			Analysis.runAnalysis(data, currentFrameImage);
+			Analysis.runAnalysis(data, currentFrameImage, getRatio());
 			makeAlert("Analysis Complete", "CSV Files and Analysis have been added to your computer.");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	/*
-	 * Saves the unfinished project data after the user has finished filling in the gaps from the 
-	 * auto tracker.  
+	/**
+	 * Saves the unfinished project data after the user has finished filling in the
+	 * gaps from the auto tracker.
 	 */
 	@FXML
 	private void saveUnfinishedProject() {
@@ -624,12 +701,20 @@ public class EditingWindowController {
 		File chosenFile = fileChooser.showSaveDialog(mainWindow);
 		try {
 			data.saveToFile(chosenFile);
-			makeAlert("Tracking Saved","You have saved your project! Your file has been saved as \"Unfinished " + data.getVideo().getFilePathJustName() + "\". Hit the finish button to recieve CSV files and analysis");
+			makeAlert("Tracking Saved",
+					"You have saved your project! Your file has been saved as \"Unfinished "
+							+ data.getVideo().getFilePathJustName()
+							+ "\". Hit the finish button to recieve CSV files and analysis");
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
+	/**
+	 * Only initializes the timeStepBox
+	 * 
+	 * @throws FileNotFoundException - if the video can't be loaded.
+	 */
 	@FXML
 	public void initialize() throws FileNotFoundException {
 		List<Integer> list = Arrays.asList(1, 2, 3, 4, 5);
@@ -639,30 +724,30 @@ public class EditingWindowController {
 
 	/**
 	 * Initializes the EditingWindow with the ProjectData
+	 * 
 	 * @param projectData - the project data of the current project
-	 * @throws FileNotFoundException if the video from project data was missing. 
+	 * @throws FileNotFoundException if the video from project data was missing.
 	 */
 	public void initializeWithProjectData(ProjectData projectData) throws FileNotFoundException {
 		data = projectData;
+		gc = canvas.getGraphicsContext2D();
+		sizeCenterPanel();
+		currentFrameImage.fitWidthProperty().bind(currentFrameImage.getScene().widthProperty());
 		totalAmountOfAnimals = data.getAnimalTracksList().size();
 		startFrame = data.getVideo().getStartFrameNum();
 		endFrame = data.getVideo().getEndFrameNum();
-//		currentFrameImage.fitWidthProperty().bind(currentFrameImage.getScene().widthProperty());
-//		canvas.setWidth(currentFrameImage.getFitWidth());
-//		canvas.setHeight(currentFrameImage.getFitHeight());
-//		currentFrameNumber = startFrame;
-		gc = canvas.getGraphicsContext2D();
 		frameJumpModifier = data.getVideo().getTimeStep();
 		frameRate = (int) Math.floor(data.getVideo().getFrameRate());
 		initializeAnimalTrackObjectComboBox();
 		timeField.setText(getTimeInMinuteSecond());
 		timeStepBox.getSelectionModel().select(data.getVideo().getTimeStep() - 1);
 		startVideo();
+
 	}
 
 	/**
-	 * Starts the video by showing the start frame and setting the slider bar to the correct length and
-	 * enabling it. 
+	 * Starts the video by showing the start frame and setting the slider bar to the
+	 * correct length and enabling it.
 	 */
 	protected void startVideo() {
 		totalNumFrame = data.getVideo().getVidCap().get(Videoio.CV_CAP_PROP_FRAME_COUNT);
@@ -695,7 +780,7 @@ public class EditingWindowController {
 	}
 
 	/**
-	 * Changes the image view to the current frame number. 
+	 * Changes the image view to the current frame number.
 	 */
 	public void updateFrameView() {
 		Platform.runLater(new Runnable() {
@@ -715,5 +800,11 @@ public class EditingWindowController {
 	 */
 	public ImageView getCurrentFrameImage() {
 		return currentFrameImage;
+	}
+
+	public double getRatio() {
+		double heightRatio = currentFrameImage.getFitHeight() / data.getVideo().getVideoHeightInPixels();
+		double widthRatio = currentFrameImage.getFitWidth() / data.getVideo().getVideoWidthInPixels();
+		return Math.min(heightRatio, widthRatio);
 	}
 }

@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="915.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="643.0" prefWidth="915.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="edu.augustana.csc285.Egret.EditingWindowController">
    <right>
       <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
          <children>
@@ -81,10 +81,10 @@
    <center>
       <AnchorPane prefHeight="256.0" prefWidth="490.0" BorderPane.alignment="CENTER">
          <children>
-            <StackPane layoutX="75.0" layoutY="25.0">
+            <StackPane fx:id="stackPane" layoutX="22.0" layoutY="13.0" prefHeight="476.0" prefWidth="765.0">
                <children>
-                  <ImageView fx:id="currentFrameImage" fitHeight="450.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true" />
-                  <Canvas fx:id="canvas" height="450.0" onMouseClicked="#addOrModifyDataPoint" width="700.0" />
+                  <ImageView fx:id="currentFrameImage" fitHeight="476.0" fitWidth="765.0" pickOnBounds="true" preserveRatio="true" />
+                  <Canvas fx:id="canvas" height="476.0" onMouseClicked="#addOrModifyDataPoint" width="765.0" />
                </children>
             </StackPane>
             <Slider fx:id="sliderSeekBar" layoutX="27.0" layoutY="502.0" onDragDetected="#runSliderSeekBar" onDragDone="#runSliderSeekBar" onDragOver="#runSliderSeekBar" onMouseClicked="#runSliderSeekBar" prefHeight="20.0" prefWidth="590.0" />
@@ -93,4 +93,7 @@
          </children>
       </AnchorPane>
    </center>
+   <left>
+      <Label BorderPane.alignment="CENTER" />
+   </left>
 </BorderPane>

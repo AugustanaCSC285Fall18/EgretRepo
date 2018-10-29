@@ -1,3 +1,7 @@
+/**
+ * Description: Creates and houses information for an AnimalTrack object
+ */
+
 package datamodel;
 
 import java.util.ArrayList;
@@ -5,22 +9,21 @@ import java.util.List;
 
 import org.opencv.core.Point;
 
-
 public class AnimalTrack {
 
-	//Data Fields
+	// Data Fields
 	private Point centerPoint;
 	private ArrayList<TimePoint> positions;
 	private String animalId;
 
-	//Constructor
+	// Constructor
 	public AnimalTrack(String name) {
 		this.animalId = name;
 		positions = new ArrayList<TimePoint>();
 	}
 
 	/**
-	 * @param positions - the list of TimePoints to set the position to. 
+	 * @param positions - the list of TimePoints to set the position to.
 	 */
 	public void setLocations(ArrayList<TimePoint> positions) {
 		this.positions = positions;
@@ -81,7 +84,8 @@ public class AnimalTrack {
 	}
 
 	/**
-	 * Allows the user to add a TimePoint to the list of locations. 
+	 * Allows the user to add a TimePoint to the list of locations.
+	 * 
 	 * @param pt - the point to add
 	 */
 	public void addTimePoint(TimePoint pt) {
@@ -89,7 +93,8 @@ public class AnimalTrack {
 	}
 
 	/**
-	 * Allows the user to remove a location at a given index. 
+	 * Allows the user to remove a location at a given index.
+	 * 
 	 * @param index
 	 */
 	public void removeLocation(int index) {
@@ -101,12 +106,12 @@ public class AnimalTrack {
 	 * @return a TimePoint at a specified index
 	 */
 	public TimePoint getTimePointAtIndex(int index) {
-		if (positions.size()<= index || index < 0) {
+		if (positions.size() <= index || index < 0) {
 			return null;
 		} else {
 			return positions.get(index);
 		}
-		
+
 	}
 
 	/**
@@ -114,8 +119,6 @@ public class AnimalTrack {
 	 * @return the TimePoint at a given frame number
 	 */
 	public TimePoint getTimePointAtTime(int frameNum) {
-		// TODO: This method's implementation is inefficient [linear search is O(N)]
-		// Replace this with binary search (O(log n)] or use a Map for fast access
 		for (TimePoint pt : positions) {
 			if (pt.getFrameNum() == frameNum) {
 				return pt;
@@ -129,29 +132,22 @@ public class AnimalTrack {
 	 * @return true if there is a TimePoint at a given time
 	 */
 	public boolean hasTimePointAtTime(int frameNum) {
-		// TODO: This method's implementation is inefficient [linear search is O(N)]
-		// Replace this with binary search (O(log n)] or use a Map for fast access
 		return getTimePointAtTime(frameNum) != null;
 	}
-	
+
 	/**
 	 * @param index - the index of the TimePoint to look for
 	 * @return True if there is a TimePoint at that index
 	 */
 	public boolean hasTimePointAtIndex(int index) {
-		// TODO: This method's implementation is inefficient [linear search is O(N)]
-		// Replace this with binary search (O(log n)] or use a Map for fast access
-
 		return getTimePointAtIndex(index) != null;
 	}
-	
+
 	/**
 	 * @param frameNum - the given frame number
 	 * @return the Point at the frameNum (NOT the TimePoint)
 	 */
 	public Point getPointAtTime(int frameNum) {
-		//TODO: This method's implementation is inefficient [linear search is O(N)]
-		//      Replace this with binary search (O(log n)] or use a Map for fast access
 		for (TimePoint pt : positions) {
 			if (pt.getFrameNum() == frameNum) {
 				return pt.getPointOpenCV();
@@ -159,14 +155,14 @@ public class AnimalTrack {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param startFrameNum - the start of the interval
-	 * @param endFrameNum - the end of the interval
+	 * @param endFrameNum   - the end of the interval
 	 * @return A list of time points within a given interval
 	 */
 	public List<TimePoint> getTimePointsWithinInterval(double startFrameNum, double endFrameNum) {
-		List<TimePoint> pointsInInterval = new ArrayList<>(); 
+		List<TimePoint> pointsInInterval = new ArrayList<>();
 		for (TimePoint pt : positions) {
 			if (pt.getFrameNum() >= startFrameNum && pt.getFrameNum() <= endFrameNum) {
 				pointsInInterval.add(pt);
@@ -174,9 +170,10 @@ public class AnimalTrack {
 		}
 		return pointsInInterval;
 	}
-	
+
 	/**
-	 * Sets a time point at a given time. 
+	 * Sets a time point at a given time.
+	 * 
 	 * @param newPoint - The new point to set the current time point to
 	 * @param frameNum - the frame number that will get a new point
 	 */
@@ -185,29 +182,29 @@ public class AnimalTrack {
 		currentTimePoint.setX(newPoint.x);
 		currentTimePoint.setY(newPoint.y);
 	}
-	
+
 	/**
 	 * Gets a list of TimePoints to be added to the current AnimalTrack.
+	 * 
 	 * @param newList - the other AnimalTrack to get the list from
 	 */
 	public void addTrackSegment(AnimalTrack newList) {
 		for (int i = 0; i < newList.getNumPoints(); i++) {
-		    positions.add(newList.getTimePointAtIndex(i)); 
+			positions.add(newList.getTimePointAtIndex(i));
 		}
-		//positions.addAll((Collection<? extends TimePoint>) newList);
 	}
 
 	/**
 	 * @return the most recently added time point in the list of locations
 	 */
 	public TimePoint getFinalTimePoint() {
-		if (positions.size() <= 0) { 
+		if (positions.size() <= 0) {
 			return null;
 		} else {
 			return positions.get(positions.size() - 1);
 		}
 	}
-	
+
 	/**
 	 * @return the first TimePoint in the list of locations
 	 */
@@ -218,7 +215,7 @@ public class AnimalTrack {
 			return positions.get(0);
 		}
 	}
-	
+
 	/**
 	 * @return X coordinate of the current center point
 	 */
@@ -232,26 +229,44 @@ public class AnimalTrack {
 	public double getY() {
 		return centerPoint.y;
 	}
-	
+
 	/**
-	 * @return the frame number of the first TimePoint in positions. 
+	 * @return the frame number of the first TimePoint in positions.
 	 */
 	public int getFirstFrame() {
 		return positions.get(0).getFrameNum();
 	}
-	
+
 	/**
-	 * @return the frame number of the last TimePoint in positions. 
+	 * @return the frame number of the last TimePoint in positions.
 	 */
 	public int getLastFrame() {
-		return positions.get(positions.size()-1).getFrameNum();
+		return positions.get(positions.size() - 1).getFrameNum();
+	}
+	
+	/**
+	 * 
+	 * @param framenumber - given frame number
+	 * @return closest point to a given frame number
+	 */
+	public TimePoint getClosestPointToFrameNumber(int framenumber) {
+		double closestDistance = Double.MAX_VALUE;
+		TimePoint closestTP = new TimePoint(0,0,0);
+		for(int i = 0; i < positions.size(); i++) {
+			if(positions.get(i).getFrameNum() - framenumber < closestDistance && positions.get(i).getFrameNum() - framenumber > 0 ) {
+				closestDistance = positions.get(i).getFrameNum() - framenumber;
+				closestTP = positions.get(i);
+			}
+		}
+		return closestTP;
 	}
 
 	/**
 	 * Compares two points to see if they are equal.
+	 * 
 	 * @param tp1 - the first TimePoint to compare
 	 * @param tp2 - the first TimePoint to compare
-	 * @return True if the two points are equal 
+	 * @return True if the two points are equal
 	 */
 	public static boolean comparePoint(TimePoint tp1, TimePoint tp2) {
 		if (!(tp1.getX() == tp2.getX())) {
